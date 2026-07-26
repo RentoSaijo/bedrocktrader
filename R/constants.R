@@ -40,32 +40,23 @@
   taiga   = character()
 )
 
-# Define public trade columns.
-.bedrock_trade_columns <- c(
+# Define compact trade columns.
+.bedrock_compact_trade_columns <- c(
   'profession',
   'tier',
-  'tier_name',
-  'total_exp_required',
   'group_id',
-  'trade_id',
-  'option_id',
   'num_trades',
   'num_to_select',
-  'select_all',
-  'variants',
-  'dimensions',
+  'trade_id',
   'wants_1_item',
-  'wants_1_aux_value',
   'wants_1_quantity_min',
   'wants_1_quantity_max',
   'wants_1_price_multiplier',
   'wants_2_item',
-  'wants_2_aux_value',
   'wants_2_quantity_min',
   'wants_2_quantity_max',
   'wants_2_price_multiplier',
   'gives_1_item',
-  'gives_1_aux_value',
   'gives_1_quantity_min',
   'gives_1_quantity_max',
   'gives_1_color',
@@ -73,24 +64,18 @@
   'gives_1_potion',
   'gives_1_map_destination',
   'gives_1_enchantments',
-  'gives_1_enchantment_count',
   'gives_1_treasure',
   'functions',
-  'levels_min',
-  'levels_max',
-  'outcome_status',
   'max_uses',
   'trader_exp',
-  'reward_exp'
+  'reward_exp',
+  'offer_probability',
+  'probability_status'
 )
 
-# Define public probability columns.
-.bedrock_probability_columns <- c(
-  .bedrock_trade_columns,
-  'trade_probability',
-  'choice_probability',
-  'function_probability',
-  'offer_probability',
-  'probability_status',
-  'probability_basis'
+# Define expanded trade columns.
+.bedrock_expanded_trade_columns <- append(
+  .bedrock_compact_trade_columns,
+  'option_id',
+  after = match('trade_id', .bedrock_compact_trade_columns)
 )

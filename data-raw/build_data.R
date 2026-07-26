@@ -92,56 +92,72 @@ for (source_file in source_files) {
   )
 }
 
+# Restore item suffixes.
+.restore_item_suffix <- function(item, aux_value) {
+  result <- item
+  suffixed <- !is.na(item) & !is.na(aux_value)
+  result[suffixed] <- paste0(item[suffixed], ':', aux_value[suffixed])
+  result
+}
+
 # Adopt public Minecraft terminology.
-.adopt_trade_names <- function(trades) {
-  mappings <- c(
-    level                 = 'tier',
-    level_name            = 'tier_name',
-    trades_in_group       = 'num_trades',
-    trades_selected       = 'num_to_select',
-    all_trades_selected   = 'select_all',
-    cost_1_item           = 'wants_1_item',
-    cost_1_aux_value      = 'wants_1_aux_value',
-    cost_1_quantity_min   = 'wants_1_quantity_min',
-    cost_1_quantity_max   = 'wants_1_quantity_max',
-    cost_1_price_multiplier = 'wants_1_price_multiplier',
-    cost_2_item           = 'wants_2_item',
-    cost_2_aux_value      = 'wants_2_aux_value',
-    cost_2_quantity_min   = 'wants_2_quantity_min',
-    cost_2_quantity_max   = 'wants_2_quantity_max',
-    cost_2_price_multiplier = 'wants_2_price_multiplier',
-    result_item           = 'gives_1_item',
-    result_aux_value      = 'gives_1_aux_value',
-    result_quantity_min   = 'gives_1_quantity_min',
-    result_quantity_max   = 'gives_1_quantity_max',
-    result_color          = 'gives_1_color',
-    result_effect         = 'gives_1_effect',
-    potion                = 'gives_1_potion',
-    map_destination       = 'gives_1_map_destination',
-    enchantments          = 'gives_1_enchantments',
-    enchantment_count     = 'gives_1_enchantment_count',
-    treasure              = 'gives_1_treasure',
-    generator             = 'functions',
-    enchanting_power_min  = 'levels_min',
-    enchanting_power_max  = 'levels_max',
-    villager_exp          = 'trader_exp',
-    player_exp            = 'reward_exp',
-    .generator_probability = '.function_probability'
+.adopt_trade_names <- function(trades, expanded) {
+  trades$tier                     <- trades$level
+  trades$num_trades               <- trades$trades_in_group
+  trades$num_to_select            <- trades$trades_selected
+  trades$num_to_select[trades$all_trades_selected] <- -1L
+  trades$num_to_select            <- as.integer(trades$num_to_select)
+  trades$wants_1_item             <- .restore_item_suffix(
+    trades$cost_1_item,
+    trades$cost_1_aux_value
   )
-  matched <- match(names(mappings), names(trades))
-  names(trades)[matched] <- unname(mappings)
-  trades$num_to_select[trades$select_all] <- -1L
-  trades$num_to_select <- as.integer(trades$num_to_select)
+  trades$wants_1_quantity_min     <- trades$cost_1_quantity_min
+  trades$wants_1_quantity_max     <- trades$cost_1_quantity_max
+  trades$wants_1_price_multiplier <- trades$cost_1_price_multiplier
+  trades$wants_2_item             <- .restore_item_suffix(
+    trades$cost_2_item,
+    trades$cost_2_aux_value
+  )
+  trades$wants_2_quantity_min     <- trades$cost_2_quantity_min
+  trades$wants_2_quantity_max     <- trades$cost_2_quantity_max
+  trades$wants_2_price_multiplier <- trades$cost_2_price_multiplier
+  trades$gives_1_item             <- .restore_item_suffix(
+    trades$result_item,
+    trades$result_aux_value
+  )
+  trades$gives_1_quantity_min     <- trades$result_quantity_min
+  trades$gives_1_quantity_max     <- trades$result_quantity_max
+  trades$gives_1_color            <- trades$result_color
+  trades$gives_1_effect           <- trades$result_effect
+  trades$gives_1_potion           <- trades$potion
+  trades$gives_1_map_destination  <- trades$map_destination
+  trades$gives_1_enchantments     <- trades$enchantments
+  trades$gives_1_treasure         <- trades$treasure
+  trades$functions                <- trades$generator
+  trades$trader_exp               <- trades$villager_exp
+  trades$reward_exp               <- trades$player_exp
+  trades$.variants                <- trades$variants
+  trades$.dimensions              <- trades$dimensions
+  trades$.function_probability    <- trades$.generator_probability
   runtime <- new.env(parent = baseenv())
   sys.source('R/constants.R', envir = runtime)
-  columns <- c(
-    runtime$.bedrock_trade_columns,
+  public_columns <- if (expanded) {
+    runtime$.bedrock_expanded_trade_columns
+  } else {
+    runtime$.bedrock_compact_trade_columns
+  }
+  public_columns <- setdiff(
+    public_columns,
+    c('offer_probability', 'probability_status')
+  )
+  private_columns <- c(
+    '.variants',
+    '.dimensions',
     '.source_option',
     '.function_probability',
-    '.probability_status',
-    '.probability_basis'
+    '.probability_status'
   )
-  trades[, columns, drop = FALSE]
+  trades[, c(public_columns, private_columns), drop = FALSE]
 }
 
 # Source Data ------------------------------------------------------------------
@@ -235,14 +251,50 @@ features <- lapply(.bedrock_trade_tables, .profession_features)
   stringsAsFactors = FALSE
 )
 
-# Build flattened trade outcomes.
+# Build compact trade options.
+trade_options <- lapply(.bedrock_trade_tables, function(table) {
+  .flatten_trade_table(table, release, expanded = FALSE)
+})
+.bedrock_trade_options <- .adopt_trade_names(
+  do.call(rbind, trade_options),
+  expanded = FALSE
+)
+rownames(.bedrock_trade_options) <- NULL
+
+# Build expanded trade outcomes.
 trade_outcomes <- lapply(.bedrock_trade_tables, function(table) {
-  .flatten_trade_table(table, release)
+  .flatten_trade_table(table, release, expanded = TRUE)
 })
 .bedrock_trade_outcomes <- .adopt_trade_names(
-  do.call(rbind, trade_outcomes)
+  do.call(rbind, trade_outcomes),
+  expanded = TRUE
 )
 rownames(.bedrock_trade_outcomes) <- NULL
+
+# Validate flattened trade counts.
+if (nrow(.bedrock_trade_options) != 283L) {
+  stop('Pinned compact trade data must contain 283 rows.', call. = FALSE)
+}
+if (nrow(.bedrock_trade_outcomes) != 2789L) {
+  stop('Pinned expanded trade data must contain 2,789 rows.', call. = FALSE)
+}
+probability_groups <- interaction(
+  .bedrock_trade_outcomes$profession,
+  .bedrock_trade_outcomes$trade_id,
+  .bedrock_trade_outcomes$.source_option,
+  drop = TRUE
+)
+probability_sums <- tapply(
+  .bedrock_trade_outcomes$.function_probability,
+  probability_groups,
+  sum
+)
+if (any(abs(probability_sums - 1) > 1e-10)) {
+  stop(
+    'Expanded function probabilities must sum to one per base option.',
+    call. = FALSE
+  )
+}
 
 # Record internal model metadata.
 .bedrock_model_metadata <- list(
@@ -264,6 +316,7 @@ save(
   .bedrock_model_metadata,
   .bedrock_professions_data,
   .bedrock_tiers_data,
+  .bedrock_trade_options,
   .bedrock_trade_outcomes,
   .bedrock_variants_data,
   file     = 'R/sysdata.rda',

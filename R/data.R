@@ -24,39 +24,16 @@
   )
 }
 
-# Normalize tier input.
-.normalize_tier_input <- function(tier, allow_null = TRUE) {
-  if (allow_null && is.null(tier)) {
-    return(seq_along(.bedrock_tier_names))
+# Normalize expansion input.
+.normalize_expanded_input <- function(expanded) {
+  if (
+    length(expanded) != 1L ||
+    is.na(expanded) ||
+    !is.logical(expanded)
+  ) {
+    stop('`expanded` must be TRUE or FALSE.', call. = FALSE)
   }
-  if (length(tier) != 1L || is.na(tier)) {
-    stop('`tier` must be one villager tier.', call. = FALSE)
-  }
-  if (is.numeric(tier)) {
-    if (
-      !is.finite(tier) ||
-      tier != floor(tier) ||
-      !(tier %in% seq_along(.bedrock_tier_names))
-    ) {
-      stop('`tier` must be an integer from 1 through 5.', call. = FALSE)
-    }
-    return(as.integer(tier))
-  }
-  if (!is.character(tier) || !nzchar(tier)) {
-    stop(
-      '`tier` must be an integer from 1 through 5 or a tier name.',
-      call. = FALSE
-    )
-  }
-  value   <- tolower(trimws(tier))
-  matched <- match(value, .bedrock_tier_names)
-  if (is.na(matched)) {
-    stop(
-      '`tier` must be novice, apprentice, journeyman, expert, or master.',
-      call. = FALSE
-    )
-  }
-  matched
+  expanded
 }
 
 # Public Functions --------------------------------------------------------------
@@ -328,16 +305,46 @@ villager_tiers <- function() {
 #'     'wants_1_quantity_max'
 #'   )
 #' ]
-villager_trades <- function(profession = 'armorer', tier = NULL) {
+villager_trades <- function(
+  profession = 'armorer',
+  expanded = FALSE,
+  variant = NULL,
+  dimension = NULL
+) {
   profession <- .normalize_profession_input(profession)
-  tiers      <- .normalize_tier_input(tier)
-  keep <- .bedrock_trade_outcomes$profession == profession &
-    .bedrock_trade_outcomes$tier %in% tiers
-  result <- .bedrock_trade_outcomes[
-    keep,
-    .bedrock_trade_columns,
-    drop = FALSE
-  ]
+  expanded   <- .normalize_expanded_input(expanded)
+  variant    <- .normalize_variant_input(variant)
+  dimension  <- .normalize_dimension_input(dimension)
+  trades <- if (expanded) {
+    .bedrock_trade_outcomes
+  } else {
+    .bedrock_trade_options
+  }
+  rows <- trades[trades$profession == profession, , drop = FALSE]
+  .require_trade_context(rows, variant, dimension)
+  keep <- .context_applies(rows$.variants, variant) &
+    .context_applies(rows$.dimensions, dimension)
+  rows <- rows[keep, , drop = FALSE]
+  if (!nrow(rows)) {
+    stop(
+      'No trades apply to the requested villager context.',
+      call. = FALSE
+    )
+  }
+  for (group_id in unique(rows$group_id)) {
+    group_rows <- rows$group_id == group_id
+    rows$num_trades[group_rows] <- length(unique(rows$trade_id[group_rows]))
+  }
+  rows$offer_probability <- .trade_probabilities(rows) *
+    .choice_probabilities(rows) *
+    rows$.function_probability
+  rows$probability_status <- rows$.probability_status
+  columns <- if (expanded) {
+    .bedrock_expanded_trade_columns
+  } else {
+    .bedrock_compact_trade_columns
+  }
+  result <- rows[, columns, drop = FALSE]
   rownames(result) <- NULL
   result
 }

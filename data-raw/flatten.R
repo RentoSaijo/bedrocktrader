@@ -1,40 +1,3 @@
-# Level Helpers ----------------------------------------------------------------
-
-# Normalize villager level input.
-.normalize_level_input <- function(level, allow_null = TRUE) {
-  if (allow_null && is.null(level)) {
-    return(seq_along(.bedrock_level_names))
-  }
-  if (length(level) != 1L || is.na(level)) {
-    stop('`level` must be one villager level.', call. = FALSE)
-  }
-  if (is.numeric(level)) {
-    if (
-      !is.finite(level) ||
-      level != floor(level) ||
-      !(level %in% 1:5)
-    ) {
-      stop('`level` must be an integer from 1 through 5.', call. = FALSE)
-    }
-    return(as.integer(level))
-  }
-  if (!is.character(level) || !nzchar(level)) {
-    stop(
-      '`level` must be an integer from 1 through 5 or a level name.',
-      call. = FALSE
-    )
-  }
-  value <- tolower(trimws(level))
-  matched <- match(value, .bedrock_level_names)
-  if (is.na(matched)) {
-    stop(
-      '`level` must be novice, apprentice, journeyman, expert, or master.',
-      call. = FALSE
-    )
-  }
-  matched
-}
-
 # Context Helpers ---------------------------------------------------------------
 
 # Combine contextual restrictions.
@@ -233,10 +196,44 @@
     aux_value        = choice$aux_value,
     quantity_min     = choice$quantity_min,
     quantity_max     = choice$quantity_max,
-    price_multiplier = choice$price_multiplier
+    price_multiplier = if (is.na(choice$price_multiplier)) {
+      0.05
+    } else {
+      choice$price_multiplier
+    }
   )
   names(values) <- paste0(prefix, '_', names(values))
   values
+}
+
+# Resolve legacy item color.
+.legacy_item_color <- function(item, aux_value, release, path) {
+  if (is.na(aux_value) || !(item %in% c('minecraft:bed', 'minecraft:banner'))) {
+    return(NA_character_)
+  }
+  if (!(aux_value %in% 0:15)) {
+    .schema_error(
+      release,
+      path,
+      'bed and banner suffixes must be from 0 through 15'
+    )
+  }
+  .bedrock_colors[[aux_value + 1L]]
+}
+
+# Resolve legacy suspicious-stew effect.
+.legacy_item_effect <- function(item, aux_value, release, path) {
+  if (is.na(aux_value) || !identical(item, 'minecraft:suspicious_stew')) {
+    return(NA_character_)
+  }
+  if (!(aux_value %in% 0:5)) {
+    .schema_error(
+      release,
+      path,
+      'suspicious-stew suffixes must be from 0 through 5'
+    )
+  }
+  .bedrock_stew_effects[[aux_value + 1L]]
 }
 
 # Combine position and choice functions.
@@ -473,8 +470,18 @@
       result_aux_value      = gives_1$aux_value,
       result_quantity_min   = gives_1$quantity_min,
       result_quantity_max   = gives_1$quantity_max,
-      result_color          = NA_character_,
-      result_effect         = NA_character_,
+      result_color          = .legacy_item_color(
+        gives_1$item_id,
+        gives_1$aux_value,
+        .pinned_release(),
+        paste0(candidate$candidate_id, '.gives[1].item')
+      ),
+      result_effect         = .legacy_item_effect(
+        gives_1$item_id,
+        gives_1$aux_value,
+        .pinned_release(),
+        paste0(candidate$candidate_id, '.gives[1].item')
+      ),
       potion                = NA_character_,
       map_destination       = NA_character_,
       enchantment           = NA_character_,
@@ -491,29 +498,24 @@
       },
       enchanting_power_min  = NA_real_,
       enchanting_power_max  = NA_real_,
-      outcome_status        = 'source_resolved',
-      max_uses              = candidate$max_uses,
-      villager_exp          = candidate$trader_exp,
-      player_exp            = candidate$reward_exp,
-      .source_option        = source_option,
-      .selection_probability = if (group$select_all) {
+      max_uses              = if (is.na(candidate$max_uses)) {
+        12
+      } else {
+        candidate$max_uses
+      },
+      villager_exp          = if (is.na(candidate$trader_exp)) {
         1
       } else {
-        group$num_to_select / group$candidate_count
+        candidate$trader_exp
       },
-      .choice_probability   = 1 /
-        (
-          length(candidate$wants[[1L]]$choices) *
-          if (length(candidate$wants) == 2L) {
-            length(candidate$wants[[2L]]$choices)
-          } else {
-            1L
-          } *
-          length(candidate$gives[[1L]]$choices)
-        ),
+      player_exp            = if (is.na(candidate$reward_exp)) {
+        TRUE
+      } else {
+        candidate$reward_exp
+      },
+      .source_option        = source_option,
       .generator_probability = 1,
-      .probability_status   = 'exact',
-      .probability_basis    = 'source_trade_table'
+      .probability_status   = 'exact'
     )
   )
   as.data.frame(
@@ -521,6 +523,41 @@
     optional         = TRUE,
     stringsAsFactors = FALSE
   )
+}
+
+# Collapse generated outcomes.
+.collapse_generator_rows <- function(rows) {
+  result <- rows[1L, , drop = FALSE]
+  result$cost_1_quantity_min <- min(rows$cost_1_quantity_min)
+  result$cost_1_quantity_max <- max(rows$cost_1_quantity_max)
+  result$result_quantity_min <- min(rows$result_quantity_min)
+  result$result_quantity_max <- max(rows$result_quantity_max)
+  generated_columns <- c(
+    'result_aux_value',
+    'result_color',
+    'result_effect',
+    'potion',
+    'map_destination',
+    'enchantment',
+    'enchantment_name',
+    'enchantment_level',
+    'enchantment_max_level',
+    'enchantments',
+    'enchantment_count',
+    'treasure'
+  )
+  for (column in generated_columns) {
+    values <- unique(rows[[column]])
+    values <- values[!is.na(values)]
+    if (length(values) != 1L || any(is.na(rows[[column]]))) {
+      result[[column]] <- rows[[column]][NA_integer_]
+    } else {
+      result[[column]] <- values[[1L]]
+    }
+  }
+  result$.generator_probability <- 1
+  result$.probability_status    <- 'exact'
+  result
 }
 
 # Expand random auxiliary values.
@@ -631,11 +668,9 @@
       )
       output$enchantment_count <- 1L
       output$treasure <- enchantment$treasure
-      output$outcome_status <- 'documented_model'
       output$.generator_probability <-
         1 / enchantment_count / enchantment$max_level
       output$.probability_status <- 'documented_model'
-      output$.probability_basis <- 'minecraft_wiki_librarian_model'
       rows[[row_n]] <- output
     }
   }
@@ -707,11 +742,8 @@
     output$treasure <- FALSE
     output$enchanting_power_min <- specification$levels$min
     output$enchanting_power_max <- specification$levels$max
-    output$outcome_status <- 'documented_model'
     output$.generator_probability <- outcomes$probability[[index]]
     output$.probability_status <- 'documented_model'
-    output$.probability_basis <-
-      'minecraft_wiki_enchanting_table_model'
     output
   })
   do.call(rbind, rows)
@@ -780,9 +812,7 @@
       release  = release,
       path     = path
     )
-    row$outcome_status <- 'engine_generated'
     row$.probability_status <- 'partial'
-    row$.probability_basis <- 'source_trade_table_engine_generated'
     return(row)
   }
   .schema_error(
@@ -804,6 +834,7 @@
   wants_1,
   wants_2,
   gives_1,
+  expanded,
   release,
   path
 ) {
@@ -846,27 +877,27 @@
     gives_1       = gives_1,
     context       = context
   )
-  .expand_generator(
+  outcomes <- .expand_generator(
     row,
     .item_functions(candidate$gives[[1L]], gives_1),
     release,
     paste0(path, '.gives[1].functions')
   )
+  if (expanded) {
+    return(outcomes)
+  }
+  .collapse_generator_rows(outcomes)
 }
 
 # Flatten profession table.
-.flatten_trade_table <- function(table, release, selected_levels = NULL) {
+.flatten_trade_table <- function(
+  table,
+  release,
+  expanded = TRUE
+) {
   rows  <- list()
   row_n <- 0L
-  levels <- table$levels
-  if (!is.null(selected_levels)) {
-    levels <- levels[vapply(
-      levels,
-      function(level) level$level %in% selected_levels,
-      logical(1)
-    )]
-  }
-  for (level in levels) {
+  for (level in table$levels) {
     for (group in level$groups) {
       for (candidate in group$candidates) {
         path <- paste0(
@@ -893,7 +924,7 @@
           for (wants_2 in wants_2_choices) {
             for (gives_1 in gives_1_choices) {
               source_option <- source_option + 1L
-              expanded <- .source_option_rows(
+              option_rows <- .source_option_rows(
                 table         = table,
                 level         = level,
                 group         = group,
@@ -902,12 +933,13 @@
                 wants_1       = wants_1,
                 wants_2       = wants_2,
                 gives_1       = gives_1,
+                expanded      = expanded,
                 release       = release,
                 path          = path
               )
-              for (index in seq_len(nrow(expanded))) {
+              for (index in seq_len(nrow(option_rows))) {
                 candidate_row_n <- candidate_row_n + 1L
-                candidate_rows[[candidate_row_n]] <- expanded[
+                candidate_rows[[candidate_row_n]] <- option_rows[
                   index,
                   ,
                   drop = FALSE
@@ -917,11 +949,13 @@
           }
         }
         candidate_result <- do.call(rbind, candidate_rows)
-        candidate_result$option_id <- paste0(
-          candidate$candidate_id,
-          '_o',
-          seq_len(nrow(candidate_result))
-        )
+        if (expanded) {
+          candidate_result$option_id <- paste0(
+            candidate$candidate_id,
+            '_o',
+            seq_len(nrow(candidate_result))
+          )
+        }
         row_n <- row_n + 1L
         rows[[row_n]] <- candidate_result
       }
