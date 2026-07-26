@@ -323,3 +323,33 @@
   'villager_exp',
   'player_exp'
 )
+
+# Define public probability columns.
+.bedrock_probability_columns <- c(
+  'profession',
+  'level',
+  'level_name',
+  'group_id',
+  'trade_id',
+  'option_id',
+  'variants',
+  'dimensions',
+  'result_item',
+  'result_aux_value',
+  'result_color',
+  'result_effect',
+  'potion',
+  'map_destination',
+  'enchantment',
+  'enchantment_name',
+  'enchantment_level',
+  'cost_1_quantity_min',
+  'cost_1_quantity_max',
+  'outcome_status',
+  'selection_probability',
+  'choice_probability',
+  'generator_probability',
+  'probability',
+  'probability_status',
+  'probability_basis'
+)
