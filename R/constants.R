@@ -1,12 +1,48 @@
 # Package Constants -------------------------------------------------------------
 
-# Define Mojang repository endpoints.
-.bedrock_api_url <- 'https://api.github.com/repos/Mojang/bedrock-samples'
+# Define pinned Mojang release.
 .bedrock_raw_url <- 'https://raw.githubusercontent.com/Mojang/bedrock-samples'
-.bedrock_version_path <- 'version.json'
+.bedrock_version <- '1.26.30.5'
+.bedrock_release_tag <- 'v1.26.30.5'
+.bedrock_release_date <- as.Date('2026-06-16')
 .bedrock_trade_directory <- 'behavior_pack/trading/economy_trades'
 .bedrock_variant_path <- 'behavior_pack/entities/villager_v2.json'
-.bedrock_minimum_version <- '1.26.20.4'
+.bedrock_enchantment_path <-
+  'metadata/vanilladata_modules/mojang-enchantments.json'
+
+# Define pinned source checksums.
+.bedrock_blob_shas <- c(
+  'behavior_pack/trading/economy_trades/armorer_trades.json' =
+    '31d6fd2973645f0c972a3b152b7cb2fcd39bbace',
+  'behavior_pack/trading/economy_trades/butcher_trades.json' =
+    '4a22616415f3b7b96523aa1198cba9e08c366aa8',
+  'behavior_pack/trading/economy_trades/cartographer_trades.json' =
+    '994a0e9d2583d1304f727e5507f4af4a31cfde27',
+  'behavior_pack/trading/economy_trades/cleric_trades.json' =
+    '20dc0260417991beee4bd2e805260c64dbe1c6ff',
+  'behavior_pack/trading/economy_trades/farmer_trades.json' =
+    'c6b2ec7e61430270e126ac86593cf6bb7868db41',
+  'behavior_pack/trading/economy_trades/fisherman_trades.json' =
+    'fba7a6b0a37d5e3c4bdb6910fbc7942d9f71b354',
+  'behavior_pack/trading/economy_trades/fletcher_trades.json' =
+    'fb6917ca882f41bc8a15bf762f02b4aabc398b28',
+  'behavior_pack/trading/economy_trades/leather_worker_trades.json' =
+    '346d71c1d6436cce636fef7f6a18f0a915c32031',
+  'behavior_pack/trading/economy_trades/librarian_trades.json' =
+    '2a5a57d4fb591ee398bb27b27776b05252a9adf4',
+  'behavior_pack/trading/economy_trades/stone_mason_trades.json' =
+    '1c1228c754b35b2944dfcf10a2bf16d96a3b0ef0',
+  'behavior_pack/trading/economy_trades/shepherd_trades.json' =
+    'fc01fde0623157ffca30e3041673ffac60961340',
+  'behavior_pack/trading/economy_trades/tool_smith_trades.json' =
+    'fd11c068c55a298ef1c27a030026941ceadb81ee',
+  'behavior_pack/trading/economy_trades/weapon_smith_trades.json' =
+    '7854722ad086c50ef75f947fba65d9741bfd708e',
+  'behavior_pack/entities/villager_v2.json' =
+    '8eff99b5176cb9952e217f557bec604fa02f98ac',
+  'metadata/vanilladata_modules/mojang-enchantments.json' =
+    'ab01e9eaf88ff3a3d25a2b13a2bc1b144ddf8acf'
+)
 
 # Define villager level vocabulary.
 .bedrock_level_names <- c(

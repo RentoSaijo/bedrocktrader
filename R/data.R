@@ -24,34 +24,9 @@
   )
 }
 
-# Find source manifest entry.
-.manifest_entry <- function(manifest, source_path, release) {
-  manifest_paths <- vapply(
-    manifest,
-    function(entry) entry$path %||% '',
-    character(1)
-  )
-  matches <- which(manifest_paths == source_path)
-  if (length(matches) != 1L) {
-    stop(
-      'Mojang release `',
-      release$bedrock_version,
-      '` does not contain expected source `',
-      source_path,
-      '`.',
-      call. = FALSE
-    )
-  }
-  manifest[[matches]]
-}
-
 # Load profession tables.
-.load_profession_tables <- function(professions, version) {
-  release  <- .resolve_release(version)
-  manifest <- .fetch_directory_manifest(
-    release,
-    .bedrock_trade_directory
-  )
+.load_profession_tables <- function(professions) {
+  release <- .pinned_release()
   tables <- vector('list', length(professions))
   names(tables) <- professions
   for (index in seq_along(professions)) {
@@ -64,8 +39,7 @@
       '/',
       source_file
     )
-    entry <- .manifest_entry(manifest, source_path, release)
-    content <- .fetch_manifest_file(entry, release)
+    content <- .fetch_pinned_file(source_path)
     table   <- .parse_json(content, source_path)
     tables[[index]] <- .normalize_trade_table(
       table       = table,
@@ -154,10 +128,6 @@
 #' `bedrocktrader`. Each row also summarizes trade-table features that may need
 #' special handling during analysis.
 #'
-#' @param version `"latest"` or an explicit stable Minecraft Bedrock sample
-#'   version returned by [bedrock_versions()]. `"latest"` is resolved when the
-#'   function is called.
-#'
 #' @return A base data frame with one row per profession:
 #'
 #'   - `profession` (`character`) is the canonical identifier accepted by
@@ -192,11 +162,10 @@
 #'   c('profession', 'context_sensitive')
 #' ]
 #'
-#' villager_professions(version = '1.26.30.5')
 #' }
-villager_professions <- function(version = 'latest') {
+villager_professions <- function() {
   professions <- .bedrock_professions$profession
-  object      <- .load_profession_tables(professions, version)
+  object      <- .load_profession_tables(professions)
   features    <- lapply(object$professions, .profession_features)
   result <- data.frame(
     profession               = professions,
@@ -233,10 +202,6 @@ villager_professions <- function(version = 'latest') {
 #' `minecraft:mark_variant` values. Trade-table filters use these numeric values
 #' to make certain offers dependent on a villager's variant.
 #'
-#' @param version `"latest"` or an explicit stable Minecraft Bedrock sample
-#'   version returned by [bedrock_versions()]. `"latest"` is resolved when the
-#'   function is called.
-#'
 #' @return A base data frame with one row per variant:
 #'
 #'   - `variant` (`character`) is the canonical package identifier.
@@ -260,14 +225,10 @@ villager_professions <- function(version = 'latest') {
 #'
 #' variants[variants$variant == 'snow', ]
 #'
-#' villager_variants(version = '1.26.30.5')
 #' }
-villager_variants <- function(version = 'latest') {
-  release <- .resolve_release(version)
-  content <- .fetch_direct_file(
-    release     = release,
-    source_path = .bedrock_variant_path
-  )
+villager_variants <- function() {
+  release <- .pinned_release()
+  content <- .fetch_pinned_file(.bedrock_variant_path)
   entity <- .parse_json(content, .bedrock_variant_path)
   result <- data.frame(
     variant      = .bedrock_variants,
@@ -290,10 +251,6 @@ villager_variants <- function(version = 'latest') {
 #'
 #' @param profession One canonical profession identifier or an alias listed by
 #'   [villager_professions()]. The default is `"armorer"`.
-#' @param version `"latest"` or an explicit stable Minecraft Bedrock sample
-#'   version returned by [bedrock_versions()]. `"latest"` is resolved when the
-#'   function is called.
-#'
 #' @return A base data frame with one row per concrete combination of item
 #' choices and 40 atomic columns.
 #'
@@ -388,8 +345,7 @@ villager_variants <- function(version = 'latest') {
 #' ]
 #'
 #' cartographer <- villager_trades(
-#'   profession = 'cartographer',
-#'   version    = '1.26.30.5'
+#'   profession = 'cartographer'
 #' )
 #' two_inputs <- !is.na(cartographer$wants_2_item)
 #' cartographer[
@@ -402,15 +358,15 @@ villager_variants <- function(version = 'latest') {
 #'   cartographer$gives_1_function_parameters[[function_row]]
 #' )
 #'
-#' mason <- villager_trades('mason', version = '1.26.30.5')
+#' mason <- villager_trades('mason')
 #' mason[
 #'   mason$select_all,
 #'   c('group_id', 'candidate_id', 'option_id', 'num_to_select')
 #' ]
 #' }
-villager_trades <- function(profession = 'armorer', version = 'latest') {
+villager_trades <- function(profession = 'armorer') {
   profession <- .normalize_profession_input(profession)
-  object     <- .load_profession_tables(profession, version)
+  object     <- .load_profession_tables(profession)
   .flatten_trade_table(
     table   = object$professions[[profession]],
     release = object$release

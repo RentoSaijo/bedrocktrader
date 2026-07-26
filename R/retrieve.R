@@ -161,172 +161,42 @@
   )
 }
 
-# Retrieve stable version registry.
-.stable_versions <- function() {
-  registry_url <- paste0(
-    .bedrock_raw_url,
-    '/main/',
-    .bedrock_version_path
-  )
-  registry <- .parse_json(
-    .fetch_bytes(registry_url),
-    .bedrock_version_path
-  )
-  registry_versions <- setdiff(names(registry), 'latest')
-  supported <- vapply(
-    registry_versions,
-    function(version) {
-      utils::compareVersion(version, .bedrock_minimum_version) >= 0L
-    },
-    logical(1)
-  )
-  versions <- registry_versions[supported]
-  if (!length(versions)) {
-    stop(
-      'Mojang stable-version registry contains no supported releases.',
-      call. = FALSE
-    )
-  }
-  result <- data.frame(
-    version      = unname(versions),
-    release_date = as.Date(vapply(
-      registry[versions],
-      function(record) record$date,
-      character(1)
-    ), format = '%d-%m-%Y'),
-    latest       = versions == registry$latest$version,
-    stringsAsFactors = FALSE
-  )
-  result <- result[
-    order(result$release_date, decreasing = TRUE),
-    ,
-    drop = FALSE
-  ]
-  rownames(result) <- NULL
-  result
-}
-
-# Resolve stable release.
-.resolve_release <- function(version = 'latest') {
-  if (
-    length(version) != 1L ||
-    is.na(version) ||
-    !is.character(version) ||
-    !nzchar(version)
-  ) {
-    stop('`version` must be one nonempty character value.', call. = FALSE)
-  }
-  requested <- sub('^v', '', version)
-  if (grepl('preview', requested, fixed = TRUE)) {
-    stop('Preview releases are outside the supported version range.', call. = FALSE)
-  }
-  versions <- .stable_versions()
-  if (identical(requested, 'latest')) {
-    if (!any(versions$latest)) {
-      stop(
-        'Mojang latest stable release is below the supported version floor.',
-        call. = FALSE
-      )
-    }
-    resolved <- versions$version[which(versions$latest)[[1L]]]
-  } else {
-    if (!requested %in% versions$version) {
-      stop(
-        '`version` must be "latest" or a release returned by ',
-        '`bedrock_versions()`.',
-        call. = FALSE
-      )
-    }
-    resolved <- requested
-  }
-  release_index <- match(resolved, versions$version)
+# Describe pinned release.
+.pinned_release <- function() {
   list(
-    requested_version = requested,
-    bedrock_version   = resolved,
-    release_date      = versions$release_date[[release_index]],
-    channel           = 'stable',
-    release_tag       = paste0('v', resolved)
+    bedrock_version = .bedrock_version,
+    release_date    = .bedrock_release_date,
+    channel         = 'stable',
+    release_tag     = .bedrock_release_tag
   )
 }
 
-# Retrieve directory manifest.
-.fetch_directory_manifest <- function(release, directory) {
-  url <- paste0(
-    .bedrock_api_url,
-    '/contents/',
-    directory,
-    '?ref=',
-    release$release_tag
-  )
-  manifest <- .parse_json(.fetch_bytes(url), url)
-  if (!is.list(manifest) || !length(manifest)) {
+# Retrieve pinned source file.
+.fetch_pinned_file <- function(source_path) {
+  expected_sha <- unname(.bedrock_blob_shas[[source_path]])
+  if (is.null(expected_sha)) {
     stop(
-      'Mojang release `',
-      release$bedrock_version,
-      '` returned an empty source manifest.',
-      call. = FALSE
-    )
-  }
-  manifest
-}
-
-# Retrieve manifest file.
-.fetch_manifest_file <- function(entry, release) {
-  required_fields <- c('path', 'sha', 'download_url')
-  if (!is.list(entry) || !all(required_fields %in% names(entry))) {
-    stop(
-      'Mojang release `',
-      release$bedrock_version,
-      '` returned incomplete source metadata.',
-      call. = FALSE
-    )
-  }
-  content <- .fetch_bytes(entry$download_url)
-  blob_sha <- .git_blob_sha(content)
-  if (!identical(blob_sha, entry$sha)) {
-    stop(
-      'Source checksum mismatch for `',
-      entry$path,
-      '` in Mojang release `',
-      release$bedrock_version,
-      '`.',
-      call. = FALSE
-    )
-  }
-  content
-}
-
-# Retrieve direct source file.
-.fetch_direct_file <- function(release, source_path) {
-  url <- paste0(
-    .bedrock_api_url,
-    '/contents/',
-    source_path,
-    '?ref=',
-    release$release_tag
-  )
-  entry <- .parse_json(.fetch_bytes(url), url)
-  if (is.null(entry$content) || is.null(entry$encoding)) {
-    stop(
-      'Mojang release `',
-      release$bedrock_version,
-      '` returned incomplete source content for `',
+      'No pinned checksum is registered for Mojang source `',
       source_path,
       '`.',
       call. = FALSE
     )
   }
-  if (!identical(entry$encoding, 'base64')) {
-    stop('Mojang source content uses an unsupported encoding.', call. = FALSE)
-  }
-  content <- jsonlite::base64_dec(gsub('[\r\n]', '', entry$content))
+  url <- paste0(
+    .bedrock_raw_url,
+    '/',
+    .bedrock_release_tag,
+    '/',
+    source_path
+  )
+  content  <- .fetch_bytes(url)
   blob_sha <- .git_blob_sha(content)
-  if (!identical(blob_sha, entry$sha)) {
+  if (!identical(blob_sha, expected_sha)) {
     stop(
       'Source checksum mismatch for `',
       source_path,
       '` in Mojang release `',
-      release$bedrock_version,
+      .bedrock_version,
       '`.',
       call. = FALSE
     )
