@@ -60,7 +60,7 @@ instructions.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A base data frame with one row per profession:</p><ul><li><p><code>profession</code> (<code>character</code>) is the canonical value accepted by
-<code><a href="villager_trades.html">villager_trades()</a></code> and <code><a href="offer_probabilities.html">offer_probabilities()</a></code>.</p></li>
+<code><a href="villager_trades.html">villager_trades()</a></code>.</p></li>
 <li><p><code>display_name</code> (<code>character</code>) is the readable profession name.</p></li>
 <li><p><code>aliases</code> (<code>character</code>) contains additional accepted inputs separated by
 commas. It is <code>NA</code> when a profession has no aliases.</p></li>
@@ -77,6 +77,9 @@ values, potion setting, map creation, or random dye.</p></li>
     <p>Inputs are case-insensitive. <code>mason</code> and <code>stonemason</code> resolve to
 <code>stone_mason</code>; <code>leather_worker</code>, <code>tool_smith</code>, and <code>weapon_smith</code> likewise
 resolve to their canonical package identifiers.</p>
+<p><code>context_sensitive = TRUE</code> means <code><a href="villager_trades.html">villager_trades()</a></code> needs <code>variant</code>,
+<code>dimension</code>, or both before it can determine applicable groups and their
+probabilities.</p>
 <p>These rows are bundled with the package. Calling the function performs no
 download and does not inspect a saved world.</p>
     </div>

@@ -12,20 +12,17 @@ lists accepted professions and summarizes important trade-table
 features.
 [`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md)
 connects biome names with Mojang's `minecraft:mark_variant` values.
+[`villager_tiers()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_tiers.md)
+pairs each numeric tier with its name and cumulative experience
+requirement.
 
 ## Data
 
 [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
 follows Mojang's `tiers`, `groups`, `trades`, `wants`, and `gives`
-terminology. It expands explicit item alternatives, auxiliary values,
-Librarian books, and complete enchanted-equipment sets.
-
-## Analysis
-
-[`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md)
-calculates the marginal chance that each displayed outcome appears among
-a villager's offers. Separate columns expose trade selection, item
-choices, function outcomes, and their product.
+terminology. Its compact rows describe base item alternatives; expanded
+rows separate modeled enchantments and other generated outcomes. Both
+forms include the marginal probability that the displayed row appears.
 
 ## Version and modeling boundary
 

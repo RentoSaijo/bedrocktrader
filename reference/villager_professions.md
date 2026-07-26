@@ -16,9 +16,7 @@ villager_professions()
 A base data frame with one row per profession:
 
 - `profession` (`character`) is the canonical value accepted by
-  [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
-  and
-  [`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md).
+  [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md).
 
 - `display_name` (`character`) is the readable profession name.
 
@@ -40,6 +38,11 @@ A base data frame with one row per profession:
 Inputs are case-insensitive. `mason` and `stonemason` resolve to
 `stone_mason`; `leather_worker`, `tool_smith`, and `weapon_smith`
 likewise resolve to their canonical package identifiers.
+
+`context_sensitive = TRUE` means
+[`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
+needs `variant`, `dimension`, or both before it can determine applicable
+groups and their probabilities.
 
 These rows are bundled with the package. Calling the function performs
 no download and does not inspect a saved world.

@@ -26,7 +26,7 @@ A base data frame with seven rows:
 
 The canonical cold-biome identifier is `snow`, matching the pinned
 entity definition. `snowy` remains an accepted convenience alias in
-[`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md).
+[`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md).
 
 The values come from the bundled `villager_v2.json` model; the function
 neither downloads data nor examines villagers in a saved world.

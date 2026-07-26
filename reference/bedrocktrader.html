@@ -59,23 +59,17 @@ without downloading files or reading <code>GITHUB_PAT</code>.</p>
 
 <p><code><a href="villager_professions.html">villager_professions()</a></code> lists accepted professions and summarizes important
 trade-table features. <code><a href="villager_variants.html">villager_variants()</a></code> connects biome names with
-Mojang's <code>minecraft:mark_variant</code> values.</p>
+Mojang's <code>minecraft:mark_variant</code> values. <code><a href="villager_tiers.html">villager_tiers()</a></code> pairs each
+numeric tier with its name and cumulative experience requirement.</p>
     </div>
     <div class="section level2">
     <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
 
 
 <p><code><a href="villager_trades.html">villager_trades()</a></code> follows Mojang's <code>tiers</code>, <code>groups</code>, <code>trades</code>, <code>wants</code>,
-and <code>gives</code> terminology. It expands explicit item alternatives, auxiliary
-values, Librarian books, and complete enchanted-equipment sets.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="analysis">Analysis<a class="anchor" aria-label="anchor" href="#analysis"></a></h2>
-
-
-<p><code><a href="offer_probabilities.html">offer_probabilities()</a></code> calculates the marginal chance that each displayed
-outcome appears among a villager's offers. Separate columns expose trade
-selection, item choices, function outcomes, and their product.</p>
+and <code>gives</code> terminology. Its compact rows describe base item alternatives;
+expanded rows separate modeled enchantments and other generated outcomes.
+Both forms include the marginal probability that the displayed row appears.</p>
     </div>
     <div class="section level2">
     <h2 id="version-and-modeling-boundary">Version and modeling boundary<a class="anchor" aria-label="anchor" href="#version-and-modeling-boundary"></a></h2>
