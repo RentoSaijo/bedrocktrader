@@ -2,5 +2,6 @@
 
 export(offer_probabilities)
 export(villager_professions)
+export(villager_tiers)
 export(villager_trades)
 export(villager_variants)

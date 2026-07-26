@@ -140,6 +140,31 @@ villager_variants <- function() {
   result
 }
 
+#' List Villager Tiers
+#'
+#' Lists the five villager trading tiers and the cumulative experience a
+#' villager needs to unlock each tier in Minecraft Bedrock `1.26.30.5`.
+#'
+#' @return A base data frame with five rows:
+#'
+#' - `tier` (`integer`) is the numeric tier used by [villager_trades()].
+#' - `tier_name` (`character`) is the corresponding in-game rank.
+#' - `total_exp_required` (`double`) is the cumulative trading experience the
+#'   villager needs to unlock the tier. The novice tier is always available.
+#'
+#' @details
+#' The bundled vanilla profession tables use the same tier names and
+#' experience thresholds. Calling this function performs no download.
+#' @export
+#'
+#' @examples
+#' villager_tiers()
+villager_tiers <- function() {
+  result <- .bedrock_tiers_data
+  rownames(result) <- NULL
+  result
+}
+
 #' Retrieve Villager Trades
 #'
 #' Returns possible vanilla trade outcomes for one profession in Minecraft

@@ -167,6 +167,32 @@ for (index in seq_along(professions)) {
   )
 }
 
+# Build villager tier metadata.
+tier_requirements <- lapply(.bedrock_trade_tables, function(table) {
+  vapply(
+    table$levels,
+    function(tier) tier$total_exp_required,
+    numeric(1)
+  )
+})
+if (!all(vapply(
+  tier_requirements,
+  identical,
+  logical(1),
+  tier_requirements[[1L]]
+))) {
+  stop(
+    'Villager tier requirements differ across profession tables.',
+    call. = FALSE
+  )
+}
+.bedrock_tiers_data <- data.frame(
+  tier               = seq_along(.bedrock_level_names),
+  tier_name          = .bedrock_level_names,
+  total_exp_required = tier_requirements[[1L]],
+  stringsAsFactors   = FALSE
+)
+
 # Retrieve and normalize villager variants.
 variant_content <- .fetch_pinned_file(.bedrock_variant_path)
 variant_entity  <- .parse_json(variant_content, .bedrock_variant_path)
@@ -237,6 +263,7 @@ rownames(.bedrock_trade_outcomes) <- NULL
 save(
   .bedrock_model_metadata,
   .bedrock_professions_data,
+  .bedrock_tiers_data,
   .bedrock_trade_outcomes,
   .bedrock_variants_data,
   file     = 'R/sysdata.rda',
