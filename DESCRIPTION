@@ -1,0 +1,22 @@
+Package: bedrocktrader
+Title: Retrieve Minecraft Bedrock Villager Trade Data
+Version: 0.0.0.9000
+Authors@R: person('Rento', 'Saijo', email = 'rentosaijo0527@gmail.com', role = c('aut', 'cre', 'cph'), comment = c(ORCID = '0009-0008-4919-7349'))
+Description: Retrieves official vanilla Minecraft Bedrock villager trade
+    tables from versioned Mojang releases and represents their tier, group,
+    candidate, item-choice, function, and filter structure in R. Each result
+    records the exact upstream version, Git commit, source path, and blob
+    identifier used.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+Imports:
+    curl,
+    digest,
+    jsonlite,
+    tibble
+URL: https://rentosaijo.github.io/bedrocktrader/, https://github.com/RentoSaijo/bedrocktrader
+BugReports: https://github.com/RentoSaijo/bedrocktrader/issues
+Config/roxygen2/version: 8.0.0
