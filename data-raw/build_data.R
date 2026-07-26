@@ -17,6 +17,7 @@ source_files <- c(
   'R/constants.R',
   'R/retrieve.R',
   'R/normalize.R',
+  'R/enchantment-model.R',
   'R/flatten.R',
   'R/data.R'
 )
@@ -102,6 +103,10 @@ rownames(.bedrock_trade_outcomes) <- NULL
   release_date    = .bedrock_release_date,
   release_tag     = .bedrock_release_tag,
   parser_model    = 1L,
+  enchantment_model = list(
+    source   = 'Minecraft Wiki: Enchanting table mechanics',
+    revision = 3681507L
+  ),
   source_shas     = .bedrock_blob_shas
 )
 

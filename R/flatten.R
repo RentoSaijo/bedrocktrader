@@ -481,6 +481,8 @@
       enchantment_name      = NA_character_,
       enchantment_level     = NA_integer_,
       enchantment_max_level = NA_integer_,
+      enchantments          = NA_character_,
+      enchantment_count     = NA_integer_,
       treasure              = NA,
       generator             = if (length(result_functions)) {
         result_functions[[1L]][['function']]
@@ -621,6 +623,13 @@
       output$enchantment_name <- enchantment$enchantment_name
       output$enchantment_level <- as.integer(enchantment_level)
       output$enchantment_max_level <- enchantment$max_level
+      output$enchantments <- paste0(
+        'minecraft:',
+        enchantment$enchantment,
+        '=',
+        enchantment_level
+      )
+      output$enchantment_count <- 1L
       output$treasure <- enchantment$treasure
       output$outcome_status <- 'documented_model'
       output$.generator_probability <-
@@ -630,6 +639,81 @@
       rows[[row_n]] <- output
     }
   }
+  do.call(rbind, rows)
+}
+
+# Expand enchanted equipment.
+.expand_equipment_enchantments <- function(
+  row,
+  specification,
+  release,
+  path
+) {
+  .validate_keys(
+    specification,
+    required = c('function', 'treasure', 'levels'),
+    allowed  = c('function', 'treasure', 'levels'),
+    release  = release,
+    path     = path
+  )
+  .validate_logical(
+    specification$treasure,
+    release,
+    paste0(path, '.treasure')
+  )
+  if (isTRUE(specification$treasure)) {
+    .schema_error(
+      release,
+      paste0(path, '.treasure'),
+      'equipment model supports the pinned non-treasure trades'
+    )
+  }
+  .validate_keys(
+    specification$levels,
+    required = c('min', 'max'),
+    allowed  = c('min', 'max'),
+    release  = release,
+    path     = paste0(path, '.levels')
+  )
+  .validate_number(
+    specification$levels$min,
+    release,
+    paste0(path, '.levels.min')
+  )
+  .validate_number(
+    specification$levels$max,
+    release,
+    paste0(path, '.levels.max')
+  )
+  if (
+    specification$levels$min != 5 ||
+    specification$levels$max != 19
+  ) {
+    .schema_error(
+      release,
+      paste0(path, '.levels'),
+      'equipment model expects the pinned inclusive range from 5 through 19'
+    )
+  }
+  outcomes <- .equipment_enchantment_outcomes(
+    item       = row$result_item,
+    levels_min = specification$levels$min,
+    levels_max = specification$levels$max
+  )
+  rows <- lapply(seq_len(nrow(outcomes)), function(index) {
+    output <- row
+    output$enchantments <- outcomes$enchantments[[index]]
+    output$enchantment_count <- outcomes$enchantment_count[[index]]
+    output$treasure <- FALSE
+    output$enchanting_power_min <- specification$levels$min
+    output$enchanting_power_max <- specification$levels$max
+    output$outcome_status <- 'documented_model'
+    output$.generator_probability <- outcomes$probability[[index]]
+    output$.probability_status <- 'documented_model'
+    output$.probability_basis <-
+      'minecraft_wiki_enchanting_table_model'
+    output
+  })
   do.call(rbind, rows)
 }
 
@@ -681,42 +765,12 @@
     return(row)
   }
   if (identical(generator, 'enchant_with_levels')) {
-    .validate_keys(
+    return(.expand_equipment_enchantments(
+      row,
       specification,
-      required = c('function', 'treasure', 'levels'),
-      allowed  = c('function', 'treasure', 'levels'),
-      release  = release,
-      path     = path
-    )
-    .validate_logical(
-      specification$treasure,
       release,
-      paste0(path, '.treasure')
-    )
-    .validate_keys(
-      specification$levels,
-      required = c('min', 'max'),
-      allowed  = c('min', 'max'),
-      release  = release,
-      path     = paste0(path, '.levels')
-    )
-    .validate_number(
-      specification$levels$min,
-      release,
-      paste0(path, '.levels.min')
-    )
-    .validate_number(
-      specification$levels$max,
-      release,
-      paste0(path, '.levels.max')
-    )
-    row$treasure <- specification$treasure
-    row$enchanting_power_min <- specification$levels$min
-    row$enchanting_power_max <- specification$levels$max
-    row$outcome_status <- 'engine_generated'
-    row$.probability_status <- 'partial'
-    row$.probability_basis <- 'source_trade_table_engine_generated'
-    return(row)
+      path
+    ))
   }
   if (identical(generator, 'random_dye')) {
     .validate_keys(
