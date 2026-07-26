@@ -10,17 +10,14 @@
 #' @section Meta:
 #' [villager_professions()] lists accepted professions and summarizes important
 #' trade-table features. [villager_variants()] connects biome names with
-#' Mojang's `minecraft:mark_variant` values.
+#' Mojang's `minecraft:mark_variant` values. [villager_tiers()] pairs each
+#' numeric tier with its name and cumulative experience requirement.
 #'
 #' @section Data:
 #' [villager_trades()] follows Mojang's `tiers`, `groups`, `trades`, `wants`,
-#' and `gives` terminology. It expands explicit item alternatives, auxiliary
-#' values, Librarian books, and complete enchanted-equipment sets.
-#'
-#' @section Analysis:
-#' [offer_probabilities()] calculates the marginal chance that each displayed
-#' outcome appears among a villager's offers. Separate columns expose trade
-#' selection, item choices, function outcomes, and their product.
+#' and `gives` terminology. Its compact rows describe base item alternatives;
+#' expanded rows separate modeled enchantments and other generated outcomes.
+#' Both forms include the marginal probability that the displayed row appears.
 #'
 #' @section Version and modeling boundary:
 #' This package supports `1.26.30.5` only. Source-resolved rows come directly

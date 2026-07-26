@@ -10,7 +10,7 @@ villager_professions()
 A base data frame with one row per profession:
 \itemize{
 \item \code{profession} (\code{character}) is the canonical value accepted by
-\code{\link[=villager_trades]{villager_trades()}} and \code{\link[=offer_probabilities]{offer_probabilities()}}.
+\code{\link[=villager_trades]{villager_trades()}}.
 \item \code{display_name} (\code{character}) is the readable profession name.
 \item \code{aliases} (\code{character}) contains additional accepted inputs separated by
 commas. It is \code{NA} when a profession has no aliases.
@@ -33,6 +33,10 @@ instructions.
 Inputs are case-insensitive. \code{mason} and \code{stonemason} resolve to
 \code{stone_mason}; \code{leather_worker}, \code{tool_smith}, and \code{weapon_smith} likewise
 resolve to their canonical package identifiers.
+
+\code{context_sensitive = TRUE} means \code{\link[=villager_trades]{villager_trades()}} needs \code{variant},
+\code{dimension}, or both before it can determine applicable groups and their
+probabilities.
 
 These rows are bundled with the package. Calling the function performs no
 download and does not inspect a saved world.

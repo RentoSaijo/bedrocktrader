@@ -301,7 +301,7 @@ if (any(abs(probability_sums - 1) > 1e-10)) {
   bedrock_version = .bedrock_version,
   release_date    = .bedrock_release_date,
   release_tag     = .bedrock_release_tag,
-  parser_model    = 1L,
+  parser_model    = 2L,
   enchantment_model = list(
     source   = 'Minecraft Wiki: Enchanting table mechanics',
     revision = 3681507L

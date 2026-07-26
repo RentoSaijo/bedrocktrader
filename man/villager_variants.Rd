@@ -24,7 +24,7 @@ Lists vanilla villager biome variants and their
 \details{
 The canonical cold-biome identifier is \code{snow}, matching the pinned entity
 definition. \code{snowy} remains an accepted convenience alias in
-\code{\link[=offer_probabilities]{offer_probabilities()}}.
+\code{\link[=villager_trades]{villager_trades()}}.
 
 The values come from the bundled \code{villager_v2.json} model; the function
 neither downloads data nor examines villagers in a saved world.
