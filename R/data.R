@@ -364,11 +364,16 @@ villager_variants <- function() {
 #'   c('group_id', 'candidate_id', 'option_id', 'num_to_select')
 #' ]
 #' }
-villager_trades <- function(profession = 'armorer') {
+villager_trades <- function(profession = 'armorer', level = NULL) {
   profession <- .normalize_profession_input(profession)
+  levels     <- .normalize_level_input(level)
   object     <- .load_profession_tables(profession)
-  .flatten_trade_table(
-    table   = object$professions[[profession]],
-    release = object$release
+  result <- .flatten_trade_table(
+    table           = object$professions[[profession]],
+    release         = object$release,
+    selected_levels = levels
   )
+  result <- result[, .bedrock_trade_columns, drop = FALSE]
+  rownames(result) <- NULL
+  result
 }
