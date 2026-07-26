@@ -36,9 +36,8 @@ reference:
 
   - title: "Meta"
     desc: >
-      Inspect supported releases and villagers
+      Inspect supported villagers
     contents:
-      - bedrock_versions
       - villager_professions
       - villager_variants
 
@@ -47,3 +46,9 @@ reference:
       Retrieve possible villager offers
     contents:
       - villager_trades
+
+  - title: "Analysis"
+    desc: >
+      Calculate offer probabilities
+    contents:
+      - offer_probabilities

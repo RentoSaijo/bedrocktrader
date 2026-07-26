@@ -4,42 +4,39 @@
 \alias{villager_professions}
 \title{List Supported Villager Professions}
 \usage{
-villager_professions(version = "latest")
-}
-\arguments{
-\item{version}{\code{"latest"} or an explicit stable Minecraft Bedrock sample
-version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}. \code{"latest"} is resolved when the
-function is called.}
+villager_professions()
 }
 \value{
 A base data frame with one row per profession:
 \itemize{
-\item \code{profession} (\code{character}) is the canonical identifier accepted by
-\code{\link[=villager_trades]{villager_trades()}}.
-\item \code{display_name} (\code{character}) is the human-readable profession name.
-\item \code{aliases} (\code{character}) contains additional accepted identifiers
-separated by commas. \code{NA} means that the profession has no aliases.
+\item \code{profession} (\code{character}) is the canonical input accepted by
+\code{\link[=villager_trades]{villager_trades()}} and \code{\link[=offer_probabilities]{offer_probabilities()}}.
+\item \code{display_name} (\code{character}) is the readable profession name.
+\item \code{aliases} (\code{character}) lists additional accepted inputs, separated by
+commas. It is \code{NA} when no aliases exist.
 \item \code{context_sensitive} (\code{logical}) is \code{TRUE} when at least one offer uses a
-villager-variant or dimension filter. Such offers are not available in
-every context.
-\item \code{contains_item_choices} (\code{logical}) is \code{TRUE} when at least one item
-position contains Mojang's \code{choice} array. \code{\link[=villager_trades]{villager_trades()}} expands
-those alternatives into separate rows.
-\item \code{contains_dynamic_functions} (\code{logical}) is \code{TRUE} when at least one
-item-generation function changes an offered item, such as by adding an
-enchantment, potion, dye, or exploration-map destination.
+biome-variant or dimension filter. It does not imply that every offer from
+the profession is conditional.
+\item \code{contains_item_choices} (\code{logical}) is \code{TRUE} when Mojang supplies an item
+\code{choice} array. \code{\link[=villager_trades]{villager_trades()}} expands those alternatives.
+\item \code{contains_dynamic_functions} (\code{logical}) is \code{TRUE} when at least one result
+uses a generator such as enchanting, random dye, potion setting, or map
+creation.
 }
 }
 \description{
 Lists the 13 employable vanilla villager professions understood by
-\code{bedrocktrader}. Each row also summarizes trade-table features that may need
-special handling during analysis.
+\code{bedrocktrader}. Each row summarizes features found in that profession's
+Minecraft Bedrock \verb{1.26.30.5} trade table.
 }
 \details{
-The feature flags describe the selected release, not permanent properties of
-a profession. To calculate them, the function downloads and inspects all 13
-profession tables. It does not evaluate filters or generate function
-outcomes.
+The function retrieves and verifies all 13 pinned profession tables, then
+inspects their source structure. The flags describe version \verb{1.26.30.5};
+they are not permanent claims about later Minecraft releases.
+
+Canonical names and aliases are case-insensitive when passed to other
+package functions. For example, \code{mason} and \code{stone_mason} both resolve to the
+canonical \code{stone_mason} profession.
 }
 \examples{
 \dontrun{
@@ -47,10 +44,9 @@ professions <- villager_professions()
 professions
 
 professions[
-  professions$context_sensitive,
-  c('profession', 'context_sensitive')
+  professions$contains_dynamic_functions,
+  c('profession', 'contains_dynamic_functions')
 ]
 
-villager_professions(version = '1.26.30.5')
 }
 }

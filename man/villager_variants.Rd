@@ -4,34 +4,28 @@
 \alias{villager_variants}
 \title{List Villager Variants}
 \usage{
-villager_variants(version = "latest")
-}
-\arguments{
-\item{version}{\code{"latest"} or an explicit stable Minecraft Bedrock sample
-version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}. \code{"latest"} is resolved when the
-function is called.}
+villager_variants()
 }
 \value{
 A base data frame with one row per variant:
 \itemize{
 \item \code{variant} (\code{character}) is the canonical package identifier.
 \item \code{mark_variant} (\code{integer}) is the value stored by Mojang's
-\code{minecraft:mark_variant} entity component and tested by vanilla
-\code{is_mark_variant} filters.
-\item \code{aliases} (\code{character}) contains additional accepted names separated by
-commas. \code{NA} means that the variant has no aliases. The \code{snow} variant
-has the alias \code{snowy}.
+\code{minecraft:mark_variant} entity component. Vanilla \code{is_mark_variant}
+filters compare against this value.
+\item \code{aliases} (\code{character}) lists additional accepted inputs, separated by
+commas. It is \code{NA} when no aliases exist.
 }
 }
 \description{
 Lists the seven vanilla villager biome variants and their stored
-\code{minecraft:mark_variant} values. Trade-table filters use these numeric values
-to make certain offers dependent on a villager's variant.
+\code{minecraft:mark_variant} values in Minecraft Bedrock \verb{1.26.30.5}.
 }
 \details{
-Values are derived from the selected release's vanilla \code{villager_v2} entity
-definition rather than assumed from a fixed lookup table. This function does
-not determine the variant of a particular villager.
+Values are read from the pinned vanilla \code{villager_v2.json} entity definition.
+The canonical snowy-biome identifier is \code{snow}; \code{snowy} is an accepted alias
+in \code{\link[=offer_probabilities]{offer_probabilities()}}. This function describes available codes and does
+not inspect a saved-world villager.
 }
 \examples{
 \dontrun{
@@ -40,6 +34,5 @@ variants
 
 variants[variants$variant == 'snow', ]
 
-villager_variants(version = '1.26.30.5')
 }
 }

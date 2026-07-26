@@ -7,32 +7,41 @@
 \title{bedrocktrader: Retrieve Minecraft Bedrock Villager Trade Data}
 \description{
 \code{bedrocktrader} retrieves official vanilla Minecraft Bedrock villager trade
-data from stable Mojang releases and returns ordinary base R data frames.
+data and returns ordinary base R data frames. This release supports Minecraft
+Bedrock Edition \verb{1.26.30.5} only.
 }
 \section{Meta}{
 
-Use \code{\link[=bedrock_versions]{bedrock_versions()}} to inspect the stable releases the package can
-retrieve, \code{\link[=villager_professions]{villager_professions()}} to discover supported professions and
-their trade-table features, and \code{\link[=villager_variants]{villager_variants()}} to connect biome
-variants with Mojang's \code{minecraft:mark_variant} values.
+Use \code{\link[=villager_professions]{villager_professions()}} to discover supported professions and their
+trade-table features. \code{\link[=villager_variants]{villager_variants()}} connects biome variants with
+Mojang's \code{minecraft:mark_variant} values.
 }
 
 \section{Data}{
 
-\code{\link[=villager_trades]{villager_trades()}} retrieves the possible offers for one profession. Its
-rows preserve villager levels, selection groups, item choices, item-generation
-functions, and contextual filters from Mojang's source table. The result
-describes the profession's possible trade definitions rather than the
-realized offers held by one villager in a saved world.
+\code{\link[=villager_trades]{villager_trades()}} retrieves the possible offers for one profession and
+expands concrete item choices. Librarian books are modeled by enchantment and
+level. More complex engine-generated outcomes remain clearly identified.
+}
+
+\section{Analysis}{
+
+\code{\link[=offer_probabilities]{offer_probabilities()}} calculates the marginal probability that each row
+appears among a villager's offers. It separates group selection, item choice,
+and generated-outcome probabilities so their sources remain visible.
 }
 
 \section{Source behavior}{
 
-Each public function retrieves its source data online. A selected release is
-read from an immutable Mojang release tag, and downloaded files are checked
-against the release manifest. The package does not write a cache.
+Each public function retrieves its source data online from Mojang's immutable
+\code{v1.26.30.5} release tag. Downloaded files are checked against pinned Git
+blob SHAs, and the package does not write a cache. Later Minecraft versions
+remain unsupported until their data and mechanics are reviewed.
 }
 
+\references{
+\href{https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5}{Mojang, "Bedrock Samples v1.26.30.5"}
+}
 \seealso{
 Useful links:
 \itemize{
