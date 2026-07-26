@@ -4,43 +4,56 @@
 \name{bedrocktrader}
 \alias{bedrocktrader}
 \alias{bedrocktrader-package}
-\title{bedrocktrader: Retrieve Minecraft Bedrock Villager Trade Data}
+\title{bedrocktrader: Minecraft Bedrock Villager Trade Data}
 \description{
-\code{bedrocktrader} retrieves official vanilla Minecraft Bedrock villager trade
-data and returns ordinary base R data frames. This release supports Minecraft
-Bedrock Edition \verb{1.26.30.5} only.
+\code{bedrocktrader} provides normalized vanilla villager trades for Minecraft
+Bedrock Edition \verb{1.26.30.5}. The data and modeled outcomes are bundled with
+the package, so its public functions return ordinary base R data frames
+without downloading files or reading \code{GITHUB_PAT}.
 }
 \section{Meta}{
 
-Use \code{\link[=villager_professions]{villager_professions()}} to discover supported professions and their
-trade-table features. \code{\link[=villager_variants]{villager_variants()}} connects biome variants with
+\code{\link[=villager_professions]{villager_professions()}} lists accepted professions and summarizes important
+trade-table features. \code{\link[=villager_variants]{villager_variants()}} connects biome names with
 Mojang's \code{minecraft:mark_variant} values.
 }
 
 \section{Data}{
 
-\code{\link[=villager_trades]{villager_trades()}} retrieves the possible offers for one profession and
-expands concrete item choices. Librarian books are modeled by enchantment and
-level. More complex engine-generated outcomes remain clearly identified.
+\code{\link[=villager_trades]{villager_trades()}} follows Mojang's \code{tiers}, \code{groups}, \code{trades}, \code{wants},
+and \code{gives} terminology. It expands explicit item alternatives, auxiliary
+values, Librarian books, and complete enchanted-equipment sets.
 }
 
 \section{Analysis}{
 
-\code{\link[=offer_probabilities]{offer_probabilities()}} calculates the marginal probability that each row
-appears among a villager's offers. It separates group selection, item choice,
-and generated-outcome probabilities so their sources remain visible.
+\code{\link[=offer_probabilities]{offer_probabilities()}} calculates the marginal chance that each displayed
+outcome appears among a villager's offers. Separate columns expose trade
+selection, item choices, function outcomes, and their product.
 }
 
-\section{Source behavior}{
+\section{Version and modeling boundary}{
 
-Each public function retrieves its source data online from Mojang's immutable
-\code{v1.26.30.5} release tag. Downloaded files are checked against pinned Git
-blob SHAs, and the package does not write a cache. Later Minecraft versions
-remain unsupported until their data and mechanics are reviewed.
+This package supports \verb{1.26.30.5} only. Source-resolved rows come directly
+from Mojang's pinned trade tables. Librarian books and enchanted equipment
+use documented models; \code{random_dye} remains marked as engine-generated.
+Later Bedrock versions are unsupported until their data and mechanics are
+reviewed and the bundled model is regenerated.
+}
+
+\section{Licensing}{
+
+The R code is GPL-3-or-later. Normalized values derived from Mojang's
+Bedrock Samples remain subject to Mojang's license notice and the Minecraft
+EULA. \code{bedrocktrader} is independent of Mojang and Microsoft.
 }
 
 \references{
 \href{https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5}{Mojang, "Bedrock Samples v1.26.30.5"}
+
+\href{https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md}{Mojang, "Bedrock Samples license notice"}
+
+\href{https://www.minecraft.net/en-us/eula}{Minecraft, "End User License Agreement"}
 }
 \seealso{
 Useful links:

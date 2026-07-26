@@ -36,19 +36,19 @@ reference:
 
   - title: "Meta"
     desc: >
-      Inspect supported villagers
+      Inspect supported professions and variants
     contents:
       - villager_professions
       - villager_variants
 
   - title: "Data"
     desc: >
-      Retrieve possible villager offers
+      Inspect possible trade outcomes
     contents:
       - villager_trades
 
   - title: "Analysis"
     desc: >
-      Calculate offer probabilities
+      Calculate marginal offer probabilities
     contents:
       - offer_probabilities

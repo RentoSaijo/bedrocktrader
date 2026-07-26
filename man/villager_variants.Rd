@@ -7,32 +7,31 @@
 villager_variants()
 }
 \value{
-A base data frame with one row per variant:
+A base data frame with seven rows:
 \itemize{
 \item \code{variant} (\code{character}) is the canonical package identifier.
-\item \code{mark_variant} (\code{integer}) is the value stored by Mojang's
-\code{minecraft:mark_variant} entity component. Vanilla \code{is_mark_variant}
-filters compare against this value.
-\item \code{aliases} (\code{character}) lists additional accepted inputs, separated by
+\item \code{mark_variant} (\code{integer}) is Mojang's
+\code{minecraft:mark_variant} component value. Vanilla
+\code{is_mark_variant} filters compare against this number.
+\item \code{aliases} (\code{character}) contains additional accepted inputs separated by
 commas. It is \code{NA} when no aliases exist.
 }
 }
 \description{
-Lists the seven vanilla villager biome variants and their stored
-\code{minecraft:mark_variant} values in Minecraft Bedrock \verb{1.26.30.5}.
+Lists vanilla villager biome variants and their
+\code{minecraft:mark_variant} values for Minecraft Bedrock \verb{1.26.30.5}.
 }
 \details{
-Values are read from the pinned vanilla \code{villager_v2.json} entity definition.
-The canonical snowy-biome identifier is \code{snow}; \code{snowy} is an accepted alias
-in \code{\link[=offer_probabilities]{offer_probabilities()}}. This function describes available codes and does
-not inspect a saved-world villager.
+The canonical cold-biome identifier is \code{snow}, matching the pinned entity
+definition. \code{snowy} remains an accepted convenience alias in
+\code{\link[=offer_probabilities]{offer_probabilities()}}.
+
+The values come from the bundled \code{villager_v2.json} model; the function
+neither downloads data nor examines villagers in a saved world.
 }
 \examples{
-\dontrun{
 variants <- villager_variants()
 variants
 
 variants[variants$variant == 'snow', ]
-
-}
 }

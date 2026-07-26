@@ -130,7 +130,8 @@ for (source_file in source_files) {
   )
   matched <- match(names(mappings), names(trades))
   names(trades)[matched] <- unname(mappings)
-  trades$num_to_select[trades$select_all] <- -1
+  trades$num_to_select[trades$select_all] <- -1L
+  trades$num_to_select <- as.integer(trades$num_to_select)
   runtime <- new.env(parent = baseenv())
   sys.source('R/constants.R', envir = runtime)
   columns <- c(

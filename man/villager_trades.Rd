@@ -4,186 +4,190 @@
 \alias{villager_trades}
 \title{Retrieve Villager Trades}
 \usage{
-villager_trades(profession = "armorer", level = NULL)
+villager_trades(profession = "armorer", tier = NULL)
 }
 \arguments{
-\item{profession}{One canonical profession identifier or an alias listed by
-\code{\link[=villager_professions]{villager_professions()}}. The default is \code{"armorer"}.}
+\item{profession}{One canonical profession or alias listed by
+\code{\link[=villager_professions]{villager_professions()}}. The default is \code{"armorer"}; \code{"all"} is not a
+profession value.}
 
-\item{level}{\code{NULL} for all five levels, or one level given as an integer
-from 1 through 5 or as \code{novice}, \code{apprentice}, \code{journeyman}, \code{expert}, or
-\code{master}.}
+\item{tier}{\code{NULL} for all five tiers, or one integer from 1 through 5 or
+one of \code{"novice"}, \code{"apprentice"}, \code{"journeyman"}, \code{"expert"}, and
+\code{"master"}.}
 }
 \value{
-A base data frame with one row per concrete item-choice or modeled
-enchantment-level outcome and 42 atomic columns.
+A plain base data frame with one row per possible option and 40
+atomic columns.
 }
 \description{
-Retrieves one official vanilla profession table for Minecraft Bedrock
-\verb{1.26.30.5} and turns its nested definitions into concrete, readable rows.
+Returns possible vanilla trade outcomes for one profession in Minecraft
+Bedrock \verb{1.26.30.5}. Item choices, integer auxiliary-value ranges,
+Librarian books, and enchanted equipment are expanded into separate rows.
 }
-\section{How to read a row}{
+\section{Reading the hierarchy}{
 
-A profession contains five levels. A level contains groups, and each group
-selects one or more source trades. A trade can then expand into several
-options because it offers alternative items, random auxiliary values, or a
-modeled enchanted book.
+Minecraft trade tables follow \code{tier -> group -> trade}. \code{bedrocktrader}
+adds \code{option} for a concrete expansion of one source trade.
 
-\code{group_id} identifies the selection pool. \code{trade_id} identifies one source
-trade inside that group and can repeat after expansion. \code{option_id} uniquely
-identifies each returned row. Options sharing a \code{trade_id} are alternative
-realizations of one trade; they are not independently selected offers.
+\code{group_id} identifies a pool from which trades are selected. \code{trade_id}
+identifies one source trade and therefore repeats when that trade has
+several item choices or generated outcomes. \code{option_id} uniquely identifies
+each returned row. Repeated \code{trade_id} values are alternatives from the same
+trade rather than separate candidates in the group.
 
-The table is a catalog of possible definitions rather than the inventory of
-a particular villager in a saved world. Use \code{\link[=offer_probabilities]{offer_probabilities()}} to apply
-context and calculate marginal appearance probabilities.
+The result describes every possible definition for a profession, not one
+villager's realized inventory. Use \code{\link[=offer_probabilities]{offer_probabilities()}} to apply context
+and calculate appearance probabilities.
 }
 
-\section{Progression and selection}{
+\section{Progression and selection columns}{
 
 \itemize{
-\item \code{profession} (\code{character}) is the canonical profession identifier.
-\item \code{level} (\code{integer}) and \code{level_name} (\code{character}) identify the tier.
-\item \code{total_exp_required} (\code{double}) is the cumulative experience the villager
-needs to unlock that tier.
-\item \code{group_id}, \code{trade_id}, and \code{option_id} (\code{character}) identify the group,
-source trade, and expanded row.
-\item \code{trades_in_group} (\code{integer}) counts source trades before expansion.
-\item \code{trades_selected} (\code{integer}) is how many source trades the group adds to a
-villager.
-\item \code{all_trades_selected} (\code{logical}) records Mojang's select-all convention.
-Source \code{num_to_select = -1}, including an omitted property, is presented as
-the actual trade count with this flag set to \code{TRUE}.
+\item \code{profession} (\code{character}) is the canonical profession.
+\item \code{tier} (\code{integer}) and \code{tier_name} (\code{character}) identify the trade tier.
+\item \code{total_exp_required} (\code{double}) is the cumulative experience the trader
+needs to unlock the tier.
+\item \code{group_id}, \code{trade_id}, and \code{option_id} (\code{character}) identify the source
+group, source trade, and expanded option.
+\item \code{num_trades} (\code{integer}) counts source trades in the group before
+expansion.
+\item \code{num_to_select} (\code{double}) preserves Mojang's selection instruction.
+\code{-1} is the select-all convention.
+\item \code{select_all} (\code{logical}) makes the \code{num_to_select = -1} convention
+explicit.
 }
 }
 
-\section{Applicability}{
+\section{Applicability columns}{
 
 \itemize{
-\item \code{variants} (\code{character}) lists allowed villager biome variants, separated
-by commas.
+\item \code{variants} (\code{character}) lists allowed villager variants separated by
+commas.
 \item \code{dimensions} (\code{character}) lists allowed dimensions.
 }
 
-\code{NA} means that the source imposes no restriction on that axis. These columns
-describe applicability; \code{villager_trades()} does not remove rows for a
-particular context.
+\code{NA} means that Mojang imposes no restriction on that axis.
+\code{villager_trades()} preserves all possibilities rather than assuming Plains
+or the Overworld.
 }
 
-\section{Player costs}{
+\section{Wants columns}{
 
-\code{cost_1_} describes the first item paid by the player; \code{cost_2_} describes an
-optional second item. Each prefix has:
+\verb{wants_1_*} describes the first item requested from the player.
+\verb{wants_2_*} describes an optional second item. Both slots use:
 \itemize{
-\item \code{item} (\code{character}) for the Mojang item identifier.
-\item \code{aux_value} (\code{integer}) for a numeric auxiliary suffix, otherwise \code{NA}.
-\item \code{quantity_min} and \code{quantity_max} (\code{double}) for the possible amount.
-\item \code{price_multiplier} (\code{double}) for demand-driven price adjustment; \code{NA}
-when Mojang omits it.
+\item \code{item} (\code{character}) for the namespaced Minecraft item identifier.
+\item \code{aux_value} (\code{integer}) for a legacy numeric item suffix, otherwise \code{NA}.
+\item \code{quantity_min} and \code{quantity_max} (\code{double}) for the inclusive quantity
+range. Equal bounds indicate a fixed amount.
+\item \code{price_multiplier} (\code{double}) for demand-driven price adjustment; it is
+\code{NA} when Mojang omits the property.
 }
 
-Every \code{cost_2_} field is typed \code{NA} for a one-input trade. Equal quantity
-bounds indicate a fixed cost. Librarian emerald bounds include the
-\code{enchant_book_for_trading} generator, but do not include later demand,
-curing, or Hero of the Village adjustments.
+All five \verb{wants_2_*} fields are typed \code{NA} for a one-input trade. Librarian
+emerald bounds include \code{enchant_book_for_trading}, but exclude later demand,
+curing, and Hero of the Village adjustments.
 }
 
-\section{Result}{
-
-\itemize{
-\item \code{result_item} (\code{character}) is the item received by the player.
-\item \code{result_aux_value} (\code{integer}) records a concrete legacy variation.
-\item \code{result_quantity_min} and \code{result_quantity_max} (\code{double}) give its amount.
-\item \code{result_color}, \code{result_effect}, \code{potion}, and \code{map_destination}
-(\code{character}) describe resolved color, suspicious-stew effect, tipped-arrow
-potion, or exploration-map destination. They are \code{NA} when inapplicable.
-\item \code{enchantment} and \code{enchantment_name} (\code{character}) identify a modeled
-librarian book.
-\item \code{enchantment_level} and \code{enchantment_max_level} (\code{integer}) give the
-offered level and that enchantment's maximum.
-\item \code{treasure} (\code{logical}) indicates a treasure enchantment. It is \code{NA} for
-results without an enchanting generator.
-}
-
-Omitted item quantities normalize to one, following the trade-table format.
-Other omitted Mojang properties remain typed \code{NA}; the package does not
-silently substitute game defaults.
-}
-
-\section{Generators}{
+\section{Gives columns}{
 
 \itemize{
-\item \code{generator} (\code{character}) names the source function, or is \code{NA}.
-\item \code{enchanting_power_min} and \code{enchanting_power_max} (\code{double}) preserve the
-level-power inputs to \code{enchant_with_levels}. They are not enchantment
-levels.
+\item \code{gives_1_item} (\code{character}) is the namespaced item given to the player.
+\item \code{gives_1_aux_value} (\code{integer}) is a resolved legacy item suffix.
+\item \code{gives_1_quantity_min} and \code{gives_1_quantity_max} (\code{double}) give the
+inclusive amount range.
+\item \code{gives_1_color}, \code{gives_1_effect}, \code{gives_1_potion}, and
+\code{gives_1_map_destination} (\code{character}) identify resolved bed or banner
+color, suspicious-stew effect, potion, or exploration-map destination.
+\item \code{gives_1_enchantments} (\code{character}) records a complete enchantment set as
+sorted \code{minecraft:id=level} pairs separated by commas. For example,
+\verb{minecraft:sharpness=2,minecraft:unbreaking=1} describes one sword carrying
+both enchantments.
+\item \code{gives_1_enchantment_count} (\code{integer}) counts enchantments in that set.
+\item \code{gives_1_treasure} (\code{logical}) indicates whether the set contains a
+treasure enchantment.
+}
+
+The enchantment fields are \code{NA} for ordinary items. Omitted quantities
+normalize to one according to the trade-table format; other absent source
+properties remain typed \code{NA}.
+}
+
+\section{Function columns}{
+
+\itemize{
+\item \code{functions} (\code{character}) names the Mojang item function, or is \code{NA}.
+\item \code{levels_min} and \code{levels_max} (\code{double}) preserve the inclusive \code{levels}
+range supplied to \code{enchant_with_levels}; they are source enchanting-power
+inputs, not enchantment levels on the finished item.
 \item \code{outcome_status} (\code{character}) is \code{source_resolved},
 \code{documented_model}, or \code{engine_generated}.
 }
 
-Explicit item choices, potions, map destinations, suspicious-stew effects,
-and bed/banner colors are source-resolved. Librarian enchanted books use a
-documented model: 39 equally likely enchantments, followed by an equally
-likely valid level. Soul Speed, Swift Sneak, and Wind Burst are excluded.
-Each enchanted-book source trade therefore expands to 116 rows.
+Direct items, explicit choices, integer \code{random_aux_value} outcomes,
+potions, and map destinations are \code{source_resolved}. Librarian books and
+enchanted equipment are \code{documented_model}. \code{random_dye} remains
+\code{engine_generated}, so its leather color is unresolved.
 
-Normal librarian emerald ranges are 5--19 for level I, 8--32 for II, 11--45
-for III, 14--58 for IV, and 17--64 for V. Treasure costs double before the
-64-emerald cap. Each row covers every price inside its displayed range;
-prices are not expanded into separate rows.
+Each Librarian book trade expands to 116 enchantment-level options. Normal
+emerald ranges are 5--19 for level I, 8--32 for II, 11--45 for III, 14--58
+for IV, and 17--64 for V. Treasure prices double before the 64-emerald cap.
 
-\code{enchant_with_levels} can produce multiple compatible enchantments through
-the Bedrock engine, and \code{random_dye} can generate arbitrary leather colors.
-Those rows remain \code{engine_generated} rather than claiming unsupported
-concrete outcomes.
+Equipment rows represent complete enchantment sets, including multi-enchant
+items sold by Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths.
+Their source emerald amount remains fixed across generated sets.
 }
 
-\section{Trade behavior}{
+\section{Trade behavior columns}{
 
 \itemize{
-\item \code{max_uses} (\code{double}) is the number of completed uses before the offer
+\item \code{max_uses} (\code{double}) is the number of completed trades before the offer
 locks until restocking.
-\item \code{villager_exp} (\code{double}) is experience gained by the villager.
-\item \code{player_exp} (\code{logical}) records whether the player receives experience.
+\item \code{trader_exp} (\code{double}) is experience gained by the villager.
+\item \code{reward_exp} (\code{logical}) says whether the player receives experience.
 }
 
-These fields are \code{NA} when Mojang omits the corresponding property.
+These fields remain \code{NA} when Mojang omits the corresponding property; the
+package does not insert documented game defaults.
 }
 
 \examples{
-\dontrun{
-armorer <- villager_trades(level = 'novice')
-armorer[
+novice <- villager_trades(tier = 'novice')
+novice[
   ,
   c(
-    'level_name',
-    'cost_1_item',
-    'cost_1_quantity_min',
-    'result_item'
+    'wants_1_item',
+    'wants_1_quantity_min',
+    'gives_1_item'
   )
 ]
 
-books <- villager_trades('librarian', level = 1)
+armor <- villager_trades('armorer', tier = 'expert')
+head(
+  armor[
+    !is.na(armor$gives_1_enchantments),
+    c(
+      'gives_1_item',
+      'gives_1_enchantments',
+      'wants_1_quantity_min'
+    )
+  ]
+)
+
+books <- villager_trades('librarian', tier = 'novice')
 books[
-  !is.na(books$enchantment) & books$enchantment == 'mending',
+  grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
   c(
-    'enchantment_name',
-    'cost_1_quantity_min',
-    'cost_1_quantity_max'
+    'gives_1_enchantments',
+    'wants_1_quantity_min',
+    'wants_1_quantity_max'
   )
 ]
-
-mason <- villager_trades('mason', level = 'journeyman')
-mason[
-  ,
-  c('group_id', 'trade_id', 'option_id', 'result_item')
-]
-}
 }
 \references{
 \href{https://learn.microsoft.com/en-us/minecraft/creator/documents/createtradetable?view=minecraft-bedrock-stable}{Microsoft, "Creating a Trade Table"}
 
 \href{https://learn.microsoft.com/en-us/minecraft/creator/reference/content/loottablereference/examples/loottabledefinitions/enchantingtables?view=minecraft-bedrock-stable}{Microsoft, "Loot Tables Documentation - Enchanting Tables"}
 
-\href{https://minecraft.wiki/w/Tutorial\%3ATrading}{Minecraft Wiki, "Tutorial: Trading"}
+\href{https://minecraft.wiki/w/Enchanting_table_mechanics?oldid=3681507}{Minecraft Wiki, "Enchanting table mechanics," revision 3681507}
 }

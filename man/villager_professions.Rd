@@ -9,37 +9,35 @@ villager_professions()
 \value{
 A base data frame with one row per profession:
 \itemize{
-\item \code{profession} (\code{character}) is the canonical input accepted by
+\item \code{profession} (\code{character}) is the canonical value accepted by
 \code{\link[=villager_trades]{villager_trades()}} and \code{\link[=offer_probabilities]{offer_probabilities()}}.
 \item \code{display_name} (\code{character}) is the readable profession name.
-\item \code{aliases} (\code{character}) lists additional accepted inputs, separated by
-commas. It is \code{NA} when no aliases exist.
-\item \code{context_sensitive} (\code{logical}) is \code{TRUE} when at least one offer uses a
-biome-variant or dimension filter. It does not imply that every offer from
-the profession is conditional.
-\item \code{contains_item_choices} (\code{logical}) is \code{TRUE} when Mojang supplies an item
-\code{choice} array. \code{\link[=villager_trades]{villager_trades()}} expands those alternatives.
-\item \code{contains_dynamic_functions} (\code{logical}) is \code{TRUE} when at least one result
-uses a generator such as enchanting, random dye, potion setting, or map
-creation.
+\item \code{aliases} (\code{character}) contains additional accepted inputs separated by
+commas. It is \code{NA} when a profession has no aliases.
+\item \code{context_sensitive} (\code{logical}) is \code{TRUE} when at least one trade uses a
+villager-variant or dimension filter.
+\item \code{contains_item_choices} (\code{logical}) is \code{TRUE} when Mojang supplies at
+least one \code{choice} array.
+\item \code{contains_dynamic_functions} (\code{logical}) is \code{TRUE} when at least one item
+uses a trade-table function, including enchanting, random auxiliary
+values, potion setting, map creation, or random dye.
 }
 }
 \description{
-Lists the 13 employable vanilla villager professions understood by
-\code{bedrocktrader}. Each row summarizes features found in that profession's
-Minecraft Bedrock \verb{1.26.30.5} trade table.
+Lists the 13 employable vanilla villager professions included in the
+Minecraft Bedrock \verb{1.26.30.5} data model. The feature flags offer a quick
+way to find tables that need contextual inputs or contain expanded source
+instructions.
 }
 \details{
-The function retrieves and verifies all 13 pinned profession tables, then
-inspects their source structure. The flags describe version \verb{1.26.30.5};
-they are not permanent claims about later Minecraft releases.
+Inputs are case-insensitive. \code{mason} and \code{stonemason} resolve to
+\code{stone_mason}; \code{leather_worker}, \code{tool_smith}, and \code{weapon_smith} likewise
+resolve to their canonical package identifiers.
 
-Canonical names and aliases are case-insensitive when passed to other
-package functions. For example, \code{mason} and \code{stone_mason} both resolve to the
-canonical \code{stone_mason} profession.
+These rows are bundled with the package. Calling the function performs no
+download and does not inspect a saved world.
 }
 \examples{
-\dontrun{
 professions <- villager_professions()
 professions
 
@@ -47,6 +45,4 @@ professions[
   professions$contains_dynamic_functions,
   c('profession', 'contains_dynamic_functions')
 ]
-
-}
 }
