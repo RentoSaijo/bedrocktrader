@@ -1,14 +1,16 @@
 # Calculate Villager Offer Probabilities
 
-Calculates the marginal probability that each possible offer appears
-when a Minecraft Bedrock `1.26.30.5` villager's trades are generated.
+Calculates the marginal probability that each possible outcome appears
+among a Minecraft Bedrock `1.26.30.5` villager's generated offers. The
+returned components distinguish trade selection, explicit item choices,
+and item-function outcomes.
 
 ## Usage
 
 ``` r
 offer_probabilities(
   profession = "armorer",
-  level = "novice",
+  tier = "novice",
   scope = c("tier", "unlocked"),
   variant = NULL,
   dimension = NULL
@@ -19,106 +21,130 @@ offer_probabilities(
 
 - profession:
 
-  One canonical profession identifier or alias listed by
+  One canonical profession or alias listed by
   [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md).
   The default is `"armorer"`.
 
-- level:
+- tier:
 
-  One level given as an integer from 1 through 5 or as `novice`,
-  `apprentice`, `journeyman`, `expert`, or `master`.
+  One integer from 1 through 5 or one of `"novice"`, `"apprentice"`,
+  `"journeyman"`, `"expert"`, and `"master"`.
 
 - scope:
 
-  `"tier"` to analyze only `level`, or `"unlocked"` to include that
-  level and every earlier level. Earlier offers remain available after a
-  villager advances.
+  `"tier"` to analyze only `tier`, or `"unlocked"` to include that tier
+  and every earlier tier.
 
 - variant:
 
-  Villager biome variant when the requested offers depend on one. Use
+  Villager biome variant when the requested trades depend on one. Use
   [`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md)
-  to inspect canonical values and aliases.
+  for canonical values and aliases.
 
 - dimension:
 
-  Dimension when the requested offers depend on one: `"overworld"`,
+  Dimension when the requested trades depend on one: `"overworld"`,
   `"nether"`, or `"end"`.
 
 ## Value
 
-A base data frame with one row per applicable outcome and 26 atomic
-columns:
+A plain base data frame containing all 40 columns documented by
+[`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
+followed by:
 
-- `profession`, `level`, `level_name`, `group_id`, `trade_id`, and
-  `option_id` identify the same row described by
-  [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md).
-
-- `variants` and `dimensions` (`character`) preserve the row's
-  contextual restrictions. `NA` means unrestricted.
-
-- `result_item` (`character`), `result_aux_value` (`integer`),
-  `result_color`, `result_effect`, `potion`, `map_destination`,
-  `enchantment`, and `enchantment_name` (`character`) identify the
-  outcome. Fields that do not apply are typed `NA`.
-
-- `enchantment_level` (`integer`) is the offered book level, otherwise
-  `NA`.
-
-- `cost_1_quantity_min` and `cost_1_quantity_max` (`double`) identify
-  the first cost range, including modeled Librarian emerald prices.
-
-- `outcome_status` (`character`) is copied from
-  [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md).
-
-- `selection_probability` (`double`) is the chance that the source trade
-  is selected from its group.
+- `trade_probability` (`double`) is the marginal chance that Mojang
+  selects the source trade from its group.
 
 - `choice_probability` (`double`) is the conditional chance of the
-  explicit item-choice combination after applying context.
+  applicable source `choice` combination.
 
-- `generator_probability` (`double`) is the conditional chance of the
-  generated row. It is one when the engine outcome remains unresolved.
+- `function_probability` (`double`) is the conditional chance of the
+  resolved or modeled item-function outcome.
 
-- `probability` (`double`) is the product of those three components.
+- `offer_probability` (`double`) is the product of the preceding three
+  components.
 
-- `probability_status` (`character`) is `exact`, `documented_model`, or
-  `partial`.
+- `probability_status` (`character`) is `"exact"`, `"documented_model"`,
+  or `"partial"`.
 
-- `probability_basis` (`character`) identifies whether the calculation
-  comes from the source table, the documented Librarian model, or a
-  source table with an unresolved engine outcome.
+- `probability_basis` (`character`) identifies the source-table or
+  modeling basis used for the function component.
 
-## Details
+## Interpreting an offer probability
 
-The returned probability is marginal: it is the chance that one row
-appears among a villager's generated offers. Rows generally do not sum
-to one because a level can contain several groups and a group can select
-several trades. Options sharing a `trade_id` divide that trade's
-probability rather than behaving as separate candidates.
+A group selecting `k` of `n` applicable source trades gives each trade
+marginal probability `k / n`. A select-all group gives every trade
+probability one. Explicit item choices divide a source trade's
+probability; expanded options sharing a `trade_id` do not become
+additional trade candidates.
 
-A group that selects `k` of `n` applicable trades gives each trade
-marginal probability `k / n`. Select-all groups give each trade
-probability one. Explicit item alternatives and integer
-`random_aux_value` outcomes are treated as uniform among the choices
-that apply to the requested context.
+The overall value is marginal: it answers whether that row appears among
+a villager's offers. Rows do not generally sum to one because a tier
+contains several groups and can add several offers. With
+`scope = "unlocked"`, the result includes every tier available to a
+villager at the requested rank.
 
-Librarian books use a documented model. One of 39 eligible enchantments
-is selected uniformly, followed by one valid level selected uniformly.
-For an enchantment with maximum level `m`, its generator probability is
-`1 / 39 / m`. Soul Speed, Swift Sneak, and Wind Burst are excluded. The
-probability is marginal over every emerald price in the displayed range;
-price rolls are not separate rows.
+## Librarian model
 
-`enchant_with_levels` and `random_dye` require game-engine logic that
-the pinned static data cannot reproduce completely. Their row
-probabilities are exact only through selection and explicit choices, so
-their `probability_status` is `partial`.
+`enchant_book_for_trading` chooses one of 39 eligible enchantments
+uniformly and then chooses one of that enchantment's valid levels
+uniformly. An enchantment with maximum level `m` therefore has function
+probability `1 / 39 / m` at each level. Soul Speed, Swift Sneak, and
+Wind Burst are excluded from this pinned pool.
 
-Context is required only when the requested levels contain filtered
-offers. For example, Cartographer map availability can depend on both
-villager variant and dimension. The function stops instead of silently
-assuming Plains or the Overworld.
+Emerald prices remain inclusive ranges rather than separate
+price-specific rows. Price therefore does not contribute another
+probability component.
+
+## Enchanted-equipment model
+
+Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use
+`enchant_with_levels`. For each source trade, the model:
+
+1.  selects an integer source level `L` uniformly from 5 through 19;
+
+2.  calculates modified power `round((L + 1 + R1 + R2) * M)`, where each
+    `R` is uniform from zero through `floor(enchantability / 4)` and `M`
+    follows the documented triangular distribution from 0.85 through
+    1.15;
+
+3.  finds the highest eligible level of each compatible non-treasure
+    enchantment;
+
+4.  selects by enchantment weight, removes conflicts, and repeats with
+    continuation chance `(power + 1) / 50`, halving power between
+    additional selections.
+
+The updater integrates the triangular distribution analytically and
+enumerates every weighted selection branch. It does not use simulation,
+cross-validation, or resampling. Identical complete enchantment sets are
+combined, and their probabilities sum to one within each equipment
+generator.
+
+These rows receive `probability_status = "documented_model"`. Their
+probabilities are exact under the cited model, while the label
+acknowledges that Mojang does not publish every Bedrock engine constant
+in the pinned sample repository.
+
+## Exact, modeled, and partial rows
+
+- `"exact"` covers outcomes fully determined by Mojang's trade tables,
+  including direct items, choices, integer auxiliary values, maps, and
+  potions.
+
+- `"documented_model"` covers Librarian books and complete enchanted
+  equipment sets.
+
+- `"partial"` currently covers `random_dye`. Its row represents the
+  unresolved dyed-leather outcome, so `function_probability = 1` refers
+  to that category rather than a particular color.
+
+## Context
+
+Filters alter which choices and source trades apply before probabilities
+are calculated. The function requests `variant`, `dimension`, or both
+only when the selected tiers depend on that context. It stops instead of
+silently assuming Plains or the Overworld.
 
 ## References
 
@@ -128,46 +154,86 @@ Table"](https://learn.microsoft.com/en-us/minecraft/creator/documents/createtrad
 [Microsoft, "Loot Tables Documentation - Enchanting
 Tables"](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/loottablereference/examples/loottabledefinitions/enchantingtables?view=minecraft-bedrock-stable)
 
-[Minecraft Wiki, "Tutorial:
-Trading"](https://minecraft.wiki/w/Tutorial%3ATrading)
-
-[Bedrock Wiki, "Trade
-Tables"](https://wiki.bedrock.dev/loot/trade-tables.html)
+[Minecraft Wiki, "Enchanting table mechanics," revision
+3681507](https://minecraft.wiki/w/Enchanting_table_mechanics?oldid=3681507)
 
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 novice <- offer_probabilities()
 novice[
   ,
   c(
-    'result_item',
-    'selection_probability',
-    'probability'
+    'gives_1_item',
+    'trade_probability',
+    'offer_probability'
   )
 ]
+#>                gives_1_item trade_probability offer_probability
+#> 1         minecraft:emerald              1.00              1.00
+#> 2   minecraft:iron_leggings              0.25              0.25
+#> 3      minecraft:iron_boots              0.25              0.25
+#> 4     minecraft:iron_helmet              0.25              0.25
+#> 5 minecraft:iron_chestplate              0.25              0.25
+
+bows <- offer_probabilities('fletcher', tier = 'expert')
+head(
+  bows[
+    order(bows$offer_probability, decreasing = TRUE),
+    c(
+      'gives_1_enchantments',
+      'function_probability',
+      'offer_probability'
+    )
+  ]
+)
+#>                        gives_1_enchantments function_probability
+#> 1                                      <NA>           1.00000000
+#> 46                        minecraft:power=2           0.25334209
+#> 44                        minecraft:power=1           0.18362116
+#> 60                   minecraft:unbreaking=1           0.12349125
+#> 61                   minecraft:unbreaking=2           0.09499037
+#> 51 minecraft:power=2,minecraft:unbreaking=2           0.09058050
+#>    offer_probability
+#> 1         1.00000000
+#> 46        0.25334209
+#> 44        0.18362116
+#> 60        0.12349125
+#> 61        0.09499037
+#> 51        0.09058050
 
 books <- offer_probabilities('librarian')
 books[
-  !is.na(books$enchantment) & books$enchantment == 'mending',
+  grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
   c(
-    'enchantment_name',
-    'enchantment_level',
-    'probability',
-    'probability_status'
+    'gives_1_enchantments',
+    'wants_1_quantity_min',
+    'wants_1_quantity_max',
+    'offer_probability'
   )
 ]
+#>    gives_1_enchantments wants_1_quantity_min wants_1_quantity_max
+#> 71  minecraft:mending=1                   10                   38
+#>    offer_probability
+#> 71        0.01282051
 
 maps <- offer_probabilities(
   profession = 'cartographer',
-  level      = 'apprentice',
+  tier       = 'apprentice',
   variant    = 'snowy',
   dimension  = 'overworld'
 )
 maps[
   ,
-  c('map_destination', 'variants', 'probability')
+  c(
+    'gives_1_map_destination',
+    'variants',
+    'offer_probability'
+  )
 ]
-} # }
+#>   gives_1_map_destination                     variants offer_probability
+#> 1                    <NA>                         <NA>               0.5
+#> 2           village_taiga          plains, snow, swamp               0.5
+#> 3               swamp_hut          jungle, snow, taiga               0.5
+#> 4          village_plains desert, savanna, snow, taiga               0.5
 ```

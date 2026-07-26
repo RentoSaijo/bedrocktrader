@@ -1,171 +1,172 @@
 # Retrieve Villager Trades
 
-Retrieves one official vanilla profession table for Minecraft Bedrock
-`1.26.30.5` and turns its nested definitions into concrete, readable
+Returns possible vanilla trade outcomes for one profession in Minecraft
+Bedrock `1.26.30.5`. Item choices, integer auxiliary-value ranges,
+Librarian books, and enchanted equipment are expanded into separate
 rows.
 
 ## Usage
 
 ``` r
-villager_trades(profession = "armorer", level = NULL)
+villager_trades(profession = "armorer", tier = NULL)
 ```
 
 ## Arguments
 
 - profession:
 
-  One canonical profession identifier or an alias listed by
+  One canonical profession or alias listed by
   [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md).
-  The default is `"armorer"`.
+  The default is `"armorer"`; `"all"` is not a profession value.
 
-- level:
+- tier:
 
-  `NULL` for all five levels, or one level given as an integer from 1
-  through 5 or as `novice`, `apprentice`, `journeyman`, `expert`, or
-  `master`.
+  `NULL` for all five tiers, or one integer from 1 through 5 or one of
+  `"novice"`, `"apprentice"`, `"journeyman"`, `"expert"`, and
+  `"master"`.
 
 ## Value
 
-A base data frame with one row per concrete item-choice or modeled
-enchantment-level outcome and 42 atomic columns.
+A plain base data frame with one row per possible option and 40 atomic
+columns.
 
-## How to read a row
+## Reading the hierarchy
 
-A profession contains five levels. A level contains groups, and each
-group selects one or more source trades. A trade can then expand into
-several options because it offers alternative items, random auxiliary
-values, or a modeled enchanted book.
+Minecraft trade tables follow `tier -> group -> trade`. `bedrocktrader`
+adds `option` for a concrete expansion of one source trade.
 
-`group_id` identifies the selection pool. `trade_id` identifies one
-source trade inside that group and can repeat after expansion.
-`option_id` uniquely identifies each returned row. Options sharing a
-`trade_id` are alternative realizations of one trade; they are not
-independently selected offers.
+`group_id` identifies a pool from which trades are selected. `trade_id`
+identifies one source trade and therefore repeats when that trade has
+several item choices or generated outcomes. `option_id` uniquely
+identifies each returned row. Repeated `trade_id` values are
+alternatives from the same trade rather than separate candidates in the
+group.
 
-The table is a catalog of possible definitions rather than the inventory
-of a particular villager in a saved world. Use
+The result describes every possible definition for a profession, not one
+villager's realized inventory. Use
 [`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md)
-to apply context and calculate marginal appearance probabilities.
+to apply context and calculate appearance probabilities.
 
-## Progression and selection
+## Progression and selection columns
 
-- `profession` (`character`) is the canonical profession identifier.
+- `profession` (`character`) is the canonical profession.
 
-- `level` (`integer`) and `level_name` (`character`) identify the tier.
+- `tier` (`integer`) and `tier_name` (`character`) identify the trade
+  tier.
 
 - `total_exp_required` (`double`) is the cumulative experience the
-  villager needs to unlock that tier.
+  trader needs to unlock the tier.
 
 - `group_id`, `trade_id`, and `option_id` (`character`) identify the
-  group, source trade, and expanded row.
+  source group, source trade, and expanded option.
 
-- `trades_in_group` (`integer`) counts source trades before expansion.
+- `num_trades` (`integer`) counts source trades in the group before
+  expansion.
 
-- `trades_selected` (`integer`) is how many source trades the group adds
-  to a villager.
+- `num_to_select` (`double`) preserves Mojang's selection instruction.
+  `-1` is the select-all convention.
 
-- `all_trades_selected` (`logical`) records Mojang's select-all
-  convention. Source `num_to_select = -1`, including an omitted
-  property, is presented as the actual trade count with this flag set to
-  `TRUE`.
+- `select_all` (`logical`) makes the `num_to_select = -1` convention
+  explicit.
 
-## Applicability
+## Applicability columns
 
-- `variants` (`character`) lists allowed villager biome variants,
-  separated by commas.
+- `variants` (`character`) lists allowed villager variants separated by
+  commas.
 
 - `dimensions` (`character`) lists allowed dimensions.
 
-`NA` means that the source imposes no restriction on that axis. These
-columns describe applicability; `villager_trades()` does not remove rows
-for a particular context.
+`NA` means that Mojang imposes no restriction on that axis.
+`villager_trades()` preserves all possibilities rather than assuming
+Plains or the Overworld.
 
-## Player costs
+## Wants columns
 
-`cost_1_` describes the first item paid by the player; `cost_2_`
-describes an optional second item. Each prefix has:
+`wants_1_*` describes the first item requested from the player.
+`wants_2_*` describes an optional second item. Both slots use:
 
-- `item` (`character`) for the Mojang item identifier.
+- `item` (`character`) for the namespaced Minecraft item identifier.
 
-- `aux_value` (`integer`) for a numeric auxiliary suffix, otherwise
+- `aux_value` (`integer`) for a legacy numeric item suffix, otherwise
   `NA`.
 
-- `quantity_min` and `quantity_max` (`double`) for the possible amount.
+- `quantity_min` and `quantity_max` (`double`) for the inclusive
+  quantity range. Equal bounds indicate a fixed amount.
 
-- `price_multiplier` (`double`) for demand-driven price adjustment; `NA`
-  when Mojang omits it.
+- `price_multiplier` (`double`) for demand-driven price adjustment; it
+  is `NA` when Mojang omits the property.
 
-Every `cost_2_` field is typed `NA` for a one-input trade. Equal
-quantity bounds indicate a fixed cost. Librarian emerald bounds include
-the `enchant_book_for_trading` generator, but do not include later
-demand, curing, or Hero of the Village adjustments.
+All five `wants_2_*` fields are typed `NA` for a one-input trade.
+Librarian emerald bounds include `enchant_book_for_trading`, but exclude
+later demand, curing, and Hero of the Village adjustments.
 
-## Result
+## Gives columns
 
-- `result_item` (`character`) is the item received by the player.
+- `gives_1_item` (`character`) is the namespaced item given to the
+  player.
 
-- `result_aux_value` (`integer`) records a concrete legacy variation.
+- `gives_1_aux_value` (`integer`) is a resolved legacy item suffix.
 
-- `result_quantity_min` and `result_quantity_max` (`double`) give its
-  amount.
+- `gives_1_quantity_min` and `gives_1_quantity_max` (`double`) give the
+  inclusive amount range.
 
-- `result_color`, `result_effect`, `potion`, and `map_destination`
-  (`character`) describe resolved color, suspicious-stew effect,
-  tipped-arrow potion, or exploration-map destination. They are `NA`
-  when inapplicable.
+- `gives_1_color`, `gives_1_effect`, `gives_1_potion`, and
+  `gives_1_map_destination` (`character`) identify resolved bed or
+  banner color, suspicious-stew effect, potion, or exploration-map
+  destination.
 
-- `enchantment` and `enchantment_name` (`character`) identify a modeled
-  librarian book.
+- `gives_1_enchantments` (`character`) records a complete enchantment
+  set as sorted `minecraft:id=level` pairs separated by commas. For
+  example, `minecraft:sharpness=2,minecraft:unbreaking=1` describes one
+  sword carrying both enchantments.
 
-- `enchantment_level` and `enchantment_max_level` (`integer`) give the
-  offered level and that enchantment's maximum.
+- `gives_1_enchantment_count` (`integer`) counts enchantments in that
+  set.
 
-- `treasure` (`logical`) indicates a treasure enchantment. It is `NA`
-  for results without an enchanting generator.
+- `gives_1_treasure` (`logical`) indicates whether the set contains a
+  treasure enchantment.
 
-Omitted item quantities normalize to one, following the trade-table
-format. Other omitted Mojang properties remain typed `NA`; the package
-does not silently substitute game defaults.
+The enchantment fields are `NA` for ordinary items. Omitted quantities
+normalize to one according to the trade-table format; other absent
+source properties remain typed `NA`.
 
-## Generators
+## Function columns
 
-- `generator` (`character`) names the source function, or is `NA`.
+- `functions` (`character`) names the Mojang item function, or is `NA`.
 
-- `enchanting_power_min` and `enchanting_power_max` (`double`) preserve
-  the level-power inputs to `enchant_with_levels`. They are not
-  enchantment levels.
+- `levels_min` and `levels_max` (`double`) preserve the inclusive
+  `levels` range supplied to `enchant_with_levels`; they are source
+  enchanting-power inputs, not enchantment levels on the finished item.
 
 - `outcome_status` (`character`) is `source_resolved`,
   `documented_model`, or `engine_generated`.
 
-Explicit item choices, potions, map destinations, suspicious-stew
-effects, and bed/banner colors are source-resolved. Librarian enchanted
-books use a documented model: 39 equally likely enchantments, followed
-by an equally likely valid level. Soul Speed, Swift Sneak, and Wind
-Burst are excluded. Each enchanted-book source trade therefore expands
-to 116 rows.
+Direct items, explicit choices, integer `random_aux_value` outcomes,
+potions, and map destinations are `source_resolved`. Librarian books and
+enchanted equipment are `documented_model`. `random_dye` remains
+`engine_generated`, so its leather color is unresolved.
 
-Normal librarian emerald ranges are 5–19 for level I, 8–32 for II, 11–45
-for III, 14–58 for IV, and 17–64 for V. Treasure costs double before the
-64-emerald cap. Each row covers every price inside its displayed range;
-prices are not expanded into separate rows.
+Each Librarian book trade expands to 116 enchantment-level options.
+Normal emerald ranges are 5–19 for level I, 8–32 for II, 11–45 for III,
+14–58 for IV, and 17–64 for V. Treasure prices double before the
+64-emerald cap.
 
-`enchant_with_levels` can produce multiple compatible enchantments
-through the Bedrock engine, and `random_dye` can generate arbitrary
-leather colors. Those rows remain `engine_generated` rather than
-claiming unsupported concrete outcomes.
+Equipment rows represent complete enchantment sets, including
+multi-enchant items sold by Armorers, Fishermen, Fletchers, Toolsmiths,
+and Weaponsmiths. Their source emerald amount remains fixed across
+generated sets.
 
-## Trade behavior
+## Trade behavior columns
 
-- `max_uses` (`double`) is the number of completed uses before the offer
-  locks until restocking.
+- `max_uses` (`double`) is the number of completed trades before the
+  offer locks until restocking.
 
-- `villager_exp` (`double`) is experience gained by the villager.
+- `trader_exp` (`double`) is experience gained by the villager.
 
-- `player_exp` (`logical`) records whether the player receives
-  experience.
+- `reward_exp` (`logical`) says whether the player receives experience.
 
-These fields are `NA` when Mojang omits the corresponding property.
+These fields remain `NA` when Mojang omits the corresponding property;
+the package does not insert documented game defaults.
 
 ## References
 
@@ -175,38 +176,70 @@ Table"](https://learn.microsoft.com/en-us/minecraft/creator/documents/createtrad
 [Microsoft, "Loot Tables Documentation - Enchanting
 Tables"](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/loottablereference/examples/loottabledefinitions/enchantingtables?view=minecraft-bedrock-stable)
 
-[Minecraft Wiki, "Tutorial:
-Trading"](https://minecraft.wiki/w/Tutorial%3ATrading)
+[Minecraft Wiki, "Enchanting table mechanics," revision
+3681507](https://minecraft.wiki/w/Enchanting_table_mechanics?oldid=3681507)
 
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-armorer <- villager_trades(level = 'novice')
-armorer[
+novice <- villager_trades(tier = 'novice')
+novice[
   ,
   c(
-    'level_name',
-    'cost_1_item',
-    'cost_1_quantity_min',
-    'result_item'
+    'wants_1_item',
+    'wants_1_quantity_min',
+    'gives_1_item'
   )
 ]
+#>        wants_1_item wants_1_quantity_min              gives_1_item
+#> 1    minecraft:coal                   15         minecraft:emerald
+#> 2 minecraft:emerald                    7   minecraft:iron_leggings
+#> 3 minecraft:emerald                    4      minecraft:iron_boots
+#> 4 minecraft:emerald                    5     minecraft:iron_helmet
+#> 5 minecraft:emerald                    9 minecraft:iron_chestplate
 
-books <- villager_trades('librarian', level = 1)
+armor <- villager_trades('armorer', tier = 'expert')
+head(
+  armor[
+    !is.na(armor$gives_1_enchantments),
+    c(
+      'gives_1_item',
+      'gives_1_enchantments',
+      'wants_1_quantity_min'
+    )
+  ]
+)
+#>                 gives_1_item
+#> 1 minecraft:diamond_leggings
+#> 2 minecraft:diamond_leggings
+#> 3 minecraft:diamond_leggings
+#> 4 minecraft:diamond_leggings
+#> 5 minecraft:diamond_leggings
+#> 6 minecraft:diamond_leggings
+#>                                                     gives_1_enchantments
+#> 1                                           minecraft:blast_protection=1
+#> 2                        minecraft:blast_protection=1,minecraft:thorns=1
+#> 3 minecraft:blast_protection=1,minecraft:thorns=1,minecraft:unbreaking=1
+#> 4                    minecraft:blast_protection=1,minecraft:unbreaking=1
+#> 5                                           minecraft:blast_protection=2
+#> 6                        minecraft:blast_protection=2,minecraft:thorns=1
+#>   wants_1_quantity_min
+#> 1                   14
+#> 2                   14
+#> 3                   14
+#> 4                   14
+#> 5                   14
+#> 6                   14
+
+books <- villager_trades('librarian', tier = 'novice')
 books[
-  !is.na(books$enchantment) & books$enchantment == 'mending',
+  grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
   c(
-    'enchantment_name',
-    'cost_1_quantity_min',
-    'cost_1_quantity_max'
+    'gives_1_enchantments',
+    'wants_1_quantity_min',
+    'wants_1_quantity_max'
   )
 ]
-
-mason <- villager_trades('mason', level = 'journeyman')
-mason[
-  ,
-  c('group_id', 'trade_id', 'option_id', 'result_item')
-]
-} # }
+#>    gives_1_enchantments wants_1_quantity_min wants_1_quantity_max
+#> 71  minecraft:mending=1                   10                   38
 ```

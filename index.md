@@ -1,18 +1,13 @@
 # bedrocktrader
 
-## Overview
-
-Minecraft Bedrock villager trades begin as nested game data: each
-profession has five levels, each level has groups of possible trades,
-and several offers depend on item choices or game-generated outcomes.
-`bedrocktrader` turns that structure into ordinary base R data frames
-that are ready to inspect and analyze.
+`bedrocktrader` makes vanilla villager trade data approachable from R.
+It turns Minecraft’s nested trade tables into ordinary base data frames,
+expands item choices and modeled enchantments, and calculates the chance
+that each outcome appears among a villager’s offers.
 
 This development release supports **Minecraft Bedrock Edition 1.26.30.5
-only**. Pinning one release lets the package provide a complete, checked
-enchantment model without implying that the same rules apply to later
-game versions. A future package release can advance the pin after its
-data and mechanics have been reviewed.
+only**. Its normalized data is bundled with the package, so every public
+function works offline without `GITHUB_PAT`.
 
 ## Installation
 
@@ -24,111 +19,61 @@ install.packages('pak')
 pak::pak('RentoSaijo/bedrocktrader')
 ```
 
-Then load the package:
+Then inspect an Armorer’s expert-tier outcomes:
 
 ``` r
 
 library(bedrocktrader)
-```
 
-Every function retrieves Mojang’s pinned files online when called. There
-is no disk or session cache. Set `GITHUB_PAT` when authenticated GitHub
-access is available.
+armor <- villager_trades(tier = 'expert')
 
-## Quick Start
-
-The Meta functions introduce the villagers represented by the package:
-
-``` r
-
-villager_professions()
-villager_variants()
-```
-
-The Data function returns possible offers. It defaults to every Armorer
-level; use a number or name to focus on one:
-
-``` r
-
-armorer <- villager_trades()
-expert  <- villager_trades('armorer', level = 'expert')
-```
-
-Read each row through the same hierarchy:
-
-``` text
-level -> group -> trade -> option
-```
-
-A group selects one or more trades. An option is a concrete row produced
-when a trade contains item alternatives or a modeled outcome. Thus,
-several rows can share a `trade_id` without representing independently
-selected offers.
-
-The cost and result columns read from the player’s perspective:
-
-``` r
-
-armorer[
+armor[
   ,
   c(
-    'level_name',
-    'cost_1_item',
-    'cost_1_quantity_min',
-    'cost_1_quantity_max',
-    'result_item',
-    'outcome_status'
+    'wants_1_item',
+    'wants_1_quantity_min',
+    'gives_1_item',
+    'gives_1_enchantments'
   )
 ]
 ```
 
-Librarian books are expanded by enchantment and level. Their emerald
-price is a range because Minecraft rolls the price after choosing the
-book:
+Read the data through Minecraft’s own hierarchy:
 
-``` r
-
-books <- villager_trades('librarian', level = 'novice')
-
-books[
-  !is.na(books$enchantment) & books$enchantment == 'mending',
-  c(
-    'enchantment_name',
-    'enchantment_level',
-    'cost_1_quantity_min',
-    'cost_1_quantity_max'
-  )
-]
+``` text
+tier -> group -> trade -> option
 ```
 
+A group selects one or more trades. A trade can expand into several
+options when it contains item choices or generated outcomes.
+Consequently, rows that share a `trade_id` describe alternatives from
+the same source trade rather than independently selected offers.
+
+Use
+[`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md)
+and
+[`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md)
+to discover accepted inputs.
 [`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md)
-separates selection, item-choice, and generated-outcome probabilities.
-The combined probability is the marginal chance that a row appears; rows
-need not sum to one because a villager can receive several offers.
+adds the trade-selection, item-choice, function, and overall
+probabilities to the same outcome rows.
 
-``` r
-
-mending <- offer_probabilities('librarian')
-
-mending[
-  !is.na(mending$enchantment) & mending$enchantment == 'mending',
-  c('enchantment_name', 'probability', 'probability_status')
-]
-```
-
-See the function reference for the complete column dictionary,
-contextual Cartographer examples, probability assumptions, and the
-boundary between resolved and engine-generated outcomes.
+Complete column definitions and examples live in
+[`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.html)
+and
+[`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.html).
 
 ## Source and License
 
-Trade and entity files come from Mojang’s immutable [`v1.26.30.5`
+The bundled values were generated from Mojang’s immutable [`v1.26.30.5`
 Bedrock Samples
-release](https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5).
-The package verifies each download against a pinned Git blob SHA.
+release](https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5)
+and verified against pinned Git blob SHAs. Equipment enchantments follow
+the documented Bedrock enchanting-table model described in the function
+reference.
 
-The R code is licensed under GPL-3-or-later. Mojang data is retrieved at
-runtime, is not redistributed with the package, and remains subject to
-Mojang’s terms and the [Minecraft EULA](https://www.minecraft.net/eula).
-`bedrocktrader` is an independent project and is not affiliated with
-Mojang or Microsoft.
+The R code is licensed under GPL-3-or-later. Values derived from
+Mojang’s samples remain subject to [Mojang’s license
+notice](https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md)
+and the [Minecraft EULA](https://www.minecraft.net/en-us/eula).
+`bedrocktrader` is independent of Mojang and Microsoft.

@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Retrieve Minecraft Bedrock Villager Trade Data">
-<meta name="description" content="Retrieves official vanilla Minecraft Bedrock 1.26.30.5 villager trade tables and represents their progression, selection, item choices, generated outcomes, contextual restrictions, and offer probabilities in flat base R data frames.">
-<meta property="og:description" content="Retrieves official vanilla Minecraft Bedrock 1.26.30.5 villager trade tables and represents their progression, selection, item choices, generated outcomes, contextual restrictions, and offer probabilities in flat base R data frames.">
+<meta name="description" content="Provides normalized vanilla Minecraft Bedrock 1.26.30.5 villager trade data, including progression, selection, item choices, modeled enchantments, contextual restrictions, and offer probabilities in flat base R data frames.">
+<meta property="og:description" content="Provides normalized vanilla Minecraft Bedrock 1.26.30.5 villager trade data, including progression, selection, item choices, modeled enchantments, contextual restrictions, and offer probabilities in flat base R data frames.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -57,12 +57,8 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="bedrocktrader">bedrocktrader<a class="anchor" aria-label="anchor" href="#bedrocktrader"></a>
 </h1></div>
-<div class="section level2">
-<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
-</h2>
-<p>Minecraft Bedrock villager trades begin as nested game data: each profession has five levels, each level has groups of possible trades, and several offers depend on item choices or game-generated outcomes. <code>bedrocktrader</code> turns that structure into ordinary base R data frames that are ready to inspect and analyze.</p>
-<p>This development release supports <strong>Minecraft Bedrock Edition 1.26.30.5 only</strong>. Pinning one release lets the package provide a complete, checked enchantment model without implying that the same rules apply to later game versions. A future package release can advance the pin after its data and mechanics have been reviewed.</p>
-</div>
+<p><code>bedrocktrader</code> makes vanilla villager trade data approachable from R. It turns Minecraft’s nested trade tables into ordinary base data frames, expands item choices and modeled enchantments, and calculates the chance that each outcome appears among a villager’s offers.</p>
+<p>This development release supports <strong>Minecraft Bedrock Edition 1.26.30.5 only</strong>. Its normalized data is bundled with the package, so every public function works offline without <code>GITHUB_PAT</code>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -70,66 +66,32 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'pak'</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">'RentoSaijo/bedrocktrader'</span><span class="op">)</span></span></code></pre></div>
-<p>Then load the package:</p>
+<p>Then inspect an Armorer’s expert-tier outcomes:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span></code></pre></div>
-<p>Every function retrieves Mojang’s pinned files online when called. There is no disk or session cache. Set <code>GITHUB_PAT</code> when authenticated GitHub access is available.</p>
-</div>
-<div class="section level2">
-<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
-</h2>
-<p>The Meta functions introduce the villagers represented by the package:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/villager_professions.html">villager_professions</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/villager_variants.html">villager_variants</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>The Data function returns possible offers. It defaults to every Armorer level; use a number or name to focus on one:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">armorer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">expert</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="st">'armorer'</span>, level <span class="op">=</span> <span class="st">'expert'</span><span class="op">)</span></span></code></pre></div>
-<p>Read each row through the same hierarchy:</p>
-<pre class="text"><code><span><span class="va">level</span> <span class="op">-&gt;</span> <span class="va">group</span> <span class="op">-&gt;</span> <span class="va">trade</span> <span class="op">-&gt;</span> <span class="va">option</span></span></code></pre>
-<p>A group selects one or more trades. An option is a concrete row produced when a trade contains item alternatives or a modeled outcome. Thus, several rows can share a <code>trade_id</code> without representing independently selected offers.</p>
-<p>The cost and result columns read from the player’s perspective:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">armorer</span><span class="op">[</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">armor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span>tier <span class="op">=</span> <span class="st">'expert'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">armor</span><span class="op">[</span></span>
 <span>  ,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">'level_name'</span>,</span>
-<span>    <span class="st">'cost_1_item'</span>,</span>
-<span>    <span class="st">'cost_1_quantity_min'</span>,</span>
-<span>    <span class="st">'cost_1_quantity_max'</span>,</span>
-<span>    <span class="st">'result_item'</span>,</span>
-<span>    <span class="st">'outcome_status'</span></span>
+<span>    <span class="st">'wants_1_item'</span>,</span>
+<span>    <span class="st">'wants_1_quantity_min'</span>,</span>
+<span>    <span class="st">'gives_1_item'</span>,</span>
+<span>    <span class="st">'gives_1_enchantments'</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">]</span></span></code></pre></div>
-<p>Librarian books are expanded by enchantment and level. Their emerald price is a range because Minecraft rolls the price after choosing the book:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">books</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="st">'librarian'</span>, level <span class="op">=</span> <span class="st">'novice'</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">books</span><span class="op">[</span></span>
-<span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">books</span><span class="op">$</span><span class="va">enchantment</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">books</span><span class="op">$</span><span class="va">enchantment</span> <span class="op">==</span> <span class="st">'mending'</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">'enchantment_name'</span>,</span>
-<span>    <span class="st">'enchantment_level'</span>,</span>
-<span>    <span class="st">'cost_1_quantity_min'</span>,</span>
-<span>    <span class="st">'cost_1_quantity_max'</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">]</span></span></code></pre></div>
-<p><code><a href="reference/offer_probabilities.html">offer_probabilities()</a></code> separates selection, item-choice, and generated-outcome probabilities. The combined probability is the marginal chance that a row appears; rows need not sum to one because a villager can receive several offers.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mending</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/offer_probabilities.html">offer_probabilities</a></span><span class="op">(</span><span class="st">'librarian'</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mending</span><span class="op">[</span></span>
-<span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">mending</span><span class="op">$</span><span class="va">enchantment</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">mending</span><span class="op">$</span><span class="va">enchantment</span> <span class="op">==</span> <span class="st">'mending'</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'enchantment_name'</span>, <span class="st">'probability'</span>, <span class="st">'probability_status'</span><span class="op">)</span></span>
-<span><span class="op">]</span></span></code></pre></div>
-<p>See the function reference for the complete column dictionary, contextual Cartographer examples, probability assumptions, and the boundary between resolved and engine-generated outcomes.</p>
+<p>Read the data through Minecraft’s own hierarchy:</p>
+<pre class="text"><code><span><span class="va">tier</span> <span class="op">-&gt;</span> <span class="va">group</span> <span class="op">-&gt;</span> <span class="va">trade</span> <span class="op">-&gt;</span> <span class="va">option</span></span></code></pre>
+<p>A group selects one or more trades. A trade can expand into several options when it contains item choices or generated outcomes. Consequently, rows that share a <code>trade_id</code> describe alternatives from the same source trade rather than independently selected offers.</p>
+<p>Use <code><a href="reference/villager_professions.html">villager_professions()</a></code> and <code><a href="reference/villager_variants.html">villager_variants()</a></code> to discover accepted inputs. <code><a href="reference/offer_probabilities.html">offer_probabilities()</a></code> adds the trade-selection, item-choice, function, and overall probabilities to the same outcome rows.</p>
+<p>Complete column definitions and examples live in <a href="https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.html"><code>villager_trades()</code></a> and <a href="https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.html"><code>offer_probabilities()</code></a>.</p>
 </div>
 <div class="section level2">
 <h2 id="source-and-license">Source and License<a class="anchor" aria-label="anchor" href="#source-and-license"></a>
 </h2>
-<p>Trade and entity files come from Mojang’s immutable <a href="https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5" class="external-link"><code>v1.26.30.5</code> Bedrock Samples release</a>. The package verifies each download against a pinned Git blob SHA.</p>
-<p>The R code is licensed under GPL-3-or-later. Mojang data is retrieved at runtime, is not redistributed with the package, and remains subject to Mojang’s terms and the <a href="https://www.minecraft.net/eula" class="external-link">Minecraft EULA</a>. <code>bedrocktrader</code> is an independent project and is not affiliated with Mojang or Microsoft.</p>
+<p>The bundled values were generated from Mojang’s immutable <a href="https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5" class="external-link"><code>v1.26.30.5</code> Bedrock Samples release</a> and verified against pinned Git blob SHAs. Equipment enchantments follow the documented Bedrock enchanting-table model described in the function reference.</p>
+<p>The R code is licensed under GPL-3-or-later. Values derived from Mojang’s samples remain subject to <a href="https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md" class="external-link">Mojang’s license notice</a> and the <a href="https://www.minecraft.net/en-us/eula" class="external-link">Minecraft EULA</a>. <code>bedrocktrader</code> is independent of Mojang and Microsoft.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

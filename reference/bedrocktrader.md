@@ -1,43 +1,56 @@
-# bedrocktrader: Retrieve Minecraft Bedrock Villager Trade Data
+# bedrocktrader: Minecraft Bedrock Villager Trade Data
 
-`bedrocktrader` retrieves official vanilla Minecraft Bedrock villager
-trade data and returns ordinary base R data frames. This release
-supports Minecraft Bedrock Edition `1.26.30.5` only.
+`bedrocktrader` provides normalized vanilla villager trades for
+Minecraft Bedrock Edition `1.26.30.5`. The data and modeled outcomes are
+bundled with the package, so its public functions return ordinary base R
+data frames without downloading files or reading `GITHUB_PAT`.
 
 ## Meta
 
-Use
 [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md)
-to discover supported professions and their trade-table features.
+lists accepted professions and summarizes important trade-table
+features.
 [`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md)
-connects biome variants with Mojang's `minecraft:mark_variant` values.
+connects biome names with Mojang's `minecraft:mark_variant` values.
 
 ## Data
 
 [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
-retrieves the possible offers for one profession and expands concrete
-item choices. Librarian books are modeled by enchantment and level. More
-complex engine-generated outcomes remain clearly identified.
+follows Mojang's `tiers`, `groups`, `trades`, `wants`, and `gives`
+terminology. It expands explicit item alternatives, auxiliary values,
+Librarian books, and complete enchanted-equipment sets.
 
 ## Analysis
 
 [`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md)
-calculates the marginal probability that each row appears among a
-villager's offers. It separates group selection, item choice, and
-generated-outcome probabilities so their sources remain visible.
+calculates the marginal chance that each displayed outcome appears among
+a villager's offers. Separate columns expose trade selection, item
+choices, function outcomes, and their product.
 
-## Source behavior
+## Version and modeling boundary
 
-Each public function retrieves its source data online from Mojang's
-immutable `v1.26.30.5` release tag. Downloaded files are checked against
-pinned Git blob SHAs, and the package does not write a cache. Later
-Minecraft versions remain unsupported until their data and mechanics are
-reviewed.
+This package supports `1.26.30.5` only. Source-resolved rows come
+directly from Mojang's pinned trade tables. Librarian books and
+enchanted equipment use documented models; `random_dye` remains marked
+as engine-generated. Later Bedrock versions are unsupported until their
+data and mechanics are reviewed and the bundled model is regenerated.
+
+## Licensing
+
+The R code is GPL-3-or-later. Normalized values derived from Mojang's
+Bedrock Samples remain subject to Mojang's license notice and the
+Minecraft EULA. `bedrocktrader` is independent of Mojang and Microsoft.
 
 ## References
 
 [Mojang, "Bedrock Samples
 v1.26.30.5"](https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5)
+
+[Mojang, "Bedrock Samples license
+notice"](https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md)
+
+[Minecraft, "End User License
+Agreement"](https://www.minecraft.net/en-us/eula)
 
 ## See also
 
