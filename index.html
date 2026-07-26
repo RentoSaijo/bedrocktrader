@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Retrieve Minecraft Bedrock Villager Trade Data">
-<meta name="description" content="Retrieves official vanilla Minecraft Bedrock villager trade tables from versioned Mojang releases and represents their tier, group, candidate, item-choice, function, and filter structure in R. Each result records the exact upstream version, Git commit, source path, and blob identifier used.">
-<meta property="og:description" content="Retrieves official vanilla Minecraft Bedrock villager trade tables from versioned Mojang releases and represents their tier, group, candidate, item-choice, function, and filter structure in R. Each result records the exact upstream version, Git commit, source path, and blob identifier used.">
+<meta name="description" content="Retrieves official vanilla Minecraft Bedrock villager trade tables from stable Mojang releases and represents their tier, group, candidate, item-choice, function, and filter structure in flat base R data frames.">
+<meta property="og:description" content="Retrieves official vanilla Minecraft Bedrock villager trade tables from stable Mojang releases and represents their tier, group, candidate, item-choice, function, and filter structure in flat base R data frames.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -58,7 +58,7 @@
 <div class="page-header"><h1 id="bedrocktrader">bedrocktrader<a class="anchor" aria-label="anchor" href="#bedrocktrader"></a>
 </h1></div>
 <p>Villager trade tables pack a surprising amount of structure into a small slice of Minecraft. Tiers contain selection groups; candidates may contain item choices, dynamic functions, and filters tied to the villager’s stored variant. <code>bedrocktrader</code> retrieves that official vanilla Bedrock data and arranges it consistently for analysis in R.</p>
-<p>The current development release provides a focused data foundation for all 13 employable villager professions. Each result identifies the exact upstream release, Git commit, source path, blob SHA, retrieval time, and parser version.</p>
+<p>The current development release provides a focused data foundation for all 13 employable villager professions. It expands Mojang item choices into ordinary base R data frames while keeping quantities, functions, filters, auxiliary values, and selection structure available as columns.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -73,27 +73,29 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="reference/bedrock_versions.html">bedrock_versions</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/villager_professions.html">villager_professions</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/villager_variants.html">villager_variants</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">farmer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="st">'farmer'</span><span class="op">)</span></span>
-<span><span class="va">farmer</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/source_info.html">source_info</a></span><span class="op">(</span><span class="va">farmer</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">armorer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">armorer</span><span class="op">)</span></span></code></pre></div>
 <p>Use Mojang’s current stable release at call time or request a specific stable version:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/bedrocktrader_data_version.html">bedrocktrader_data_version</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mason</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">mason</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span></span>
 <span>  <span class="st">'mason'</span>,</span>
 <span>  version <span class="op">=</span> <span class="st">'1.26.30.5'</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The package contacts Mojang’s GitHub repository for every top-level retrieval. It verifies each downloaded file against the release manifest and does not write a cache.</p>
+<p>The package contacts Mojang’s GitHub repository for every top-level retrieval. Supported stable releases begin with <code>1.26.20.4</code>; <code><a href="reference/bedrock_versions.html">bedrock_versions()</a></code> lists every stable release from that floor through Mojang’s runtime latest version. Each downloaded file is verified against the release manifest, and no cache is written.</p>
+</div>
+<div class="section level2">
+<h2 id="profession-indicators">Profession Indicators<a class="anchor" aria-label="anchor" href="#profession-indicators"></a>
+</h2>
+<p>The profession table includes three quick structural indicators. <code>context_sensitive</code> identifies variant or dimension filters, <code>contains_item_choices</code> identifies Mojang <code>choice</code> arrays, and <code>contains_dynamic_functions</code> identifies item-generation functions such as enchantments, potions, dyes, or exploration maps.</p>
 </div>
 <div class="section level2">
 <h2 id="development-boundary">Development Boundary<a class="anchor" aria-label="anchor" href="#development-boundary"></a>
 </h2>
-<p>This iteration retrieves and normalizes source data. It does not yet calculate offer probabilities, evaluate villager context, build trade catalogs, produce plots, or accept custom trade tables. Those features can grow from a compact, auditable source model instead of being layered over an unstable parser.</p>
+<p>This iteration retrieves, normalizes, and flattens source data. It does not yet calculate offer probabilities, evaluate villager context, produce plots, or accept custom trade tables. Those features can grow from a compact source model instead of being layered over an unstable parser.</p>
 <p>Mojang data remains subject to the <a href="https://www.minecraft.net/eula" class="external-link">Minecraft End User License Agreement</a>. <code>bedrocktrader</code> is independent of Mojang and Microsoft.</p>
 </div>
 </div>

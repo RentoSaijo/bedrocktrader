@@ -10,10 +10,10 @@ Package overview
 
 ## Release
 
-Resolve Minecraft Bedrock sample releases
+List supported Minecraft Bedrock sample releases
 
-- [`bedrocktrader_data_version()`](https://rentosaijo.github.io/bedrocktrader/reference/bedrocktrader_data_version.md)
-  : Report Minecraft Bedrock Data Version
+- [`bedrock_versions()`](https://rentosaijo.github.io/bedrocktrader/reference/bedrock_versions.md)
+  : List Supported Minecraft Bedrock Versions
 
 ## Discovery
 
@@ -26,9 +26,7 @@ Inspect supported villagers
 
 ## Retrieval
 
-Retrieve normalized trade data and its provenance
+Retrieve flat villager trade data
 
 - [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
   : Retrieve Villager Trades
-- [`source_info()`](https://rentosaijo.github.io/bedrocktrader/reference/source_info.md)
-  : Report Source Provenance

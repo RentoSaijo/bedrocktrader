@@ -17,7 +17,7 @@ villager_variants(version = "latest")
 
 ## Value
 
-A tibble containing canonical variant identifiers, vanilla
+A base data frame containing canonical variant identifiers, vanilla
 `mark_variant` values, and aliases.
 
 ## Examples
