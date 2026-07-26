@@ -34,21 +34,16 @@ reference:
     contents:
       - bedrocktrader
 
-  - title: "Release"
+  - title: "Meta"
     desc: >
-      List supported Minecraft Bedrock sample releases
+      Inspect supported releases and villagers
     contents:
       - bedrock_versions
-
-  - title: "Discovery"
-    desc: >
-      Inspect supported villagers
-    contents:
       - villager_professions
       - villager_variants
 
-  - title: "Retrieval"
+  - title: "Data"
     desc: >
-      Retrieve flat villager trade data
+      Retrieve possible villager offers
     contents:
       - villager_trades
