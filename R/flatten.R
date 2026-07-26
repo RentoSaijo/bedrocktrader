@@ -802,9 +802,6 @@
 
 # Flatten profession table.
 .flatten_trade_table <- function(table, release, selected_levels = NULL) {
-  if (identical(table$profession, 'librarian')) {
-    .validate_enchantment_registry(release)
-  }
   rows  <- list()
   row_n <- 0L
   levels <- table$levels

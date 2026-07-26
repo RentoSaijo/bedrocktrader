@@ -26,31 +26,10 @@
 
 # Load profession tables.
 .load_profession_tables <- function(professions) {
-  release <- .pinned_release()
-  tables <- vector('list', length(professions))
-  names(tables) <- professions
-  for (index in seq_along(professions)) {
-    profession <- professions[[index]]
-    source_file <- .bedrock_professions$source_file[
-      match(profession, .bedrock_professions$profession)
-    ]
-    source_path <- paste0(
-      .bedrock_trade_directory,
-      '/',
-      source_file
-    )
-    content <- .fetch_pinned_file(source_path)
-    table   <- .parse_json(content, source_path)
-    tables[[index]] <- .normalize_trade_table(
-      table       = table,
-      profession  = profession,
-      release     = release,
-      source_path = source_path
-    )
-  }
+  tables <- .bedrock_trade_tables[professions]
   list(
     professions = tables,
-    release     = release
+    release     = .pinned_release()
   )
 }
 
@@ -166,34 +145,7 @@
 #'
 #' }
 villager_professions <- function() {
-  professions <- .bedrock_professions$profession
-  object      <- .load_profession_tables(professions)
-  features    <- lapply(object$professions, .profession_features)
-  result <- data.frame(
-    profession               = professions,
-    display_name             = .bedrock_professions$display_name,
-    aliases                  = vapply(
-      .bedrock_profession_aliases[professions],
-      .collapse_aliases,
-      character(1)
-    ),
-    context_sensitive        = vapply(
-      features,
-      function(feature) feature[['context_sensitive']],
-      logical(1)
-    ),
-    contains_item_choices    = vapply(
-      features,
-      function(feature) feature[['contains_item_choices']],
-      logical(1)
-    ),
-    contains_dynamic_functions = vapply(
-      features,
-      function(feature) feature[['contains_dynamic_functions']],
-      logical(1)
-    ),
-    stringsAsFactors = FALSE
-  )
+  result <- .bedrock_professions_data
   rownames(result) <- NULL
   result
 }
@@ -228,19 +180,7 @@ villager_professions <- function() {
 #'
 #' }
 villager_variants <- function() {
-  release <- .pinned_release()
-  content <- .fetch_pinned_file(.bedrock_variant_path)
-  entity <- .parse_json(content, .bedrock_variant_path)
-  result <- data.frame(
-    variant      = .bedrock_variants,
-    mark_variant = .normalize_variants(entity, release),
-    aliases      = vapply(
-      .bedrock_variant_aliases[.bedrock_variants],
-      .collapse_aliases,
-      character(1)
-    ),
-    stringsAsFactors = FALSE
-  )
+  result <- .bedrock_variants_data
   rownames(result) <- NULL
   result
 }

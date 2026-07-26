@@ -6,4 +6,5 @@
 ^LICENSE\.md$
 ^.*[.]Rcheck$
 ^.*[.]tar[.]gz$
+^data-raw$
 ^index\.md$
