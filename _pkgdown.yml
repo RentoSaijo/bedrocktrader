@@ -36,9 +36,9 @@ reference:
 
   - title: "Release"
     desc: >
-      Resolve Minecraft Bedrock sample releases
+      List supported Minecraft Bedrock sample releases
     contents:
-      - bedrocktrader_data_version
+      - bedrock_versions
 
   - title: "Discovery"
     desc: >
@@ -49,7 +49,6 @@ reference:
 
   - title: "Retrieval"
     desc: >
-      Retrieve normalized trade data and its provenance
+      Retrieve flat villager trade data
     contents:
       - villager_trades
-      - source_info

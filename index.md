@@ -7,8 +7,9 @@ choices, dynamic functions, and filters tied to the villager's stored variant.
 consistently for analysis in R.
 
 The current development release provides a focused data foundation for all 13
-employable villager professions. Each result identifies the exact upstream
-release, Git commit, source path, blob SHA, retrieval time, and parser version.
+employable villager professions. It expands Mojang item choices into ordinary
+base R data frames while keeping quantities, functions, filters, auxiliary
+values, and selection structure available as columns.
 
 ## Installation
 
@@ -24,21 +25,18 @@ pak::pak('RentoSaijo/bedrocktrader')
 ```r
 library(bedrocktrader)
 
+bedrock_versions()
 villager_professions()
 villager_variants()
 
-farmer <- villager_trades('farmer')
-farmer
-
-source_info(farmer)
+armorer <- villager_trades()
+head(armorer)
 ```
 
 Use Mojang's current stable release at call time or request a specific stable
 version:
 
 ```r
-bedrocktrader_data_version()
-
 mason <- villager_trades(
   'mason',
   version = '1.26.30.5'
@@ -46,15 +44,25 @@ mason <- villager_trades(
 ```
 
 The package contacts Mojang's GitHub repository for every top-level retrieval.
-It verifies each downloaded file against the release manifest and does not
-write a cache.
+Supported stable releases begin with `1.26.20.4`; `bedrock_versions()` lists
+every stable release from that floor through Mojang's runtime latest version.
+Each downloaded file is verified against the release manifest, and no cache is
+written.
+
+## Profession Indicators
+
+The profession table includes three quick structural indicators.
+`context_sensitive` identifies variant or dimension filters,
+`contains_item_choices` identifies Mojang `choice` arrays, and
+`contains_dynamic_functions` identifies item-generation functions such as
+enchantments, potions, dyes, or exploration maps.
 
 ## Development Boundary
 
-This iteration retrieves and normalizes source data. It does not yet calculate
-offer probabilities, evaluate villager context, build trade catalogs, produce
-plots, or accept custom trade tables. Those features can grow from a compact,
-auditable source model instead of being layered over an unstable parser.
+This iteration retrieves, normalizes, and flattens source data. It does not yet
+calculate offer probabilities, evaluate villager context, produce plots, or
+accept custom trade tables. Those features can grow from a compact source model
+instead of being layered over an unstable parser.
 
 Mojang data remains subject to the
 [Minecraft End User License Agreement](https://www.minecraft.net/eula).
