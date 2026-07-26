@@ -8,22 +8,49 @@ villager_professions(version = "latest")
 }
 \arguments{
 \item{version}{\code{"latest"} or an explicit stable Minecraft Bedrock sample
-version.}
+version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}. \code{"latest"} is resolved when the
+function is called.}
 }
 \value{
-A base data frame containing canonical profession identifiers,
-display names, aliases, and structural feature flags. \code{context_sensitive}
-marks tables with variant or dimension filters. \code{contains_item_choices}
-marks tables with Mojang item \code{choice} arrays.
-\code{contains_dynamic_functions} marks tables with item-generation functions.
+A base data frame with one row per profession:
+\itemize{
+\item \code{profession} (\code{character}) is the canonical identifier accepted by
+\code{\link[=villager_trades]{villager_trades()}}.
+\item \code{display_name} (\code{character}) is the human-readable profession name.
+\item \code{aliases} (\code{character}) contains additional accepted identifiers
+separated by commas. \code{NA} means that the profession has no aliases.
+\item \code{context_sensitive} (\code{logical}) is \code{TRUE} when at least one offer uses a
+villager-variant or dimension filter. Such offers are not available in
+every context.
+\item \code{contains_item_choices} (\code{logical}) is \code{TRUE} when at least one item
+position contains Mojang's \code{choice} array. \code{\link[=villager_trades]{villager_trades()}} expands
+those alternatives into separate rows.
+\item \code{contains_dynamic_functions} (\code{logical}) is \code{TRUE} when at least one
+item-generation function changes an offered item, such as by adding an
+enchantment, potion, dye, or exploration-map destination.
+}
 }
 \description{
-Retrieves and inspects all supported vanilla profession tables from one
-stable Mojang release.
+Lists the 13 employable vanilla villager professions understood by
+\code{bedrocktrader}. Each row also summarizes trade-table features that may need
+special handling during analysis.
+}
+\details{
+The feature flags describe the selected release, not permanent properties of
+a profession. To calculate them, the function downloads and inspects all 13
+profession tables. It does not evaluate filters or generate function
+outcomes.
 }
 \examples{
 \dontrun{
-villager_professions()
-villager_professions('1.26.30.5')
+professions <- villager_professions()
+professions
+
+professions[
+  professions$context_sensitive,
+  c('profession', 'context_sensitive')
+]
+
+villager_professions(version = '1.26.30.5')
 }
 }

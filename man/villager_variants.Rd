@@ -8,19 +8,38 @@ villager_variants(version = "latest")
 }
 \arguments{
 \item{version}{\code{"latest"} or an explicit stable Minecraft Bedrock sample
-version.}
+version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}. \code{"latest"} is resolved when the
+function is called.}
 }
 \value{
-A base data frame containing canonical variant identifiers, vanilla
-\code{mark_variant} values, and aliases.
+A base data frame with one row per variant:
+\itemize{
+\item \code{variant} (\code{character}) is the canonical package identifier.
+\item \code{mark_variant} (\code{integer}) is the value stored by Mojang's
+\code{minecraft:mark_variant} entity component and tested by vanilla
+\code{is_mark_variant} filters.
+\item \code{aliases} (\code{character}) contains additional accepted names separated by
+commas. \code{NA} means that the variant has no aliases. The \code{snow} variant
+has the alias \code{snowy}.
+}
 }
 \description{
-Retrieves the vanilla villager entity definition from one stable Mojang
-release and derives its seven stored \code{mark_variant} values.
+Lists the seven vanilla villager biome variants and their stored
+\code{minecraft:mark_variant} values. Trade-table filters use these numeric values
+to make certain offers dependent on a villager's variant.
+}
+\details{
+Values are derived from the selected release's vanilla \code{villager_v2} entity
+definition rather than assumed from a fixed lookup table. This function does
+not determine the variant of a particular villager.
 }
 \examples{
 \dontrun{
-villager_variants()
-villager_variants('1.26.30.5')
+variants <- villager_variants()
+variants
+
+variants[variants$variant == 'snow', ]
+
+villager_variants(version = '1.26.30.5')
 }
 }

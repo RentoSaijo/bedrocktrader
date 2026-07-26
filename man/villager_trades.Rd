@@ -7,24 +7,138 @@
 villager_trades(profession = "armorer", version = "latest")
 }
 \arguments{
-\item{profession}{A canonical profession identifier or documented alias.}
+\item{profession}{One canonical profession identifier or an alias listed by
+\code{\link[=villager_professions]{villager_professions()}}. The default is \code{"armorer"}.}
 
 \item{version}{\code{"latest"} or an explicit stable Minecraft Bedrock sample
-version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}.}
+version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}. \code{"latest"} is resolved when the
+function is called.}
 }
 \value{
 A base data frame with one row per concrete combination of item
-choices. Dynamic function outcomes remain unresolved and are retained as
-function names and JSON parameters.
+choices and 40 atomic columns.
 }
 \description{
-Retrieves and normalizes an official vanilla Minecraft Bedrock trade table
-for one supported villager profession.
+Retrieves the official vanilla trade table for one supported profession and
+converts its nested structure into a flat base data frame.
 }
+\section{How to read a row}{
+
+A Bedrock profession table contains five villager levels. Each level contains
+one or more selection groups, each group contains candidate trades, and a
+candidate may contain alternative items. \code{villager_trades()} expands the
+cross-product of those item alternatives. Consequently, rows sharing a
+\code{candidate_id} represent alternative item realizations of one candidate;
+\code{option_id} identifies the individual expanded row.
+
+The result describes every possible offer in the profession table. It does
+not represent the offers selected for a particular villager, calculate offer
+probabilities, evaluate contextual filters, or generate dynamic function
+outcomes.
+}
+
+\section{Trade columns}{
+
+\itemize{
+\item \code{profession} (\code{character}): canonical profession identifier.
+\item \code{level} (\code{integer}): numeric villager tier from 1 through 5.
+\item \code{level_name} (\code{character}): \code{novice}, \code{apprentice}, \code{journeyman}, \code{expert},
+or \code{master}.
+\item \code{total_exp_required} (\code{double}): cumulative experience the villager, rather
+than the player, needs to unlock the level.
+\item \code{group_id} (\code{character}): package-generated identifier for a selection
+group, formatted from profession, level, and group position.
+\item \code{candidate_id} (\code{character}): package-generated identifier for one source
+trade within a group. It can repeat after item choices are expanded.
+\item \code{option_id} (\code{character}): unique identifier for one expanded output row.
+\item \code{candidate_count} (\code{integer}): number of source trade candidates in the
+group before item-choice expansion.
+\item \code{num_to_select} (\code{integer}): number of candidates Mojang selects from the
+group. \code{-1} represents the select-all convention.
+\item \code{select_all} (\code{logical}): convenient indicator for
+\code{num_to_select == -1}.
+\item \code{max_uses} (\code{double}): number of uses before the offer locks until the
+villager restocks.
+\item \code{trader_exp} (\code{double}): experience the villager gains when the trade is
+completed.
+\item \code{reward_exp} (\code{logical}): whether completing the trade rewards the player
+with experience.
+}
+
+The three item-slot prefixes describe the exchange from the player's
+perspective:
+\itemize{
+\item \code{wants_1_} is the first item the player pays.
+\item \code{wants_2_} is an optional second item the player pays. All nine fields are
+typed \code{NA} when a trade has only one input.
+\item \code{gives_1_} is the item the villager gives the player.
+}
+}
+
+\section{Item-slot columns}{
+
+Each prefix is combined with the following nine fields:
+\itemize{
+\item \code{item_raw} (\code{character}): exact Mojang item identifier, including a
+numeric auxiliary suffix when one is present.
+\item \code{item} (\code{character}): normalized item identifier without that suffix.
+\item \code{aux_value} (\code{integer}): numeric auxiliary or legacy data value removed
+from \code{item_raw}; \code{NA} when no suffix exists.
+\item \code{quantity_min} and \code{quantity_max} (\code{double}): lower and upper bounds of the
+quantity. They are equal for a fixed quantity. An omitted source quantity
+becomes one.
+\item \code{price_multiplier} (\code{double}): Mojang's multiplier for price increases
+caused by supply and demand.
+\item \code{functions} (\code{character}): item-generation function names in source order,
+separated by commas.
+\item \code{function_parameters} (\code{character}): a JSON array whose objects align with
+the names in \code{functions}.
+\item \code{filters} (\code{character}): unevaluated filter JSON. A top-level \code{position} or
+\code{choice} key records where the filter appeared in Mojang's item structure.
+}
+
+Optional properties remain \code{NA} when Mojang omits them; the package does not
+replace them with Minecraft's runtime defaults. Functions, function
+parameters, and filters are also \code{NA} when absent. The generated IDs are
+deterministic for a release's source order, but their meaning should be
+compared by content before matching different releases.
+}
+
 \examples{
 \dontrun{
 armorer <- villager_trades()
-farmer <- villager_trades('farmer')
+armorer[
+  ,
+  c(
+    'level_name',
+    'wants_1_item',
+    'wants_1_quantity_min',
+    'gives_1_item'
+  )
+]
+
+cartographer <- villager_trades(
+  profession = 'cartographer',
+  version    = '1.26.30.5'
+)
+two_inputs <- !is.na(cartographer$wants_2_item)
+cartographer[
+  two_inputs,
+  c('wants_1_item', 'wants_2_item', 'gives_1_item')
+]
+
+function_row <- which(!is.na(cartographer$gives_1_functions))[[1L]]
+jsonlite::fromJSON(
+  cartographer$gives_1_function_parameters[[function_row]]
+)
+
 mason <- villager_trades('mason', version = '1.26.30.5')
+mason[
+  mason$select_all,
+  c('group_id', 'candidate_id', 'option_id', 'num_to_select')
+]
 }
+}
+\references{
+\href{https://learn.microsoft.com/en-us/minecraft/creator/documents/createtradetable?view=minecraft-bedrock-stable}{Microsoft, "Creating a Trade Table"}
 }
