@@ -1,0 +1,55 @@
+url: https://rentosaijo.github.io/bedrocktrader/
+
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+  light-switch: true
+
+navbar:
+  title: "bedrocktrader"
+  structure:
+    left: [intro, reference]
+    right: [search, github, lightswitch]
+  components:
+    intro:
+      icon: fa-home fa-lg
+      href: index.html
+      aria-label: Home
+    reference:
+      text: "Functions"
+      href: reference/index.html
+    github:
+      icon: fa-github
+      href: https://github.com/RentoSaijo/bedrocktrader
+      aria-label: GitHub
+
+authors:
+  Rento Saijo:
+    href: https://github.com/RentoSaijo
+
+reference:
+  - title: "Package"
+    desc: >
+      Package overview
+    contents:
+      - bedrocktrader
+
+  - title: "Release"
+    desc: >
+      Resolve Minecraft Bedrock sample releases
+    contents:
+      - bedrocktrader_data_version
+
+  - title: "Discovery"
+    desc: >
+      Inspect supported villagers
+    contents:
+      - villager_professions
+      - villager_variants
+
+  - title: "Retrieval"
+    desc: >
+      Retrieve normalized trade data and its provenance
+    contents:
+      - villager_trades
+      - source_info
