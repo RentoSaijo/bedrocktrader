@@ -11,10 +11,6 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.1.0)
-Imports:
-    curl,
-    digest,
-    jsonlite
 URL: https://rentosaijo.github.io/bedrocktrader/, https://github.com/RentoSaijo/bedrocktrader
 BugReports: https://github.com/RentoSaijo/bedrocktrader/issues
 Config/roxygen2/version: 8.0.0
