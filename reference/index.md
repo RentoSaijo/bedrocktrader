@@ -10,10 +10,8 @@ Package overview
 
 ## Meta
 
-Inspect supported releases and villagers
+Inspect supported villagers
 
-- [`bedrock_versions()`](https://rentosaijo.github.io/bedrocktrader/reference/bedrock_versions.md)
-  : List Supported Minecraft Bedrock Versions
 - [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md)
   : List Supported Villager Professions
 - [`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md)
@@ -25,3 +23,10 @@ Retrieve possible villager offers
 
 - [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
   : Retrieve Villager Trades
+
+## Analysis
+
+Calculate offer probabilities
+
+- [`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md)
+  : Calculate Villager Offer Probabilities

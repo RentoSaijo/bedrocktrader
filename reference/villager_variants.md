@@ -1,23 +1,13 @@
 # List Villager Variants
 
 Lists the seven vanilla villager biome variants and their stored
-`minecraft:mark_variant` values. Trade-table filters use these numeric
-values to make certain offers dependent on a villager's variant.
+`minecraft:mark_variant` values in Minecraft Bedrock `1.26.30.5`.
 
 ## Usage
 
 ``` r
-villager_variants(version = "latest")
+villager_variants()
 ```
-
-## Arguments
-
-- version:
-
-  `"latest"` or an explicit stable Minecraft Bedrock sample version
-  returned by
-  [`bedrock_versions()`](https://rentosaijo.github.io/bedrocktrader/reference/bedrock_versions.md).
-  `"latest"` is resolved when the function is called.
 
 ## Value
 
@@ -26,18 +16,20 @@ A base data frame with one row per variant:
 - `variant` (`character`) is the canonical package identifier.
 
 - `mark_variant` (`integer`) is the value stored by Mojang's
-  `minecraft:mark_variant` entity component and tested by vanilla
-  `is_mark_variant` filters.
+  `minecraft:mark_variant` entity component. Vanilla `is_mark_variant`
+  filters compare against this value.
 
-- `aliases` (`character`) contains additional accepted names separated
-  by commas. `NA` means that the variant has no aliases. The `snow`
-  variant has the alias `snowy`.
+- `aliases` (`character`) lists additional accepted inputs, separated by
+  commas. It is `NA` when no aliases exist.
 
 ## Details
 
-Values are derived from the selected release's vanilla `villager_v2`
-entity definition rather than assumed from a fixed lookup table. This
-function does not determine the variant of a particular villager.
+Values are read from the pinned vanilla `villager_v2.json` entity
+definition. The canonical snowy-biome identifier is `snow`; `snowy` is
+an accepted alias in
+[`offer_probabilities()`](https://rentosaijo.github.io/bedrocktrader/reference/offer_probabilities.md).
+This function describes available codes and does not inspect a
+saved-world villager.
 
 ## Examples
 
@@ -48,6 +40,5 @@ variants
 
 variants[variants$variant == 'snow', ]
 
-villager_variants(version = '1.26.30.5')
 } # }
 ```
