@@ -11,8 +11,11 @@ villager_professions(version = "latest")
 version.}
 }
 \value{
-A tibble containing canonical profession identifiers, display names,
-aliases, source files, and structural feature flags.
+A base data frame containing canonical profession identifiers,
+display names, aliases, and structural feature flags. \code{context_sensitive}
+marks tables with variant or dimension filters. \code{contains_item_choices}
+marks tables with Mojang item \code{choice} arrays.
+\code{contains_dynamic_functions} marks tables with item-generation functions.
 }
 \description{
 Retrieves and inspects all supported vanilla profession tables from one

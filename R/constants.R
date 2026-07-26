@@ -1,14 +1,12 @@
 # Package Constants -------------------------------------------------------------
 
 # Define Mojang repository endpoints.
-.bedrock_repository <- 'Mojang/bedrock-samples'
-.bedrock_repository_url <- 'https://github.com/Mojang/bedrock-samples'
 .bedrock_api_url <- 'https://api.github.com/repos/Mojang/bedrock-samples'
 .bedrock_raw_url <- 'https://raw.githubusercontent.com/Mojang/bedrock-samples'
 .bedrock_version_path <- 'version.json'
 .bedrock_trade_directory <- 'behavior_pack/trading/economy_trades'
 .bedrock_variant_path <- 'behavior_pack/entities/villager_v2.json'
-.bedrock_parser_version <- 1L
+.bedrock_minimum_version <- '1.26.20.4'
 
 # Define villager level vocabulary.
 .bedrock_level_names <- c(

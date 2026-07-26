@@ -11,9 +11,6 @@
     stop('`profession` must be one nonempty character value.', call. = FALSE)
   }
   value <- tolower(trimws(profession))
-  if (identical(value, 'all')) {
-    return(.bedrock_professions$profession)
-  }
   for (canonical in names(.bedrock_profession_aliases)) {
     if (value %in% c(canonical, .bedrock_profession_aliases[[canonical]])) {
       return(canonical)
@@ -55,8 +52,7 @@
     release,
     .bedrock_trade_directory
   )
-  tables      <- vector('list', length(professions))
-  source_rows <- vector('list', length(professions))
+  tables <- vector('list', length(professions))
   names(tables) <- professions
   for (index in seq_along(professions)) {
     profession <- professions[[index]]
@@ -69,29 +65,27 @@
       source_file
     )
     entry <- .manifest_entry(manifest, source_path, release)
-    file  <- .fetch_manifest_file(
-      entry       = entry,
-      release     = release,
-      source_role = 'trade_table',
-      profession  = profession
-    )
-    table <- .parse_json(file$content, source_path)
+    content <- .fetch_manifest_file(entry, release)
+    table   <- .parse_json(content, source_path)
     tables[[index]] <- .normalize_trade_table(
       table       = table,
       profession  = profession,
       release     = release,
       source_path = source_path
     )
-    source_rows[[index]] <- file$source
   }
-  structure(
-    list(
-      professions = tables,
-      data_version = .release_tibble(release),
-      source       = .bind_source_rows(source_rows)
-    ),
-    class = 'bedrock_villager_trades'
+  list(
+    professions = tables,
+    release     = release
   )
+}
+
+# Collapse aliases.
+.collapse_aliases <- function(aliases) {
+  if (!length(aliases)) {
+    return(NA_character_)
+  }
+  paste(aliases, collapse = ', ')
 }
 
 # Flatten normalized item positions.
@@ -162,8 +156,11 @@
 #' @param version `"latest"` or an explicit stable Minecraft Bedrock sample
 #'   version.
 #'
-#' @return A tibble containing canonical profession identifiers, display names,
-#'   aliases, source files, and structural feature flags.
+#' @return A base data frame containing canonical profession identifiers,
+#'   display names, aliases, and structural feature flags. `context_sensitive`
+#'   marks tables with variant or dimension filters. `contains_item_choices`
+#'   marks tables with Mojang item `choice` arrays.
+#'   `contains_dynamic_functions` marks tables with item-generation functions.
 #' @export
 #'
 #' @examples
@@ -175,11 +172,14 @@ villager_professions <- function(version = 'latest') {
   professions <- .bedrock_professions$profession
   object      <- .load_profession_tables(professions, version)
   features    <- lapply(object$professions, .profession_features)
-  result <- tibble::tibble(
+  result <- data.frame(
     profession               = professions,
     display_name             = .bedrock_professions$display_name,
-    aliases                  = unname(.bedrock_profession_aliases[professions]),
-    source_file              = .bedrock_professions$source_file,
+    aliases                  = vapply(
+      .bedrock_profession_aliases[professions],
+      .collapse_aliases,
+      character(1)
+    ),
     context_sensitive        = vapply(
       features,
       function(feature) feature[['context_sensitive']],
@@ -194,10 +194,11 @@ villager_professions <- function(version = 'latest') {
       features,
       function(feature) feature[['contains_dynamic_functions']],
       logical(1)
-    )
+    ),
+    stringsAsFactors = FALSE
   )
-  class(result) <- c('bedrocktrader_professions', class(result))
-  .attach_source(result, object$source)
+  rownames(result) <- NULL
+  result
 }
 
 #' List Villager Variants
@@ -208,7 +209,7 @@ villager_professions <- function(version = 'latest') {
 #' @param version `"latest"` or an explicit stable Minecraft Bedrock sample
 #'   version.
 #'
-#' @return A tibble containing canonical variant identifiers, vanilla
+#' @return A base data frame containing canonical variant identifiers, vanilla
 #'   `mark_variant` values, and aliases.
 #' @export
 #'
@@ -219,42 +220,50 @@ villager_professions <- function(version = 'latest') {
 #' }
 villager_variants <- function(version = 'latest') {
   release <- .resolve_release(version)
-  file    <- .fetch_direct_file(
+  content <- .fetch_direct_file(
     release     = release,
-    source_path = .bedrock_variant_path,
-    source_role = 'villager_entity'
+    source_path = .bedrock_variant_path
   )
-  entity <- .parse_json(file$content, .bedrock_variant_path)
-  result <- tibble::tibble(
+  entity <- .parse_json(content, .bedrock_variant_path)
+  result <- data.frame(
     variant      = .bedrock_variants,
     mark_variant = .normalize_variants(entity, release),
-    aliases      = unname(.bedrock_variant_aliases[.bedrock_variants])
+    aliases      = vapply(
+      .bedrock_variant_aliases[.bedrock_variants],
+      .collapse_aliases,
+      character(1)
+    ),
+    stringsAsFactors = FALSE
   )
-  class(result) <- c('bedrocktrader_variants', class(result))
-  .attach_source(result, file$source)
+  rownames(result) <- NULL
+  result
 }
 
 #' Retrieve Villager Trades
 #'
-#' Retrieves and normalizes official vanilla Minecraft Bedrock trade tables for
-#' one supported villager profession or all supported professions.
+#' Retrieves and normalizes an official vanilla Minecraft Bedrock trade table
+#' for one supported villager profession.
 #'
-#' @param profession A canonical profession identifier, documented alias, or
-#'   `"all"`.
+#' @param profession A canonical profession identifier or documented alias.
 #' @param version `"latest"` or an explicit stable Minecraft Bedrock sample
-#'   version.
+#'   version returned by [bedrock_versions()].
 #'
-#' @return A `bedrock_villager_trades` object containing normalized profession,
-#'   level, selection-group, candidate, item-position, and item-choice records.
+#' @return A base data frame with one row per concrete combination of item
+#'   choices. Dynamic function outcomes remain unresolved and are retained as
+#'   function names and JSON parameters.
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' armorer <- villager_trades()
 #' farmer <- villager_trades('farmer')
 #' mason <- villager_trades('mason', version = '1.26.30.5')
-#' all_trades <- villager_trades('all')
 #' }
-villager_trades <- function(profession, version = 'latest') {
-  professions <- .normalize_profession_input(profession)
-  .load_profession_tables(professions, version)
+villager_trades <- function(profession = 'armorer', version = 'latest') {
+  profession <- .normalize_profession_input(profession)
+  object     <- .load_profession_tables(profession, version)
+  .flatten_trade_table(
+    table   = object$professions[[profession]],
+    release = object$release
+  )
 }

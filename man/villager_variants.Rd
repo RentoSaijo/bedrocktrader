@@ -11,7 +11,7 @@ villager_variants(version = "latest")
 version.}
 }
 \value{
-A tibble containing canonical variant identifiers, vanilla
+A base data frame containing canonical variant identifiers, vanilla
 \code{mark_variant} values, and aliases.
 }
 \description{

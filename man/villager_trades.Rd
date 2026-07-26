@@ -4,27 +4,27 @@
 \alias{villager_trades}
 \title{Retrieve Villager Trades}
 \usage{
-villager_trades(profession, version = "latest")
+villager_trades(profession = "armorer", version = "latest")
 }
 \arguments{
-\item{profession}{A canonical profession identifier, documented alias, or
-\code{"all"}.}
+\item{profession}{A canonical profession identifier or documented alias.}
 
 \item{version}{\code{"latest"} or an explicit stable Minecraft Bedrock sample
-version.}
+version returned by \code{\link[=bedrock_versions]{bedrock_versions()}}.}
 }
 \value{
-A \code{bedrock_villager_trades} object containing normalized profession,
-level, selection-group, candidate, item-position, and item-choice records.
+A base data frame with one row per concrete combination of item
+choices. Dynamic function outcomes remain unresolved and are retained as
+function names and JSON parameters.
 }
 \description{
-Retrieves and normalizes official vanilla Minecraft Bedrock trade tables for
-one supported villager profession or all supported professions.
+Retrieves and normalizes an official vanilla Minecraft Bedrock trade table
+for one supported villager profession.
 }
 \examples{
 \dontrun{
+armorer <- villager_trades()
 farmer <- villager_trades('farmer')
 mason <- villager_trades('mason', version = '1.26.30.5')
-all_trades <- villager_trades('all')
 }
 }

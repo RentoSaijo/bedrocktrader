@@ -161,20 +161,49 @@
   )
 }
 
-# Resolve annotated Git tag.
-.resolve_tag_object <- function(tag_object) {
-  object_type <- tag_object$object$type
-  object_sha  <- tag_object$object$sha
-  while (identical(object_type, 'tag')) {
-    url <- paste0(.bedrock_api_url, '/git/tags/', object_sha)
-    tag <- .parse_json(.fetch_bytes(url), url)
-    object_type <- tag$object$type
-    object_sha  <- tag$object$sha
+# Retrieve stable version registry.
+.stable_versions <- function() {
+  registry_url <- paste0(
+    .bedrock_raw_url,
+    '/main/',
+    .bedrock_version_path
+  )
+  registry <- .parse_json(
+    .fetch_bytes(registry_url),
+    .bedrock_version_path
+  )
+  registry_versions <- setdiff(names(registry), 'latest')
+  supported <- vapply(
+    registry_versions,
+    function(version) {
+      utils::compareVersion(version, .bedrock_minimum_version) >= 0L
+    },
+    logical(1)
+  )
+  versions <- registry_versions[supported]
+  if (!length(versions)) {
+    stop(
+      'Mojang stable-version registry contains no supported releases.',
+      call. = FALSE
+    )
   }
-  if (!identical(object_type, 'commit')) {
-    stop('Mojang release tag does not resolve to a Git commit.', call. = FALSE)
-  }
-  object_sha
+  result <- data.frame(
+    version      = unname(versions),
+    release_date = as.Date(vapply(
+      registry[versions],
+      function(record) record$date,
+      character(1)
+    ), format = '%d-%m-%Y'),
+    latest       = versions == registry$latest$version,
+    stringsAsFactors = FALSE
+  )
+  result <- result[
+    order(result$release_date, decreasing = TRUE),
+    ,
+    drop = FALSE
+  ]
+  rownames(result) <- NULL
+  result
 }
 
 # Resolve stable release.
@@ -191,44 +220,32 @@
   if (grepl('preview', requested, fixed = TRUE)) {
     stop('Preview releases are outside the supported version range.', call. = FALSE)
   }
-  registry_url <- paste0(
-    .bedrock_raw_url,
-    '/main/',
-    .bedrock_version_path
-  )
-  registry <- .parse_json(
-    .fetch_bytes(registry_url),
-    .bedrock_version_path
-  )
-  stable_versions <- setdiff(names(registry), 'latest')
+  versions <- .stable_versions()
   if (identical(requested, 'latest')) {
-    resolved <- registry$latest$version
-    record   <- registry[[resolved]]
-  } else {
-    if (!requested %in% stable_versions) {
+    if (!any(versions$latest)) {
       stop(
-        '`version` must be "latest" or a stable release listed by Mojang.',
+        'Mojang latest stable release is below the supported version floor.',
         call. = FALSE
       )
     }
-    resolved <- registry[[requested]]$version
-    record   <- registry[[requested]]
+    resolved <- versions$version[which(versions$latest)[[1L]]]
+  } else {
+    if (!requested %in% versions$version) {
+      stop(
+        '`version` must be "latest" or a release returned by ',
+        '`bedrock_versions()`.',
+        call. = FALSE
+      )
+    }
+    resolved <- requested
   }
-  release_tag <- paste0('v', resolved)
-  tag_url <- paste0(
-    .bedrock_api_url,
-    '/git/ref/tags/',
-    release_tag
-  )
-  tag_object <- .parse_json(.fetch_bytes(tag_url), tag_url)
+  release_index <- match(resolved, versions$version)
   list(
     requested_version = requested,
     bedrock_version   = resolved,
-    release_date      = as.Date(record$date, format = '%d-%m-%Y'),
+    release_date      = versions$release_date[[release_index]],
     channel           = 'stable',
-    release_tag       = release_tag,
-    git_commit        = .resolve_tag_object(tag_object),
-    retrieved_at      = as.POSIXct(Sys.time(), tz = 'UTC')
+    release_tag       = paste0('v', resolved)
   )
 }
 
@@ -254,7 +271,7 @@
 }
 
 # Retrieve manifest file.
-.fetch_manifest_file <- function(entry, release, source_role, profession = NA_character_) {
+.fetch_manifest_file <- function(entry, release) {
   required_fields <- c('path', 'sha', 'download_url')
   if (!is.list(entry) || !all(required_fields %in% names(entry))) {
     stop(
@@ -276,20 +293,11 @@
       call. = FALSE
     )
   }
-  list(
-    content = content,
-    source  = .source_row(
-      source_role = source_role,
-      profession  = profession,
-      release     = release,
-      source_path = entry$path,
-      blob_sha    = blob_sha
-    )
-  )
+  content
 }
 
 # Retrieve direct source file.
-.fetch_direct_file <- function(release, source_path, source_role) {
+.fetch_direct_file <- function(release, source_path) {
   url <- paste0(
     .bedrock_api_url,
     '/contents/',
@@ -323,14 +331,5 @@
       call. = FALSE
     )
   }
-  list(
-    content = content,
-    source  = .source_row(
-      source_role = source_role,
-      profession  = NA_character_,
-      release     = release,
-      source_path = source_path,
-      blob_sha    = blob_sha
-    )
-  )
+  content
 }
