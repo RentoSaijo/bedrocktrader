@@ -1,0 +1,23 @@
+project:
+  type: default
+  render:
+    - math.qmd
+
+execute:
+  enabled: false
+
+format:
+  pdf:
+    documentclass: article
+    classoption:
+      - 12pt
+    include-in-header:
+      - template/_include-in-header.tex
+    template-partials:
+      - template/title.tex
+      - template/before-body.tex
+    biblio-style: agsm
+    cite-method: natbib
+    number-sections: true
+    shift-heading-level-by: -1
+    keep-tex: false

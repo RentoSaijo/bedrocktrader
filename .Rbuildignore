@@ -8,3 +8,4 @@
 ^.*[.]tar[.]gz$
 ^data-raw$
 ^index\.md$
+^other$
