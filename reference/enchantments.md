@@ -1,6 +1,6 @@
 # List enchantments
 
-Lists the 42 enchantments registered in Minecraft Bedrock Edition
+Lists the 42 enchantments registered in Minecraft: Bedrock Edition
 `1.26.30.5` and identifies those available through the bundled villager
 model.
 
@@ -53,6 +53,7 @@ Enchantments"](https://learn.microsoft.com/en-us/minecraft/creator/documents/int
 ## Examples
 
 ``` r
+# Inspect enchantment metadata.
 registry <- enchantments()
 head(registry)
 #>                    enchantment       display_name max_level treasure
@@ -77,6 +78,7 @@ head(registry)
 #> 5                                                                                                        <NA>
 #> 6                                                                                                        <NA>
 
+# Inspect enchantments unavailable through villagers.
 registry[!registry$villager_attainable, ]
 #>              enchantment display_name max_level treasure villager_attainable
 #> 37  minecraft:soul_speed   Soul Speed         3     TRUE               FALSE

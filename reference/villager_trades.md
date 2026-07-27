@@ -1,6 +1,6 @@
 # Retrieve villager trades
 
-Returns the possible vanilla trades for one profession in Minecraft
+Returns the possible vanilla trades for one profession in Minecraft:
 Bedrock Edition `1.26.30.5`, together with the probability represented
 at the requested trade, option, or offer resolution.
 
@@ -283,6 +283,7 @@ metadata"](https://minecraft.wiki/w/Banner#Metadata)
 ## Examples
 
 ``` r
+# Inspect armorer trades.
 armor <- villager_trades()
 head(
   armor[
@@ -303,6 +304,7 @@ head(
 #> 5    1    minecraft:emerald minecraft:iron_chestplate              0.25
 #> 6    2 minecraft:iron_ingot         minecraft:emerald              1.00
 
+# Inspect concrete enchanted armorer options.
 armor_options <- villager_trades(view = 'option')
 head(
   armor_options[
@@ -338,6 +340,7 @@ head(
 #> 19      0.0122614313
 #> 20      0.0010950188
 
+# Inspect exact Mending book offers.
 book_offers <- villager_trades('librarian', view = 'offer')
 head(
   book_offers[
@@ -361,6 +364,7 @@ head(
 #> 1879  minecraft:mending=1                   18      0.0008547009
 #> 1880  minecraft:mending=1                   20      0.0008547009
 
+# Inspect context-specific cartographer maps.
 maps <- villager_trades(
   profession = 'cartographer',
   variant    = 'snowy',

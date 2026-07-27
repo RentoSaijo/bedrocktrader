@@ -1,14 +1,19 @@
-# bedrocktrader
+  
+
+[![bedrocktrader
+logo](reference/figures/logo.png)](https://rentosaijo.github.io/bedrocktrader/)
+
+## **bedrocktrader**
 
 ### Overview
 
 bedrocktrader is an R package to access and analyze vanilla villager
-trades from **Minecraft Bedrock Edition 1.26.30.5**. It bundles
-normalized professions, variants, tiers, enchantments, and modeled trade
-outcomes as ordinary base R data frames, so every public function works
-offline without GitHub credentials. The package follows Mojang’s
-`tiers`, `groups`, `trades`, `wants`, and `gives` terminology while
-making the possible offers and their probabilities easier to inspect.
+trades from **Minecraft: Bedrock Edition 1.26.30.5**. It connects
+Mojang’s authored trade tables to concrete item specifications and exact
+prices through three linked views: `trade`, `option`, and `offer`. The
+package also supplies metadata for professions, variants, tiers, and
+enchantments, and calculates the probability that a fully unlocked
+villager offers selected enchanted books or equipment.
 
 ### Installation
 
@@ -16,6 +21,7 @@ Install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 
+# Install package.
 install.packages('pak')
 pak::pak('RentoSaijo/bedrocktrader')
 ```
@@ -33,8 +39,10 @@ than 26 emeralds:
 
 ``` r
 
+# Load package.
 library(bedrocktrader)
 
+# Inspect enchanted diamond helmet options.
 armorer_options <- villager_trades(
   profession = 'armorer',
   view       = 'option'
@@ -50,6 +58,7 @@ helmet_options <- armorer_options[
 ]
 head(helmet_options)
 
+# Calculate Mending probability.
 mending_probability <- enchanted_book_probability(
   enchantment  = 'minecraft:mending=1',
   max_emeralds = 26
@@ -79,9 +88,11 @@ develops the probability model in full.
 The bundled values come from Mojang’s immutable [`v1.26.30.5` Bedrock
 Samples
 release](https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5)
-and are verified against pinned Git blob SHAs during development. The R
-code is GPL-3-or-later; values derived from Mojang’s samples remain
-subject to [Mojang’s license
+and are verified against pinned Git blob SHAs during development.
+Normalized data and modeled outcomes ship with the package, so its
+public functions work offline without GitHub credentials. The R code is
+GPL-3-or-later; values derived from Mojang’s samples remain subject to
+[Mojang’s license
 notice](https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md)
 and the [Minecraft EULA](https://www.minecraft.net/en-us/eula).
 bedrocktrader is independent of Mojang and Microsoft.

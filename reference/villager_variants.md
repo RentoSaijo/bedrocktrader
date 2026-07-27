@@ -1,7 +1,7 @@
 # List villager variants
 
 Lists vanilla villager biome variants and their `minecraft:mark_variant`
-values for Minecraft Bedrock Edition `1.26.30.5`.
+values for Minecraft: Bedrock Edition `1.26.30.5`.
 
 ## Usage
 
@@ -34,6 +34,7 @@ neither downloads data nor examines villagers in a saved world.
 ## Examples
 
 ``` r
+# Inspect villager variants.
 variants <- villager_variants()
 variants
 #>   variant mark_variant aliases
@@ -45,6 +46,7 @@ variants
 #> 6   swamp            5    <NA>
 #> 7   taiga            6    <NA>
 
+# Inspect snowy villager metadata.
 variants[variants$variant == 'snow', ]
 #>   variant mark_variant aliases
 #> 5    snow            4   snowy

@@ -1,7 +1,7 @@
 # List villager tiers
 
 Lists the five villager trading tiers and the cumulative experience a
-villager needs to unlock each tier in Minecraft Bedrock Edition
+villager needs to unlock each tier in Minecraft: Bedrock Edition
 `1.26.30.5`.
 
 ## Usage
@@ -31,6 +31,7 @@ experience thresholds. Calling this function performs no download.
 ## Examples
 
 ``` r
+# Inspect villager tiers.
 villager_tiers()
 #>   tier  tier_name total_exp_required
 #> 1    1     novice                  0

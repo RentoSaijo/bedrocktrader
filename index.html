@@ -5,14 +5,15 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Retrieve Minecraft Bedrock Villager Trade Data • bedrocktrader</title>
+<title>Retrieve Villager Trade Data for Minecraft: Bedrock Edition • bedrocktrader</title>
 <script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Retrieve Minecraft Bedrock Villager Trade Data">
-<meta name="description" content="Provides normalized vanilla Minecraft Bedrock Edition 1.26.30.5 villager trade data, including tiers, item choices, modeled enchantments, contextual restrictions, and offer probabilities in flat base R data frames.">
-<meta property="og:description" content="Provides normalized vanilla Minecraft Bedrock Edition 1.26.30.5 villager trade data, including tiers, item choices, modeled enchantments, contextual restrictions, and offer probabilities in flat base R data frames.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Retrieve Villager Trade Data for Minecraft: Bedrock Edition">
+<meta name="description" content="Provides normalized vanilla villager trade data for Minecraft: Bedrock Edition 1.26.30.5, including tiers, item choices, modeled enchantments, contextual restrictions, and offer probabilities in flat base R data frames.">
+<meta property="og:description" content="Provides normalized vanilla villager trade data for Minecraft: Bedrock Edition 1.26.30.5, including tiers, item choices, modeled enchantments, contextual restrictions, and offer probabilities in flat base R data frames.">
+<meta property="og:image" content="https://rentosaijo.github.io/bedrocktrader/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -54,20 +55,25 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="bedrocktrader">bedrocktrader<a class="anchor" aria-label="anchor" href="#bedrocktrader"></a>
-</h1></div>
+  <main id="main" class="col-md-9"><p><br></p>
+<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+<a href="https://rentosaijo.github.io/bedrocktrader/"> <img src="reference/figures/logo.png" width="100" alt="bedrocktrader logo"></a>
+<h2 style="margin: 0;">
+<strong>bedrocktrader</strong>
+</h2>
+</div>
 <div class="section level3">
 <h3 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h3>
-<p>bedrocktrader is an R package to access and analyze vanilla villager trades from <strong>Minecraft Bedrock Edition 1.26.30.5</strong>. It bundles normalized professions, variants, tiers, enchantments, and modeled trade outcomes as ordinary base R data frames, so every public function works offline without GitHub credentials. The package follows Mojang’s <code>tiers</code>, <code>groups</code>, <code>trades</code>, <code>wants</code>, and <code>gives</code> terminology while making the possible offers and their probabilities easier to inspect.</p>
+<p>bedrocktrader is an R package to access and analyze vanilla villager trades from <strong>Minecraft: Bedrock Edition 1.26.30.5</strong>. It connects Mojang’s authored trade tables to concrete item specifications and exact prices through three linked views: <code>trade</code>, <code>option</code>, and <code>offer</code>. The package also supplies metadata for professions, variants, tiers, and enchantments, and calculates the probability that a fully unlocked villager offers selected enchanted books or equipment.</p>
 </div>
 <div class="section level3">
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
 <p>Install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'pak'</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Install package.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'pak'</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">'RentoSaijo/bedrocktrader'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -75,8 +81,10 @@
 </h3>
 <p>Minecraft organizes trading possibilities as <code>tier -&gt; group -&gt; trade -&gt; option -&gt; offer</code>. The trade view summarizes generated specifications and prices, the option view resolves one concrete item specification while retaining its price bounds, and the offer view separates every exact specification and price. For example, the following code inspects enchanted diamond helmets and calculates the probability that a fully unlocked librarian offers Mending for no more than 26 emeralds:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Load package.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Inspect enchanted diamond helmet options.</span></span>
 <span><span class="va">armorer_options</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span></span>
 <span>  profession <span class="op">=</span> <span class="st">'armorer'</span>,</span>
 <span>  view       <span class="op">=</span> <span class="st">'option'</span></span>
@@ -92,6 +100,7 @@
 <span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">helmet_options</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Calculate Mending probability.</span></span>
 <span><span class="va">mending_probability</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/enchanted_book_probability.html">enchanted_book_probability</a></span><span class="op">(</span></span>
 <span>  enchantment  <span class="op">=</span> <span class="st">'minecraft:mending=1'</span>,</span>
 <span>  max_emeralds <span class="op">=</span> <span class="fl">26</span></span>
@@ -102,9 +111,9 @@
 <div class="section level3">
 <h3 id="source-and-license">Source and license<a class="anchor" aria-label="anchor" href="#source-and-license"></a>
 </h3>
-<p>The bundled values come from Mojang’s immutable <a href="https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5" class="external-link"><code>v1.26.30.5</code> Bedrock Samples release</a> and are verified against pinned Git blob SHAs during development. The R code is GPL-3-or-later; values derived from Mojang’s samples remain subject to <a href="https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md" class="external-link">Mojang’s license notice</a> and the <a href="https://www.minecraft.net/en-us/eula" class="external-link">Minecraft EULA</a>. bedrocktrader is independent of Mojang and Microsoft.</p>
+<p>The bundled values come from Mojang’s immutable <a href="https://github.com/Mojang/bedrock-samples/releases/tag/v1.26.30.5" class="external-link"><code>v1.26.30.5</code> Bedrock Samples release</a> and are verified against pinned Git blob SHAs during development. Normalized data and modeled outcomes ship with the package, so its public functions work offline without GitHub credentials. The R code is GPL-3-or-later; values derived from Mojang’s samples remain subject to <a href="https://github.com/Mojang/bedrock-samples/blob/v1.26.30.5/LICENSE.md" class="external-link">Mojang’s license notice</a> and the <a href="https://www.minecraft.net/en-us/eula" class="external-link">Minecraft EULA</a>. bedrocktrader is independent of Mojang and Microsoft.</p>
 </div>
-</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">

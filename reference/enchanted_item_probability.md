@@ -1,7 +1,7 @@
 # Calculate enchanted item probability
 
 Calculates the probability that a fully unlocked villager offers one
-qualifying enchanted equipment item in Minecraft Bedrock Edition
+qualifying enchanted equipment item in Minecraft: Bedrock Edition
 `1.26.30.5`.
 
 ## Usage
@@ -115,9 +115,11 @@ Tables"](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/l
 ## Examples
 
 ``` r
+# Calculate Sharpness III sword probability.
 enchanted_item_probability('sword', 'sharpness=3')
 #> [1] 0.006747492
 
+# Calculate Efficiency II-or-higher pickaxe probability.
 enchanted_item_probability(
   item                 = 'pickaxe',
   enchantments         = 'efficiency=2',
@@ -126,6 +128,7 @@ enchanted_item_probability(
 )
 #> [1] 0.5698418
 
+# Calculate an enchanted diamond axe probability.
 enchanted_item_probability(
   item         = 'axe',
   enchantments = 'efficiency=2,unbreaking=1',

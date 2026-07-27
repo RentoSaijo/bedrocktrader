@@ -10,12 +10,12 @@
 Source:
 [`DESCRIPTION`](https://github.com/RentoSaijo/bedrocktrader/blob/main/DESCRIPTION)
 
-Saijo R (2026). *bedrocktrader: Retrieve Minecraft Bedrock Villager
-Trade Data*. R package version 0.0.0.9000,
+Saijo R (2026). *bedrocktrader: Retrieve Villager Trade Data for
+Minecraft: Bedrock Edition*. R package version 0.0.0.9000,
 <https://rentosaijo.github.io/bedrocktrader/>.
 
     @Manual{,
-      title = {bedrocktrader: Retrieve Minecraft Bedrock Villager Trade Data},
+      title = {bedrocktrader: Retrieve Villager Trade Data for Minecraft: Bedrock Edition},
       author = {Rento Saijo},
       year = {2026},
       note = {R package version 0.0.0.9000},

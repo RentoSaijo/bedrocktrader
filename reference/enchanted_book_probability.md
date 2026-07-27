@@ -1,7 +1,7 @@
 # Calculate enchanted book probability
 
 Calculates the probability that a fully unlocked librarian has at least
-one qualifying enchanted-book offer in Minecraft Bedrock Edition
+one qualifying enchanted-book offer in Minecraft: Bedrock Edition
 `1.26.30.5`.
 
 ## Usage
@@ -73,6 +73,7 @@ Enchantments"](https://learn.microsoft.com/en-us/minecraft/creator/documents/int
 ## Examples
 
 ``` r
+# Calculate enchanted-book probabilities.
 enchanted_book_probability()
 #> [1] 0.04619302
 enchanted_book_probability('mending=1', max_emeralds = 26)

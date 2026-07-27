@@ -1,7 +1,7 @@
 # List supported villager professions
 
 Lists the 13 employable vanilla villager professions included in the
-Minecraft Bedrock Edition `1.26.30.5` data model. The feature flags
+Minecraft: Bedrock Edition `1.26.30.5` data model. The feature flags
 identify tables that need contextual inputs or contain generated source
 instructions.
 
@@ -50,6 +50,7 @@ no download and does not inspect a saved world.
 ## Examples
 
 ``` r
+# Inspect villager professions.
 professions <- villager_professions()
 professions
 #>       profession  display_name           aliases context_sensitive
@@ -81,6 +82,7 @@ professions
 #> 12                 FALSE                       TRUE
 #> 13                 FALSE                       TRUE
 
+# Inspect professions with generated source instructions.
 professions[
   professions$contains_dynamic_functions,
   c('profession', 'contains_dynamic_functions')

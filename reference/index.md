@@ -6,7 +6,7 @@ Package overview
 
 - [`bedrocktrader`](https://rentosaijo.github.io/bedrocktrader/reference/bedrocktrader.md)
   [`bedrocktrader-package`](https://rentosaijo.github.io/bedrocktrader/reference/bedrocktrader.md)
-  : bedrocktrader: Minecraft Bedrock Edition villager trade data
+  : bedrocktrader: Villager trade data for Minecraft: Bedrock Edition
 
 ## Meta
 
