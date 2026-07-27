@@ -1,5 +1,5 @@
 Package: bedrocktrader
-Title: Retrieve Villager Trade Data for Minecraft: Bedrock Edition
+Title: Analyze Minecraft: Bedrock Edition Villager Trades
 Version: 0.0.0.9000
 Authors@R: person('Rento', 'Saijo', email = 'rentosaijo0527@gmail.com', role = c('aut', 'cre', 'cph'), comment = c(ORCID = '0009-0008-4919-7349'))
 Description: Provides normalized vanilla villager trade data for Minecraft:
