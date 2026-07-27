@@ -24,16 +24,9 @@
   )
 }
 
-# Normalize expansion input.
-.normalize_expanded_input <- function(expanded) {
-  if (
-    length(expanded) != 1L ||
-    is.na(expanded) ||
-    !is.logical(expanded)
-  ) {
-    stop('`expanded` must be TRUE or FALSE.', call. = FALSE)
-  }
-  expanded
+# Normalize trade view input.
+.normalize_view_input <- function(view) {
+  match.arg(view, c('trade', 'option', 'offer'))
 }
 
 # Public Functions --------------------------------------------------------------
@@ -402,19 +395,20 @@ villager_tiers <- function() {
 #' ]
 villager_trades <- function(
   profession = 'armorer',
-  expanded = FALSE,
+  view = c('trade', 'option', 'offer'),
   variant = NULL,
   dimension = NULL
 ) {
   profession <- .normalize_profession_input(profession)
-  expanded   <- .normalize_expanded_input(expanded)
+  view       <- .normalize_view_input(view)
   variant    <- .normalize_variant_input(variant)
   dimension  <- .normalize_dimension_input(dimension)
-  trades <- if (expanded) {
-    .bedrock_trade_outcomes
-  } else {
-    .bedrock_trade_options
-  }
+  trades <- switch(
+    view,
+    trade  = .bedrock_trade_trades,
+    option = .bedrock_trade_options,
+    offer  = .bedrock_trade_offers
+  )
   rows <- trades[trades$profession == profession, , drop = FALSE]
   .require_trade_context(rows, variant, dimension)
   keep <- .context_applies(rows$.variants, variant) &
@@ -443,11 +437,12 @@ villager_trades <- function(
     .choice_probabilities(rows) *
     rows$.function_probability
   rows$probability_status <- rows$.probability_status
-  columns <- if (expanded) {
-    .bedrock_expanded_trade_columns
-  } else {
-    .bedrock_compact_trade_columns
-  }
+  columns <- switch(
+    view,
+    trade  = .bedrock_trade_columns,
+    option = .bedrock_option_columns,
+    offer  = .bedrock_offer_columns
+  )
   result <- rows[, columns, drop = FALSE]
   rownames(result) <- NULL
   result

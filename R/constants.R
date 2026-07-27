@@ -40,8 +40,8 @@
   taiga   = character()
 )
 
-# Define compact trade columns.
-.bedrock_compact_trade_columns <- c(
+# Define trade columns.
+.bedrock_trade_columns <- c(
   'profession',
   'tier',
   'group_id',
@@ -73,9 +73,16 @@
   'probability_status'
 )
 
-# Define expanded trade columns.
-.bedrock_expanded_trade_columns <- append(
-  .bedrock_compact_trade_columns,
+# Define option columns.
+.bedrock_option_columns <- append(
+  .bedrock_trade_columns,
   'option_id',
-  after = match('trade_id', .bedrock_compact_trade_columns)
+  after = match('trade_id', .bedrock_trade_columns)
+)
+
+# Define offer columns.
+.bedrock_offer_columns <- append(
+  .bedrock_trade_columns,
+  c('option_id', 'offer_id'),
+  after = match('trade_id', .bedrock_trade_columns)
 )
