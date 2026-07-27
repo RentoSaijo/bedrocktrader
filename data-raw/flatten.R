@@ -363,8 +363,14 @@
   invisible(TRUE)
 }
 
-# Calculate librarian emerald range.
-.librarian_cost_range <- function(specification, level, treasure, release, path) {
+# Calculate librarian emerald outcomes.
+.librarian_cost_outcomes <- function(
+  specification,
+  level,
+  treasure,
+  release,
+  path
+) {
   .validate_keys(
     specification,
     required = c(
@@ -409,18 +415,31 @@
   }
   minimum <- specification$base_cost +
     level * specification$per_level_cost
-  maximum <- minimum +
-    specification$base_random_cost +
-    level * specification$per_level_random_cost -
-    1
-  if (treasure) {
-    minimum <- minimum * 2
-    maximum <- maximum * 2
+  random_count <- specification$base_random_cost +
+    level * specification$per_level_random_cost
+  if (random_count < 1) {
+    .schema_error(
+      release,
+      path,
+      'librarian random-cost range must contain at least one value'
+    )
   }
-  c(
-    minimum = min(minimum, 64),
-    maximum = min(maximum, 64)
+  costs <- minimum + seq.int(0, random_count - 1)
+  if (treasure) {
+    costs <- costs * 2
+  }
+  costs <- pmin(costs, 64)
+  probabilities <- tapply(
+    rep(1 / random_count, length(costs)),
+    costs,
+    sum
   )
+  result <- data.frame(
+    cost             = as.numeric(names(probabilities)),
+    probability      = as.numeric(probabilities),
+    stringsAsFactors = FALSE
+  )
+  result[order(result$cost), , drop = FALSE]
 }
 
 # Generator Helpers -------------------------------------------------------------
@@ -655,34 +674,38 @@
   for (index in seq_len(enchantment_count)) {
     enchantment <- .bedrock_enchantments[index, , drop = FALSE]
     for (enchantment_level in seq_len(enchantment$max_level)) {
-      row_n <- row_n + 1L
-      output <- row
-      cost <- .librarian_cost_range(
+      costs <- .librarian_cost_outcomes(
         specification,
         enchantment_level,
         enchantment$treasure,
         release,
         path
       )
-      output$cost_1_quantity_min <- unname(cost[['minimum']])
-      output$cost_1_quantity_max <- unname(cost[['maximum']])
-      output$result_item <- 'minecraft:enchanted_book'
-      output$enchantment <- enchantment$enchantment
-      output$enchantment_name <- enchantment$enchantment_name
-      output$enchantment_level <- as.integer(enchantment_level)
-      output$enchantment_max_level <- enchantment$max_level
-      output$enchantments <- paste0(
-        'minecraft:',
-        enchantment$enchantment,
-        '=',
-        enchantment_level
-      )
-      output$enchantment_count <- 1L
-      output$treasure <- enchantment$treasure
-      output$.generator_probability <-
-        1 / enchantment_count / enchantment$max_level
-      output$.probability_status <- 'documented_model'
-      rows[[row_n]] <- output
+      for (cost_index in seq_len(nrow(costs))) {
+        row_n <- row_n + 1L
+        output <- row
+        output$cost_1_quantity_min <- costs$cost[[cost_index]]
+        output$cost_1_quantity_max <- costs$cost[[cost_index]]
+        output$result_item <- 'minecraft:enchanted_book'
+        output$enchantment <- enchantment$enchantment
+        output$enchantment_name <- enchantment$enchantment_name
+        output$enchantment_level <- as.integer(enchantment_level)
+        output$enchantment_max_level <- enchantment$max_level
+        output$enchantments <- paste0(
+          'minecraft:',
+          enchantment$enchantment,
+          '=',
+          enchantment_level
+        )
+        output$enchantment_count <- 1L
+        output$treasure <- enchantment$treasure
+        output$.generator_probability <-
+          1 / enchantment_count /
+          enchantment$max_level *
+          costs$probability[[cost_index]]
+        output$.probability_status <- 'documented_model'
+        rows[[row_n]] <- output
+      }
     }
   }
   do.call(rbind, rows)
@@ -741,22 +764,45 @@
       'equipment model expects the pinned inclusive range from 5 through 19'
     )
   }
-  outcomes <- .equipment_enchantment_outcomes(
-    item       = row$result_item,
-    levels_min = specification$levels$min,
-    levels_max = specification$levels$max
+  if (
+    !identical(row$cost_1_item, 'minecraft:emerald') ||
+    row$cost_1_quantity_min != row$cost_1_quantity_max
+  ) {
+    .schema_error(
+      release,
+      path,
+      'equipment model requires one fixed base emerald cost'
+    )
+  }
+  source_levels <- seq.int(
+    specification$levels$min,
+    specification$levels$max
   )
-  rows <- lapply(seq_len(nrow(outcomes)), function(index) {
-    output <- row
-    output$enchantments <- outcomes$enchantments[[index]]
-    output$enchantment_count <- outcomes$enchantment_count[[index]]
-    output$treasure <- FALSE
-    output$enchanting_power_min <- specification$levels$min
-    output$enchanting_power_max <- specification$levels$max
-    output$.generator_probability <- outcomes$probability[[index]]
-    output$.probability_status <- 'documented_model'
-    output
-  })
+  rows  <- list()
+  row_n <- 0L
+  for (source_level in source_levels) {
+    outcomes <- .equipment_enchantment_outcomes(
+      item       = row$result_item,
+      levels_min = source_level,
+      levels_max = source_level
+    )
+    for (index in seq_len(nrow(outcomes))) {
+      row_n <- row_n + 1L
+      output <- row
+      emerald_cost <- row$cost_1_quantity_min + source_level
+      output$cost_1_quantity_min <- emerald_cost
+      output$cost_1_quantity_max <- emerald_cost
+      output$enchantments <- outcomes$enchantments[[index]]
+      output$enchantment_count <- outcomes$enchantment_count[[index]]
+      output$treasure <- FALSE
+      output$enchanting_power_min <- source_level
+      output$enchanting_power_max <- source_level
+      output$.generator_probability <-
+        outcomes$probability[[index]] / length(source_levels)
+      output$.probability_status <- 'documented_model'
+      rows[[row_n]] <- output
+    }
+  }
   do.call(rbind, rows)
 }
 

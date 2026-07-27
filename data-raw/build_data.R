@@ -276,8 +276,24 @@ rownames(.bedrock_trade_outcomes) <- NULL
 if (nrow(.bedrock_trade_options) != 281L) {
   stop('Pinned compact trade data must contain 281 rows.', call. = FALSE)
 }
-if (nrow(.bedrock_trade_outcomes) != 2787L) {
-  stop('Pinned expanded trade data must contain 2,787 rows.', call. = FALSE)
+if (nrow(.bedrock_trade_outcomes) != 30592L) {
+  stop('Pinned expanded trade data must contain 30,592 rows.', call. = FALSE)
+}
+quantity_pairs <- list(
+  c('wants_1_quantity_min', 'wants_1_quantity_max'),
+  c('wants_2_quantity_min', 'wants_2_quantity_max'),
+  c('gives_1_quantity_min', 'gives_1_quantity_max')
+)
+for (pair in quantity_pairs) {
+  minimum <- .bedrock_trade_outcomes[[pair[[1L]]]]
+  maximum <- .bedrock_trade_outcomes[[pair[[2L]]]]
+  populated <- !is.na(minimum) & !is.na(maximum)
+  if (any(minimum[populated] != maximum[populated])) {
+    stop(
+      'Expanded trade quantities must describe exact outcomes.',
+      call. = FALSE
+    )
+  }
 }
 probability_groups <- interaction(
   .bedrock_trade_outcomes$profession,
