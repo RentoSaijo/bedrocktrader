@@ -83,7 +83,7 @@ document their assumptions and matching rules. The accompanying
 note](https://github.com/RentoSaijo/bedrocktrader/blob/main/other/math.pdf)
 develops the probability model in full.
 
-### Source and license
+### Source and License
 
 The bundled values come from Mojang’s immutable [`v1.26.30.5` Bedrock
 Samples
