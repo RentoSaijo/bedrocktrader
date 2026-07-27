@@ -342,6 +342,52 @@ features <- lapply(.bedrock_trade_tables, .profession_features)
   stringsAsFactors = FALSE
 )
 
+# Build enchantment metadata.
+.validate_enchantment_registry(release)
+enchantment_definitions <- rbind(
+  .bedrock_enchantments,
+  .bedrock_special_enchantments
+)
+traded_items <- vapply(
+  enchantment_definitions$enchantment,
+  function(enchantment) {
+    item_types <- names(.bedrock_equipment_enchantments)[vapply(
+      .bedrock_equipment_enchantments,
+      function(definitions) enchantment %in% definitions$enchantment,
+      logical(1)
+    )]
+    items <- sort(unique(
+      .bedrock_enchanted_items$item[
+        .bedrock_enchanted_items$item_type %in% item_types
+      ]
+    ))
+    if (!length(items)) {
+      return(NA_character_)
+    }
+    paste(items, collapse = ', ')
+  },
+  character(1)
+)
+.bedrock_enchantments_data <- data.frame(
+  enchantment = paste0(
+    'minecraft:',
+    enchantment_definitions$enchantment
+  ),
+  display_name          = enchantment_definitions$enchantment_name,
+  max_level             = enchantment_definitions$max_level,
+  treasure              = enchantment_definitions$treasure,
+  villager_attainable   = enchantment_definitions$enchantment %in%
+    .bedrock_enchantments$enchantment,
+  traded_items          = traded_items,
+  stringsAsFactors      = FALSE
+)
+.bedrock_enchantments_data <- .bedrock_enchantments_data[
+  order(.bedrock_enchantments_data$enchantment),
+  ,
+  drop = FALSE
+]
+rownames(.bedrock_enchantments_data) <- NULL
+
 # Build trade view.
 trade_rows <- lapply(.bedrock_trade_tables, function(table) {
   .flatten_trade_table(table, release, expanded = FALSE)
@@ -452,6 +498,7 @@ if (any(abs(probability_sums - 1) > 1e-10)) {
 
 # Save private package data.
 save(
+  .bedrock_enchantments_data,
   .bedrock_model_metadata,
   .bedrock_professions_data,
   .bedrock_tiers_data,

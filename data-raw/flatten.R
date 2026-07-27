@@ -348,7 +348,7 @@
   )
   expected <- c(
     .bedrock_enchantments$enchantment,
-    .bedrock_special_enchantments
+    .bedrock_special_enchantments$enchantment
   )
   if (
     length(unique(identifiers)) != length(expected) ||

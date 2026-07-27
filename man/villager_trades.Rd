@@ -6,7 +6,7 @@
 \usage{
 villager_trades(
   profession = "armorer",
-  expanded = FALSE,
+  view = c("trade", "option", "offer"),
   variant = NULL,
   dimension = NULL
 )
@@ -16,17 +16,17 @@ villager_trades(
 \code{\link[=villager_professions]{villager_professions()}}. The default is \code{"armorer"}; \code{"all"} is not a
 profession value.}
 
-\item{expanded}{\code{FALSE} returns compact base item-choice combinations that
-may contain quantity ranges. \code{TRUE} returns exact modeled outcomes:
-populated quantity minima equal their corresponding maxima, and each row
-has the probability of its displayed items, specifications, and price.}
-
 \item{variant}{One villager biome variant when the profession has
 variant-dependent trades. Use \code{\link[=villager_variants]{villager_variants()}} for canonical values
 and aliases.}
 
 \item{dimension}{One of \code{"overworld"}, \code{"nether"}, or \code{"end"} when the
 profession has dimension-dependent trades.}
+
+\item{expanded}{\code{FALSE} returns compact base item-choice combinations that
+may contain quantity ranges. \code{TRUE} returns exact modeled outcomes:
+populated quantity minima equal their corresponding maxima, and each row
+has the probability of its displayed items, specifications, and price.}
 }
 \value{
 A plain base data frame containing only atomic columns. Compact

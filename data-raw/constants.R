@@ -242,10 +242,20 @@
 )
 
 # Define specialized enchantments outside librarian model.
-.bedrock_special_enchantments <- c(
-  'soul_speed',
-  'swift_sneak',
-  'wind_burst'
+.bedrock_special_enchantments <- data.frame(
+  enchantment = c(
+    'soul_speed',
+    'swift_sneak',
+    'wind_burst'
+  ),
+  enchantment_name = c(
+    'Soul Speed',
+    'Swift Sneak',
+    'Wind Burst'
+  ),
+  max_level = c(3L, 3L, 3L),
+  treasure  = c(TRUE, TRUE, TRUE),
+  stringsAsFactors = FALSE
 )
 
 # Define legacy bed color values.

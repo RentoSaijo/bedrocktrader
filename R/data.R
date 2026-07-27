@@ -139,6 +139,30 @@ villager_tiers <- function() {
   result
 }
 
+#' List Enchantments
+#'
+#' Lists the 42 enchantments registered in Minecraft Bedrock `1.26.30.5` and
+#' identifies those available through the bundled villager model.
+#'
+#' @return A base data frame with one row per enchantment:
+#'
+#' - `enchantment` (`character`) is the namespaced identifier.
+#' - `display_name` (`character`) is the readable enchantment name.
+#' - `max_level` (`integer`) is the highest valid level.
+#' - `treasure` (`logical`) identifies treasure enchantments.
+#' - `villager_attainable` (`logical`) indicates availability from villagers.
+#' - `traded_items` (`character`) lists directly traded enchanted equipment,
+#'   separated by commas. It is `NA` when none applies.
+#' @export
+#'
+#' @examples
+#' enchantments()
+enchantments <- function() {
+  result <- .bedrock_enchantments_data
+  rownames(result) <- NULL
+  result
+}
+
 #' Retrieve Villager Trades
 #'
 #' Returns the possible vanilla trades for one profession in Minecraft Bedrock
