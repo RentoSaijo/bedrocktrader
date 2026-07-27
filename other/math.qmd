@@ -1,6 +1,6 @@
 ---
-title: 'The Mathematics of bedrocktrader: Villager Trade Probabilities in Minecraft Bedrock Edition'
-title-meta: 'The Mathematics of bedrocktrader: Villager Trade Probabilities in Minecraft Bedrock Edition'
+title: 'The Mathematics behind bedrocktrader: Villager Trade Probabilities in Minecraft: Bedrock Edition'
+title-meta: 'The Mathematics behind bedrocktrader: Villager Trade Probabilities in Minecraft: Bedrock Edition'
 author:
   - name: Rento Saijo
     corresponding: true
@@ -8,13 +8,13 @@ author:
     affiliations:
       - Connecticut College
 keywords:
-  - Minecraft Bedrock Edition
+  - 'Minecraft: Bedrock Edition'
   - Villager trading
   - Enchanting
   - Probability
   - R
 abstract: |
-  Villager trade tables describe random mechanisms rather than a single realized inventory. Turning those tables into probabilities requires more than flattening JSON: source trades are sampled within groups, item choices branch into alternatives, item functions generate additional outcomes, and identical visible offers can arise through several source paths. This note develops the probability model implemented in bedrocktrader for the vanilla Minecraft Bedrock Edition 1.26.30.5 trade tables. It formalizes context conditioning and the package's trade-to-option-to-offer hierarchy, derives selection probabilities when repeated source entries create multiplicity, and shows how exact offers aggregate into item specifications and trade summaries. Separate sections cover librarian enchanted books, capped treasure prices, fully unlocked librarian probabilities, and the documented model used for enchanted equipment. Worked examples recover a 2.79% probability of a fully unlocked librarian offering Mending for at most 26 emeralds and exact Efficiency II diamond-axe probabilities of 6.07% for a toolsmith and 12.13% for a weaponsmith. The model is evaluated analytically and bundled with the package; no simulation, resampling, network access, or runtime JSON parsing is required.
+  Villager trade tables describe random mechanisms rather than a single realized inventory. Turning those tables into probabilities requires more than flattening JSON: source trades are sampled within groups, item choices branch into alternatives, item functions generate additional outcomes, and identical visible offers can arise through several source paths. This note develops the probability model implemented in bedrocktrader for the vanilla Minecraft: Bedrock Edition 1.26.30.5 trade tables. It formalizes context conditioning and the package's trade-to-option-to-offer hierarchy, derives selection probabilities when repeated source entries create multiplicity, and shows how exact offers aggregate into item specifications and trade summaries. Separate sections cover librarian enchanted books, capped treasure prices, fully unlocked librarian probabilities, and the documented model used for enchanted equipment. Worked examples recover a 2.79% probability of a fully unlocked librarian offering Mending for at most 26 emeralds and exact Efficiency II diamond-axe probabilities of 6.07% for a toolsmith and 12.13% for a weaponsmith. The model is evaluated analytically and bundled with the package; no simulation, resampling, network access, or runtime JSON parsing is required.
 date: 2026-07-26
 bibliography: references.bib
 number-sections: true
@@ -22,7 +22,7 @@ number-sections: true
 
 ## Introduction
 
-The vanilla Minecraft Bedrock Edition trade files look deceptively close to
+The vanilla Minecraft: Bedrock Edition trade files look deceptively close to
 ordinary tabular data. A profession has five tiers, each tier contains one or
 more groups, and each group contains possible trades. Yet a row in the source
 does not necessarily describe a row on a player's trading screen. Groups select
@@ -530,6 +530,7 @@ $$
 or approximately $2.79\%$. The corresponding R call is:
 
 ```{r}
+# Calculate Mending probability.
 mending_probability <- enchanted_book_probability(
   enchantment  = 'minecraft:mending=1',
   max_emeralds = 26
@@ -547,6 +548,7 @@ The next query requires the complete enchantment set to be exactly Efficiency
 II, permits every original price, and does not count higher Efficiency levels:
 
 ```{r}
+# Calculate exact Efficiency II diamond axe probabilities.
 toolsmith_probability <- enchanted_item_probability(
   item         = 'axe',
   enchantments = 'efficiency=2',
