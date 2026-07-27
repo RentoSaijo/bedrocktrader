@@ -1,8 +1,8 @@
-# Retrieve Villager Trades
+# Retrieve villager trades
 
 Returns the possible vanilla trades for one profession in Minecraft
-Bedrock `1.26.30.5`, together with the probability represented at the
-requested trade, option, or offer resolution.
+Bedrock Edition `1.26.30.5`, together with the probability represented
+at the requested trade, option, or offer resolution.
 
 ## Usage
 
@@ -58,7 +58,7 @@ field stays atomic.
 
 `view = "trade"` returns 281 base item-choice combinations from 182
 authored source entries across the pinned tables. Generated details
-remain summarized, so a Librarian book row covers every modeled
+remain summarized, so a librarian book row covers every modeled
 enchantment, level, and price. A `trade_id` can repeat when Mojang
 supplies explicit item choices.
 
@@ -197,7 +197,7 @@ trade-view row.
 - `"exact"` covers source-table selection, explicit choices, legacy
   data-value outcomes, fixed potions, and maps.
 
-- `"documented_model"` covers Librarian books and complete enchanted
+- `"documented_model"` covers librarian books and complete enchanted
   equipment sets.
 
 - `"partial"` marks `random_dye`, whose exact leather-color distribution
@@ -205,7 +205,7 @@ trade-view row.
 
 ## Enchantment models
 
-Each Librarian book trade draws uniformly from 39 eligible enchantments,
+Each librarian book trade draws uniformly from 39 eligible enchantments,
 then draws uniformly from the selected enchantment's valid levels. This
 gives 116 enchantment-level combinations. Soul Speed, Swift Sneak, and
 Wind Burst are excluded. For enchantment level `L`, the pinned
@@ -217,7 +217,7 @@ price support, and probabilities from every underlying price capped at
 and need not contain every integer inside its trade or option
 minimum–maximum range.
 
-Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use the
+Armorers, fishermen, fletchers, toolsmiths, and weaponsmiths use the
 pinned `enchant_with_levels` model. The source enchanting level is
 uniform from 5 through 19. Mojang's base emerald cost is increased by
 that selected level, and the enchantment set is generated conditionally
@@ -234,7 +234,7 @@ not published.
 
 ## Pinned table details
 
-The Librarian master candle group contains three identical red-candle
+The librarian master candle group contains three identical red-candle
 source entries and one yellow-candle entry. They are presented as two
 rows: red has probability `0.75`, yellow has probability `0.25`, and
 `num_trades` remains four to preserve the source selection pool.
@@ -243,13 +243,13 @@ Bed colors use the white-to-black auxiliary-value order. Banner colors
 use Bedrock's black-to-white metadata order, so `minecraft:banner:0` is
 black and `minecraft:banner:15` is white.
 
-Mojang omits `num_to_select` from the pinned Fisherman master group.
+Mojang omits `num_to_select` from the pinned fisherman master group.
 That group contains the pufferfish trade and one variant-specific boat
 trade; both are selected. The returned value is therefore `-1`, the
 trade-table select-all convention. No other omission is accepted by the
 data updater.
 
-The Farmer suspicious-stew trade follows the six auxiliary values
+The farmer suspicious-stew trade follows the six auxiliary values
 authored in the pinned table. Option and offer output assign each effect
 probability `1/6`, including Night Vision. This describes the source
 table rather than the known Bedrock runtime defect affecting that
@@ -258,7 +258,7 @@ effect.
 ## Villager context
 
 Filters are applied before group sizes and probabilities are calculated.
-Fisherman requires `variant`; Cartographer requires both `variant` and
+Fisherman requires `variant`; cartographer requires both `variant` and
 `dimension`. Other professions need neither. The function stops when
 required context is missing rather than assuming Plains or the
 Overworld.

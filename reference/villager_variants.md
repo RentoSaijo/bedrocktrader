@@ -1,7 +1,7 @@
-# List Villager Variants
+# List villager variants
 
 Lists vanilla villager biome variants and their `minecraft:mark_variant`
-values for Minecraft Bedrock `1.26.30.5`.
+values for Minecraft Bedrock Edition `1.26.30.5`.
 
 ## Usage
 

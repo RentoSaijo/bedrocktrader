@@ -1,7 +1,8 @@
-# Calculate Enchanted Book Probability
+# Calculate enchanted book probability
 
-Calculates the probability that a fully unlocked Librarian has at least
-one qualifying enchanted-book offer in Minecraft Bedrock `1.26.30.5`.
+Calculates the probability that a fully unlocked librarian has at least
+one qualifying enchanted-book offer in Minecraft Bedrock Edition
+`1.26.30.5`.
 
 ## Usage
 
@@ -35,7 +36,7 @@ One numeric probability from 0 through 1.
 
 ## Details
 
-A fully unlocked Bedrock Librarian has four independent opportunities to
+A fully unlocked Bedrock librarian has four independent opportunities to
 offer an enchanted book. The book candidate is selected with probability
 `1/2` at novice, apprentice, and journeyman tiers and `1/3` at expert.
 Within each selected book trade, the model chooses one of 39
@@ -44,7 +45,7 @@ valid levels and generates its emerald price.
 
 The function sums all qualifying level-and-price offers within each
 source trade, then calculates one minus the probability that none of the
-four book trades qualifies. A recognized enchantment that Villagers
+four book trades qualifies. A recognized enchantment that villagers
 cannot offer, such as Soul Speed, returns zero. Unknown identifiers and
 invalid levels produce errors; use
 [`enchantments()`](https://rentosaijo.github.io/bedrocktrader/reference/enchantments.md)
@@ -53,7 +54,7 @@ to inspect the registry.
 `max_emeralds` applies to the original modeled price before demand,
 curing, or other adjustments. The default `64` includes every book
 price. A cutoff of `26` is useful when screening for the commonly
-targeted low-price Librarian books, but the function does not simulate
+targeted low-price librarian books, but the function does not simulate
 curing or promise a post-cure price.
 
 Probabilities for book identity, level, and price follow the documented

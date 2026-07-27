@@ -6,33 +6,33 @@ Package overview
 
 - [`bedrocktrader`](https://rentosaijo.github.io/bedrocktrader/reference/bedrocktrader.md)
   [`bedrocktrader-package`](https://rentosaijo.github.io/bedrocktrader/reference/bedrocktrader.md)
-  : bedrocktrader: Minecraft Bedrock Villager Trade Data
+  : bedrocktrader: Minecraft Bedrock Edition villager trade data
 
 ## Meta
 
 Inspect professions, variants, tiers, and enchantments
 
 - [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md)
-  : List Supported Villager Professions
+  : List supported villager professions
 - [`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md)
-  : List Villager Variants
+  : List villager variants
 - [`villager_tiers()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_tiers.md)
-  : List Villager Tiers
+  : List villager tiers
 - [`enchantments()`](https://rentosaijo.github.io/bedrocktrader/reference/enchantments.md)
-  : List Enchantments
+  : List enchantments
 
 ## Data
 
 Inspect possible trades, options, and offers
 
 - [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
-  : Retrieve Villager Trades
+  : Retrieve villager trades
 
 ## Analysis
 
 Calculate enchantment probabilities
 
 - [`enchanted_book_probability()`](https://rentosaijo.github.io/bedrocktrader/reference/enchanted_book_probability.md)
-  : Calculate Enchanted Book Probability
+  : Calculate enchanted book probability
 - [`enchanted_item_probability()`](https://rentosaijo.github.io/bedrocktrader/reference/enchanted_item_probability.md)
-  : Calculate Enchanted Item Probability
+  : Calculate enchanted item probability

@@ -1,7 +1,8 @@
-# List Enchantments
+# List enchantments
 
-Lists the 42 enchantments registered in Minecraft Bedrock `1.26.30.5`
-and identifies those available through the bundled villager model.
+Lists the 42 enchantments registered in Minecraft Bedrock Edition
+`1.26.30.5` and identifies those available through the bundled villager
+model.
 
 ## Usage
 
@@ -22,20 +23,20 @@ A base data frame with one row per enchantment:
 - `treasure` (`logical`) identifies treasure enchantments.
 
 - `villager_attainable` (`logical`) indicates availability through the
-  pinned Librarian trade model.
+  pinned librarian trade model.
 
 - `traded_items` (`character`) lists directly traded enchanted
   equipment, separated by commas. It is `NA` when none applies.
 
 ## Details
 
-The registry contains the 39 enchantments available from Librarians plus
+The registry contains the 39 enchantments available from librarians plus
 Soul Speed, Swift Sneak, and Wind Burst. The latter three remain visible
 for validation and return `FALSE` in `villager_attainable`.
 
-`traded_items` concerns equipment generated directly by Armorer,
-Fisherman, Fletcher, Toolsmith, or Weaponsmith trades. It does not list
-items that can receive a Librarian book later through an anvil.
+`traded_items` concerns equipment generated directly by armorer,
+fisherman, fletcher, toolsmith, or weaponsmith trades. It does not list
+items that can receive a librarian book later through an anvil.
 
 Values are bundled and verified against Mojang's pinned enchantment
 registry during package development. Calling the function performs no

@@ -1,9 +1,9 @@
-# List Supported Villager Professions
+# List supported villager professions
 
 Lists the 13 employable vanilla villager professions included in the
-Minecraft Bedrock `1.26.30.5` data model. The feature flags offer a
-quick way to find tables that need contextual inputs or contain
-generated source instructions.
+Minecraft Bedrock Edition `1.26.30.5` data model. The feature flags
+identify tables that need contextual inputs or contain generated source
+instructions.
 
 ## Usage
 

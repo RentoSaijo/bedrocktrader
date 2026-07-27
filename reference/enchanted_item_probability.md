@@ -1,7 +1,8 @@
-# Calculate Enchanted Item Probability
+# Calculate enchanted item probability
 
 Calculates the probability that a fully unlocked villager offers one
-qualifying enchanted equipment item in Minecraft Bedrock `1.26.30.5`.
+qualifying enchanted equipment item in Minecraft Bedrock Edition
+`1.26.30.5`.
 
 ## Usage
 
@@ -58,10 +59,10 @@ swords, axes, pickaxes, and shovels refer to their diamond forms. Their
 corresponding namespaced item IDs are also accepted. Iron equipment is
 outside this analysis interface.
 
-Profession is inferred as Armorer, Fisherman, Fletcher, Toolsmith, or
-Weaponsmith. Diamond axes appear in two profession tables, so
-`profession` is required for that item. The Toolsmith trade is selected
-with probability `1/2`; the Weaponsmith trade is guaranteed. Profession
+Profession is inferred as armorer, fisherman, fletcher, toolsmith, or
+weaponsmith. Diamond axes appear in two profession tables, so
+`profession` is required for that item. The toolsmith trade is selected
+with probability `1/2`; the weaponsmith trade is guaranteed. Profession
 aliases accepted by
 [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md)
 remain valid.

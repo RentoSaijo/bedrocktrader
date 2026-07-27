@@ -1,7 +1,8 @@
-# List Villager Tiers
+# List villager tiers
 
 Lists the five villager trading tiers and the cumulative experience a
-villager needs to unlock each tier in Minecraft Bedrock `1.26.30.5`.
+villager needs to unlock each tier in Minecraft Bedrock Edition
+`1.26.30.5`.
 
 ## Usage
 
