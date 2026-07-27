@@ -25,7 +25,7 @@ values, potion setting, map creation, or random dye.
 }
 \description{
 Lists the 13 employable vanilla villager professions included in the
-Minecraft Bedrock Edition \verb{1.26.30.5} data model. The feature flags identify
+Minecraft: Bedrock Edition \verb{1.26.30.5} data model. The feature flags identify
 tables that need contextual inputs or contain generated source instructions.
 }
 \details{
@@ -41,9 +41,11 @@ These rows are bundled with the package. Calling the function performs no
 download and does not inspect a saved world.
 }
 \examples{
+# Inspect villager professions.
 professions <- villager_professions()
 professions
 
+# Inspect professions with generated source instructions.
 professions[
   professions$contains_dynamic_functions,
   c('profession', 'contains_dynamic_functions')

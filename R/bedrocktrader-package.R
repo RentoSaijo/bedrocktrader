@@ -1,11 +1,11 @@
 # Package Documentation ---------------------------------------------------------
 
-#' bedrocktrader: Minecraft Bedrock Edition villager trade data
+#' bedrocktrader: Villager trade data for Minecraft: Bedrock Edition
 #'
-#' `bedrocktrader` provides normalized vanilla villager trades for Minecraft
-#' Bedrock Edition `1.26.30.5`. The data and modeled outcomes are bundled with
-#' the package, so its public functions return ordinary base R data frames
-#' without downloading files or reading `GITHUB_PAT`.
+#' `bedrocktrader` provides normalized vanilla villager trades for
+#' Minecraft: Bedrock Edition `1.26.30.5`. The data and modeled outcomes are
+#' bundled with the package, so its public functions return ordinary base R
+#' data frames without downloading files or reading `GITHUB_PAT`.
 #'
 #' @section Meta:
 #' [villager_professions()] lists accepted professions and summarizes important

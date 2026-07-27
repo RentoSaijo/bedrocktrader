@@ -36,7 +36,7 @@ One numeric probability from 0 through 1.
 }
 \description{
 Calculates the probability that a fully unlocked villager offers one
-qualifying enchanted equipment item in Minecraft Bedrock Edition
+qualifying enchanted equipment item in Minecraft: Bedrock Edition
 \verb{1.26.30.5}.
 }
 \section{Items and professions}{
@@ -91,8 +91,10 @@ internals.
 }
 
 \examples{
+# Calculate Sharpness III sword probability.
 enchanted_item_probability('sword', 'sharpness=3')
 
+# Calculate Efficiency II-or-higher pickaxe probability.
 enchanted_item_probability(
   item                 = 'pickaxe',
   enchantments         = 'efficiency=2',
@@ -100,6 +102,7 @@ enchanted_item_probability(
   match                = 'contains'
 )
 
+# Calculate an enchanted diamond axe probability.
 enchanted_item_probability(
   item         = 'axe',
   enchantments = 'efficiency=2,unbreaking=1',

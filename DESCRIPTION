@@ -1,11 +1,11 @@
 Package: bedrocktrader
-Title: Retrieve Minecraft Bedrock Villager Trade Data
+Title: Retrieve Villager Trade Data for Minecraft: Bedrock Edition
 Version: 0.0.0.9000
 Authors@R: person('Rento', 'Saijo', email = 'rentosaijo0527@gmail.com', role = c('aut', 'cre', 'cph'), comment = c(ORCID = '0009-0008-4919-7349'))
-Description: Provides normalized vanilla Minecraft Bedrock Edition 1.26.30.5
-    villager trade data, including tiers, item choices, modeled enchantments,
-    contextual restrictions, and offer probabilities in flat base R data
-    frames.
+Description: Provides normalized vanilla villager trade data for Minecraft:
+    Bedrock Edition 1.26.30.5, including tiers, item choices, modeled
+    enchantments, contextual restrictions, and offer probabilities in flat
+    base R data frames.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

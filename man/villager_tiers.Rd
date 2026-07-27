@@ -17,12 +17,14 @@ villager needs to unlock the tier. The novice tier is always available.
 }
 \description{
 Lists the five villager trading tiers and the cumulative experience a
-villager needs to unlock each tier in Minecraft Bedrock Edition \verb{1.26.30.5}.
+villager needs to unlock each tier in Minecraft: Bedrock Edition
+\verb{1.26.30.5}.
 }
 \details{
 The bundled vanilla profession tables use the same tier names and
 experience thresholds. Calling this function performs no download.
 }
 \examples{
+# Inspect villager tiers.
 villager_tiers()
 }

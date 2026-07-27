@@ -26,7 +26,7 @@ One numeric probability from 0 through 1.
 }
 \description{
 Calculates the probability that a fully unlocked librarian has at least one
-qualifying enchanted-book offer in Minecraft Bedrock Edition \verb{1.26.30.5}.
+qualifying enchanted-book offer in Minecraft: Bedrock Edition \verb{1.26.30.5}.
 }
 \details{
 A fully unlocked Bedrock librarian has four independent opportunities to
@@ -53,6 +53,7 @@ model described in \code{\link[=villager_trades]{villager_trades()}}. They are e
 rather than a guarantee about undocumented Bedrock internals.
 }
 \examples{
+# Calculate enchanted-book probabilities.
 enchanted_book_probability()
 enchanted_book_probability('mending=1', max_emeralds = 26)
 enchanted_book_probability(

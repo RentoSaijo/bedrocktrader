@@ -290,7 +290,7 @@
 #' Calculate enchanted book probability
 #'
 #' Calculates the probability that a fully unlocked librarian has at least one
-#' qualifying enchanted-book offer in Minecraft Bedrock Edition `1.26.30.5`.
+#' qualifying enchanted-book offer in Minecraft: Bedrock Edition `1.26.30.5`.
 #'
 #' @param enchantment One `identifier=level` pair. The `minecraft:` namespace
 #'   is optional. The default is the alphabetically first attainable
@@ -333,6 +333,7 @@
 #' @export
 #'
 #' @examples
+#' # Calculate enchanted-book probabilities.
 #' enchanted_book_probability()
 #' enchanted_book_probability('mending=1', max_emeralds = 26)
 #' enchanted_book_probability(
@@ -390,7 +391,7 @@ enchanted_book_probability <- function(
 #' Calculate enchanted item probability
 #'
 #' Calculates the probability that a fully unlocked villager offers one
-#' qualifying enchanted equipment item in Minecraft Bedrock Edition
+#' qualifying enchanted equipment item in Minecraft: Bedrock Edition
 #' `1.26.30.5`.
 #'
 #' @param item One supported short item name or canonical Minecraft item ID.
@@ -459,8 +460,10 @@ enchanted_book_probability <- function(
 #' @export
 #'
 #' @examples
+#' # Calculate Sharpness III sword probability.
 #' enchanted_item_probability('sword', 'sharpness=3')
 #'
+#' # Calculate Efficiency II-or-higher pickaxe probability.
 #' enchanted_item_probability(
 #'   item                 = 'pickaxe',
 #'   enchantments         = 'efficiency=2',
@@ -468,6 +471,7 @@ enchanted_book_probability <- function(
 #'   match                = 'contains'
 #' )
 #'
+#' # Calculate an enchanted diamond axe probability.
 #' enchanted_item_probability(
 #'   item         = 'axe',
 #'   enchantments = 'efficiency=2,unbreaking=1',

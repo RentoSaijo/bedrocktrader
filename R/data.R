@@ -34,7 +34,7 @@
 #' List supported villager professions
 #'
 #' Lists the 13 employable vanilla villager professions included in the
-#' Minecraft Bedrock Edition `1.26.30.5` data model. The feature flags identify
+#' Minecraft: Bedrock Edition `1.26.30.5` data model. The feature flags identify
 #' tables that need contextual inputs or contain generated source instructions.
 #'
 #' @returns A base data frame with one row per profession:
@@ -66,9 +66,11 @@
 #' @export
 #'
 #' @examples
+#' # Inspect villager professions.
 #' professions <- villager_professions()
 #' professions
 #'
+#' # Inspect professions with generated source instructions.
 #' professions[
 #'   professions$contains_dynamic_functions,
 #'   c('profession', 'contains_dynamic_functions')
@@ -82,7 +84,7 @@ villager_professions <- function() {
 #' List villager variants
 #'
 #' Lists vanilla villager biome variants and their
-#' `minecraft:mark_variant` values for Minecraft Bedrock Edition `1.26.30.5`.
+#' `minecraft:mark_variant` values for Minecraft: Bedrock Edition `1.26.30.5`.
 #'
 #' @returns A base data frame with seven rows:
 #'
@@ -103,9 +105,11 @@ villager_professions <- function() {
 #' @export
 #'
 #' @examples
+#' # Inspect villager variants.
 #' variants <- villager_variants()
 #' variants
 #'
+#' # Inspect snowy villager metadata.
 #' variants[variants$variant == 'snow', ]
 villager_variants <- function() {
   result <- .bedrock_variants_data
@@ -116,7 +120,8 @@ villager_variants <- function() {
 #' List villager tiers
 #'
 #' Lists the five villager trading tiers and the cumulative experience a
-#' villager needs to unlock each tier in Minecraft Bedrock Edition `1.26.30.5`.
+#' villager needs to unlock each tier in Minecraft: Bedrock Edition
+#' `1.26.30.5`.
 #'
 #' @returns A base data frame with five rows:
 #'
@@ -131,6 +136,7 @@ villager_variants <- function() {
 #' @export
 #'
 #' @examples
+#' # Inspect villager tiers.
 #' villager_tiers()
 villager_tiers <- function() {
   result <- .bedrock_tiers_data
@@ -140,7 +146,7 @@ villager_tiers <- function() {
 
 #' List enchantments
 #'
-#' Lists the 42 enchantments registered in Minecraft Bedrock Edition
+#' Lists the 42 enchantments registered in Minecraft: Bedrock Edition
 #' `1.26.30.5` and identifies those available through the bundled villager
 #' model.
 #'
@@ -174,9 +180,11 @@ villager_tiers <- function() {
 #' @export
 #'
 #' @examples
+#' # Inspect enchantment metadata.
 #' registry <- enchantments()
 #' head(registry)
 #'
+#' # Inspect enchantments unavailable through villagers.
 #' registry[!registry$villager_attainable, ]
 enchantments <- function() {
   result <- .bedrock_enchantments_data
@@ -186,9 +194,9 @@ enchantments <- function() {
 
 #' Retrieve villager trades
 #'
-#' Returns the possible vanilla trades for one profession in Minecraft Bedrock
-#' Edition `1.26.30.5`, together with the probability represented at the
-#' requested trade, option, or offer resolution.
+#' Returns the possible vanilla trades for one profession in
+#' Minecraft: Bedrock Edition `1.26.30.5`, together with the probability
+#' represented at the requested trade, option, or offer resolution.
 #'
 #' @param profession One canonical profession or alias listed by
 #'   [villager_professions()]. The default is `"armorer"`; `"all"` is not a
@@ -396,6 +404,7 @@ enchantments <- function() {
 #' @export
 #'
 #' @examples
+#' # Inspect armorer trades.
 #' armor <- villager_trades()
 #' head(
 #'   armor[
@@ -409,6 +418,7 @@ enchantments <- function() {
 #'   ]
 #' )
 #'
+#' # Inspect concrete enchanted armorer options.
 #' armor_options <- villager_trades(view = 'option')
 #' head(
 #'   armor_options[
@@ -423,6 +433,7 @@ enchantments <- function() {
 #'   ]
 #' )
 #'
+#' # Inspect exact Mending book offers.
 #' book_offers <- villager_trades('librarian', view = 'offer')
 #' head(
 #'   book_offers[
@@ -439,6 +450,7 @@ enchantments <- function() {
 #'   ]
 #' )
 #'
+#' # Inspect context-specific cartographer maps.
 #' maps <- villager_trades(
 #'   profession = 'cartographer',
 #'   variant    = 'snowy',

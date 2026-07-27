@@ -34,9 +34,9 @@ contain 29 columns. Option results add \code{option_id} after \code{trade_id}, f
 30 columns. Offer results add \code{offer_id} after \code{option_id}, for 31 columns.
 }
 \description{
-Returns the possible vanilla trades for one profession in Minecraft Bedrock
-Edition \verb{1.26.30.5}, together with the probability represented at the
-requested trade, option, or offer resolution.
+Returns the possible vanilla trades for one profession in
+Minecraft: Bedrock Edition \verb{1.26.30.5}, together with the probability
+represented at the requested trade, option, or offer resolution.
 }
 \section{Hierarchical views}{
 
@@ -238,6 +238,7 @@ required context is missing rather than assuming Plains or the Overworld.
 }
 
 \examples{
+# Inspect armorer trades.
 armor <- villager_trades()
 head(
   armor[
@@ -251,6 +252,7 @@ head(
   ]
 )
 
+# Inspect concrete enchanted armorer options.
 armor_options <- villager_trades(view = 'option')
 head(
   armor_options[
@@ -265,6 +267,7 @@ head(
   ]
 )
 
+# Inspect exact Mending book offers.
 book_offers <- villager_trades('librarian', view = 'offer')
 head(
   book_offers[
@@ -281,6 +284,7 @@ head(
   ]
 )
 
+# Inspect context-specific cartographer maps.
 maps <- villager_trades(
   profession = 'cartographer',
   variant    = 'snowy',

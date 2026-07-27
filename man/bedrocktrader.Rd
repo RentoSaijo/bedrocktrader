@@ -4,12 +4,12 @@
 \name{bedrocktrader}
 \alias{bedrocktrader}
 \alias{bedrocktrader-package}
-\title{bedrocktrader: Minecraft Bedrock Edition villager trade data}
+\title{bedrocktrader: Villager trade data for Minecraft: Bedrock Edition}
 \description{
-\code{bedrocktrader} provides normalized vanilla villager trades for Minecraft
-Bedrock Edition \verb{1.26.30.5}. The data and modeled outcomes are bundled with
-the package, so its public functions return ordinary base R data frames
-without downloading files or reading \code{GITHUB_PAT}.
+\code{bedrocktrader} provides normalized vanilla villager trades for
+Minecraft: Bedrock Edition \verb{1.26.30.5}. The data and modeled outcomes are
+bundled with the package, so its public functions return ordinary base R
+data frames without downloading files or reading \code{GITHUB_PAT}.
 }
 \section{Meta}{
 

@@ -20,7 +20,7 @@ separated by commas. It is \code{NA} when none applies.
 }
 }
 \description{
-Lists the 42 enchantments registered in Minecraft Bedrock Edition
+Lists the 42 enchantments registered in Minecraft: Bedrock Edition
 \verb{1.26.30.5} and identifies those available through the bundled villager
 model.
 }
@@ -37,9 +37,11 @@ Values are bundled and verified against Mojang's pinned enchantment registry
 during package development. Calling the function performs no download.
 }
 \examples{
+# Inspect enchantment metadata.
 registry <- enchantments()
 head(registry)
 
+# Inspect enchantments unavailable through villagers.
 registry[!registry$villager_attainable, ]
 }
 \references{
