@@ -154,6 +154,7 @@ for (source_file in source_files) {
     '.variants',
     '.dimensions',
     '.source_option',
+    '.trade_weight',
     '.function_probability',
     '.probability_status'
   )
@@ -272,11 +273,11 @@ trade_outcomes <- lapply(.bedrock_trade_tables, function(table) {
 rownames(.bedrock_trade_outcomes) <- NULL
 
 # Validate flattened trade counts.
-if (nrow(.bedrock_trade_options) != 283L) {
-  stop('Pinned compact trade data must contain 283 rows.', call. = FALSE)
+if (nrow(.bedrock_trade_options) != 281L) {
+  stop('Pinned compact trade data must contain 281 rows.', call. = FALSE)
 }
-if (nrow(.bedrock_trade_outcomes) != 2789L) {
-  stop('Pinned expanded trade data must contain 2,789 rows.', call. = FALSE)
+if (nrow(.bedrock_trade_outcomes) != 2787L) {
+  stop('Pinned expanded trade data must contain 2,787 rows.', call. = FALSE)
 }
 probability_groups <- interaction(
   .bedrock_trade_outcomes$profession,

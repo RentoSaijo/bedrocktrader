@@ -248,8 +248,8 @@
   'wind_burst'
 )
 
-# Define legacy color values.
-.bedrock_colors <- c(
+# Define legacy bed color values.
+.bedrock_bed_colors <- c(
   'white',
   'orange',
   'magenta',
@@ -266,6 +266,26 @@
   'green',
   'red',
   'black'
+)
+
+# Define legacy banner color values.
+.bedrock_banner_colors <- c(
+  'black',
+  'red',
+  'green',
+  'brown',
+  'blue',
+  'purple',
+  'cyan',
+  'light_gray',
+  'gray',
+  'pink',
+  'lime',
+  'yellow',
+  'light_blue',
+  'magenta',
+  'orange',
+  'white'
 )
 
 # Define suspicious stew effects.

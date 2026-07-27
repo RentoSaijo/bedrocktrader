@@ -218,7 +218,12 @@
       'bed and banner suffixes must be from 0 through 15'
     )
   }
-  .bedrock_colors[[aux_value + 1L]]
+  colors <- if (identical(item, 'minecraft:bed')) {
+    .bedrock_bed_colors
+  } else {
+    .bedrock_banner_colors
+  }
+  colors[[aux_value + 1L]]
 }
 
 # Resolve legacy suspicious-stew effect.
@@ -514,6 +519,7 @@
         candidate$reward_exp
       },
       .source_option        = source_option,
+      .trade_weight        = candidate$source_weight,
       .generator_probability = 1,
       .probability_status   = 'exact'
     )
@@ -602,7 +608,12 @@
           'bed and banner colors require auxiliary values from 0 through 15'
         )
       }
-      output$result_color <- .bedrock_colors[[auxiliary_value + 1L]]
+      colors <- if (identical(output$result_item, 'minecraft:bed')) {
+        .bedrock_bed_colors
+      } else {
+        .bedrock_banner_colors
+      }
+      output$result_color <- colors[[auxiliary_value + 1L]]
     }
     if (identical(output$result_item, 'minecraft:suspicious_stew')) {
       if (!(auxiliary_value %in% 0:5)) {

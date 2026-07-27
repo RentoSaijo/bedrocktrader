@@ -381,7 +381,16 @@ villager_trades <- function(
   }
   for (group_id in unique(rows$group_id)) {
     group_rows <- rows$group_id == group_id
-    rows$num_trades[group_rows] <- length(unique(rows$trade_id[group_rows]))
+    trade_ids <- unique(rows$trade_id[group_rows])
+    rows$num_trades[group_rows] <- sum(vapply(
+      trade_ids,
+      function(trade_id) {
+        unique(rows$.trade_weight[
+          group_rows & rows$trade_id == trade_id
+        ])
+      },
+      numeric(1)
+    ))
   }
   rows$offer_probability <- .trade_probabilities(rows) *
     .choice_probabilities(rows) *

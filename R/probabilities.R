@@ -92,14 +92,36 @@
   probabilities <- numeric(nrow(rows))
   for (group_id in unique(rows$group_id)) {
     group_rows <- which(rows$group_id == group_id)
-    num_trades <- length(unique(rows$trade_id[group_rows]))
+    trade_ids <- unique(rows$trade_id[group_rows])
+    trade_weights <- vapply(
+      trade_ids,
+      function(trade_id) {
+        unique(rows$.trade_weight[
+          group_rows[rows$trade_id[group_rows] == trade_id]
+        ])
+      },
+      numeric(1)
+    )
+    num_trades <- sum(trade_weights)
     num_to_select <- rows$num_to_select[[group_rows[[1L]]]]
     if (num_to_select == -1L) {
-      probability <- 1
+      probabilities[group_rows] <- 1
     } else {
-      probability <- min(num_to_select, num_trades) / num_trades
+      selected_n <- min(num_to_select, num_trades)
+      for (index in seq_along(trade_ids)) {
+        trade_id     <- trade_ids[[index]]
+        trade_weight <- trade_weights[[index]]
+        not_selected <- if (num_trades - trade_weight < selected_n) {
+          0
+        } else {
+          choose(num_trades - trade_weight, selected_n) /
+            choose(num_trades, selected_n)
+        }
+        probabilities[
+          group_rows[rows$trade_id[group_rows] == trade_id]
+        ] <- 1 - not_selected
+      }
     }
-    probabilities[group_rows] <- probability
   }
   probabilities
 }

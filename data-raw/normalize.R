@@ -415,7 +415,23 @@
       paste0(path, '.num_to_select')
     )
   }
-  num_to_select <- as.integer(group$num_to_select %||% -1L)
+  omitted_select_all <- !num_to_select_explicit &&
+    identical(profession, 'fisherman') &&
+    identical(level, 5L) &&
+    identical(group_position, 1L) &&
+    identical(candidate_count, 2L)
+  if (!num_to_select_explicit && !omitted_select_all) {
+    .schema_error(
+      release,
+      paste0(path, '.num_to_select'),
+      'only the pinned Fisherman master select-all omission is supported'
+    )
+  }
+  num_to_select <- if (omitted_select_all) {
+    -1L
+  } else {
+    as.integer(group$num_to_select)
+  }
   if (
     (num_to_select_explicit && group$num_to_select != num_to_select) ||
     !(num_to_select == -1L ||
@@ -428,8 +444,38 @@
     )
   }
   group_id <- paste0(profession, '_l', level, '_g', group_position)
-  candidates <- lapply(seq_along(group$trades), function(candidate_position) {
-    .normalize_candidate(
+  candidate_positions <- integer()
+  candidate_weights   <- integer()
+  for (candidate_position in seq_along(group$trades)) {
+    matches <- vapply(
+      candidate_positions,
+      function(existing_position) {
+        identical(
+          group$trades[[candidate_position]],
+          group$trades[[existing_position]]
+        )
+      },
+      logical(1)
+    )
+    if (any(matches)) {
+      match_index <- which(matches)[[1L]]
+      candidate_weights[[match_index]] <-
+        candidate_weights[[match_index]] + 1L
+    } else {
+      candidate_positions <- c(candidate_positions, candidate_position)
+      candidate_weights   <- c(candidate_weights, 1L)
+    }
+  }
+  if (any(candidate_weights > 1L) && num_to_select != 1L) {
+    .schema_error(
+      release,
+      path,
+      'duplicate source trades can be aggregated only when one trade is selected'
+    )
+  }
+  candidates <- lapply(seq_along(candidate_positions), function(index) {
+    candidate_position <- candidate_positions[[index]]
+    candidate <- .normalize_candidate(
       candidate          = group$trades[[candidate_position]],
       profession         = profession,
       level              = level,
@@ -438,6 +484,8 @@
       release            = release,
       path               = paste0(path, '.trades[', candidate_position, ']')
     )
+    candidate$source_weight <- candidate_weights[[index]]
+    candidate
   })
   list(
     group_position  = group_position,
