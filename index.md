@@ -16,7 +16,8 @@ pak::pak('RentoSaijo/bedrocktrader')
 
 ## Quick start
 
-The compact table keeps one row for each base item choice:
+Compact rows keep generated details together and may report a quantity
+range:
 
 ``` r
 
@@ -24,21 +25,18 @@ library(bedrocktrader)
 
 armor <- villager_trades()
 
-head(
-  armor[
-    ,
-    c(
-      'tier',
-      'wants_1_item',
-      'gives_1_item',
-      'offer_probability'
-    )
-  ]
-)
+armor[
+  armor$gives_1_item == 'minecraft:diamond_helmet',
+  c(
+    'wants_1_quantity_min',
+    'wants_1_quantity_max',
+    'gives_1_item',
+    'offer_probability'
+  )
+]
 ```
 
-Set `expanded = TRUE` to separate modeled enchantments and other
-generated outcomes:
+Expanded rows describe one exact outcome and price:
 
 ``` r
 
@@ -46,9 +44,9 @@ enchanted_armor <- villager_trades(expanded = TRUE)
 
 head(
   enchanted_armor[
-    !is.na(enchanted_armor$gives_1_enchantments),
+    enchanted_armor$gives_1_item == 'minecraft:diamond_helmet',
     c(
-      'gives_1_item',
+      'wants_1_quantity_min',
       'gives_1_enchantments',
       'offer_probability'
     )
@@ -63,8 +61,9 @@ tier -> group -> trade -> option
 ```
 
 A group selects one or more trades. Explicit item choices form separate
-base rows, while an expanded option describes one enchantment set,
-color, effect, or other modeled outcome from its source trade.
+base rows. Compact probabilities are marginal over collapsed outcomes,
+whereas an expanded option’s probability covers its exact items,
+specifications, and price.
 
 Use
 [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md),

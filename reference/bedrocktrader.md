@@ -20,9 +20,9 @@ requirement.
 
 [`villager_trades()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
 follows Mojang's `tiers`, `groups`, `trades`, `wants`, and `gives`
-terminology. Its compact rows describe base item alternatives; expanded
-rows separate modeled enchantments and other generated outcomes. Both
-forms include the marginal probability that the displayed row appears.
+terminology. Compact rows may summarize generated details with quantity
+ranges. Expanded rows identify one exact item specification and price.
+Both forms report the probability of the outcome displayed by that row.
 
 ## Version and modeling boundary
 

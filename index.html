@@ -69,32 +69,30 @@
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>The compact table keeps one row for each base item choice:</p>
+<p>Compact rows keep generated details together and may report a quantity range:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">armor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span>
-<span>  <span class="va">armor</span><span class="op">[</span></span>
-<span>    ,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">'tier'</span>,</span>
-<span>      <span class="st">'wants_1_item'</span>,</span>
-<span>      <span class="st">'gives_1_item'</span>,</span>
-<span>      <span class="st">'offer_probability'</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">]</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>Set <code>expanded = TRUE</code> to separate modeled enchantments and other generated outcomes:</p>
+<span><span class="va">armor</span><span class="op">[</span></span>
+<span>  <span class="va">armor</span><span class="op">$</span><span class="va">gives_1_item</span> <span class="op">==</span> <span class="st">'minecraft:diamond_helmet'</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">'wants_1_quantity_min'</span>,</span>
+<span>    <span class="st">'wants_1_quantity_max'</span>,</span>
+<span>    <span class="st">'gives_1_item'</span>,</span>
+<span>    <span class="st">'offer_probability'</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">]</span></span></code></pre></div>
+<p>Expanded rows describe one exact outcome and price:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">enchanted_armor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span>expanded <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span>
 <span>  <span class="va">enchanted_armor</span><span class="op">[</span></span>
-<span>    <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">enchanted_armor</span><span class="op">$</span><span class="va">gives_1_enchantments</span><span class="op">)</span>,</span>
+<span>    <span class="va">enchanted_armor</span><span class="op">$</span><span class="va">gives_1_item</span> <span class="op">==</span> <span class="st">'minecraft:diamond_helmet'</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">'gives_1_item'</span>,</span>
+<span>      <span class="st">'wants_1_quantity_min'</span>,</span>
 <span>      <span class="st">'gives_1_enchantments'</span>,</span>
 <span>      <span class="st">'offer_probability'</span></span>
 <span>    <span class="op">)</span></span>
@@ -102,7 +100,7 @@
 <span><span class="op">)</span></span></code></pre></div>
 <p>Minecraft organizes these possibilities as:</p>
 <pre class="text"><code><span><span class="va">tier</span> <span class="op">-&gt;</span> <span class="va">group</span> <span class="op">-&gt;</span> <span class="va">trade</span> <span class="op">-&gt;</span> <span class="va">option</span></span></code></pre>
-<p>A group selects one or more trades. Explicit item choices form separate base rows, while an expanded option describes one enchantment set, color, effect, or other modeled outcome from its source trade.</p>
+<p>A group selects one or more trades. Explicit item choices form separate base rows. Compact probabilities are marginal over collapsed outcomes, whereas an expanded option’s probability covers its exact items, specifications, and price.</p>
 <p>Use <code><a href="reference/villager_professions.html">villager_professions()</a></code>, <code><a href="reference/villager_variants.html">villager_variants()</a></code>, and <code><a href="reference/villager_tiers.html">villager_tiers()</a></code> to inspect accepted metadata. The <a href="reference/villager_trades.html"><code>villager_trades()</code> reference</a> explains every column, contextual inputs, probabilities, and modeling limits.</p>
 </div>
 <div class="section level2">
