@@ -16,9 +16,10 @@ villager_trades(
 \code{\link[=villager_professions]{villager_professions()}}. The default is \code{"armorer"}; \code{"all"} is not a
 profession value.}
 
-\item{expanded}{\code{FALSE} returns base item-choice combinations. \code{TRUE}
-separates modeled enchantments, random legacy data values, and other
-reconstructable function outcomes.}
+\item{expanded}{\code{FALSE} returns compact base item-choice combinations that
+may contain quantity ranges. \code{TRUE} returns exact modeled outcomes:
+populated quantity minima equal their corresponding maxima, and each row
+has the probability of its displayed items, specifications, and price.}
 
 \item{variant}{One villager biome variant when the profession has
 variant-dependent trades. Use \code{\link[=villager_variants]{villager_variants()}} for canonical values
@@ -34,8 +35,8 @@ after \code{trade_id}, for 30 columns.
 }
 \description{
 Returns the possible vanilla trades for one profession in Minecraft Bedrock
-\verb{1.26.30.5}, together with the marginal probability that each displayed row
-appears among a villager's offers.
+\verb{1.26.30.5}, together with the probability represented by each compact or
+expanded row.
 }
 \section{Compact and expanded rows}{
 
@@ -45,12 +46,16 @@ remains a single value.
 
 With \code{expanded = FALSE}, generated details remain collapsed into their base
 row. For example, a Librarian enchanted-book row describes the full emerald
-range but does not name one enchantment. Its probability is the chance that
-the base item combination appears, marginal over every function outcome.
+range without naming one enchantment or price. Its probability is the chance
+that the base item combination appears, marginal over every function
+outcome. The pinned tables contain 281 compact rows across all professions.
 
-With \code{expanded = TRUE}, each reconstructable function outcome receives its
-own row and \code{option_id}. Repeated \code{trade_id} values remain alternatives from
-one source trade; they are not additional candidates in a group.
+With \code{expanded = TRUE}, each reconstructable function outcome and exact
+price receives its own row and \code{option_id}. Repeated \code{trade_id} values remain
+alternatives from one source trade; they are not additional candidates in a
+group. The pinned tables contain 30,592 expanded rows. Apart from the
+unresolved color of \code{random_dye}, every populated quantity minimum equals
+its maximum.
 
 Fixed potion and exploration-map functions resolve to one value in either
 form because they do not create alternative outcomes. \code{random_dye} cannot
@@ -65,8 +70,10 @@ expanded row.
 \item \code{tier} (\code{integer}) is the numeric trading tier. Join it to
 \code{\link[=villager_tiers]{villager_tiers()}} for its name and experience requirement.
 \item \code{group_id} (\code{character}) identifies a pool of possible source trades.
-\item \code{num_trades} (\code{integer}) counts source trades that apply to the requested
-context in that group. Item and function expansions do not increase it.
+\item \code{num_trades} (\code{integer}) counts source entries that apply to the requested
+context in that group. Item and function expansions do not increase it;
+repeated identical entries still count because they affect selection
+probability.
 \item \code{num_to_select} (\code{integer}) is Mojang's number of trades selected from the
 group. \code{-1} means every applicable trade is selected.
 \item \code{trade_id} (\code{character}) identifies one source trade.
@@ -94,10 +101,10 @@ Every \verb{wants_2_*} field is typed \code{NA} for a one-item payment. An omitt
 quantity becomes one, while an omitted price multiplier on an existing item
 becomes Mojang's documented default of \code{0.05}.
 
-Librarian emerald bounds incorporate \code{enchant_book_for_trading}. Compact
-rows span all modeled enchantments and levels; expanded rows give the range
-for the displayed enchantment. These values precede demand, curing, and Hero
-of the Village adjustments.
+Compact Librarian and enchanted-equipment rows span every modeled emerald
+price. In expanded output, the emerald minimum and maximum are equal and
+identify the exact modeled price attached to that row. These values precede
+demand, curing, and Hero of the Village adjustments.
 }
 
 \section{Gives columns}{
@@ -141,13 +148,18 @@ experience enabled.
 
 \code{offer_probability} (\code{double}) is the marginal chance that the displayed row
 appears among the villager's offers. A group selecting \code{k} of \code{n} applicable
-trades gives each source trade probability \code{k / n}; select-all groups give
-every source trade probability one. Explicit choices and expanded function
-outcomes then contribute their conditional probabilities.
+source entries gives an ordinary source trade probability \code{k / n};
+select-all groups give every source trade probability one. Identical source
+entries are treated as repeated ways to obtain the same trade. Explicit
+choices and expanded function outcomes then contribute their conditional
+probabilities.
 
 Rows do not generally sum to one. A tier can contain several groups and can
-therefore add several offers. Compact probabilities do equal the sum of the
-corresponding expanded probabilities.
+therefore add several offers. A compact row's probability is marginal over
+all details it collapses. An expanded row instead gives the joint probability
+of its exact displayed items, specifications, and price. Summing expanded
+probabilities over one base item-choice combination recovers its compact
+probability.
 
 \code{probability_status} (\code{character}) describes the calculation:
 \itemize{
@@ -162,22 +174,53 @@ not established by the pinned sources.
 
 \section{Enchantment models}{
 
-Each expanded Librarian book trade has 116 enchantment-level outcomes drawn
-from 39 eligible enchantments. Enchantment is uniform first; level is then
-uniform within that enchantment. Soul Speed, Swift Sneak, and Wind Burst are
-excluded. Normal emerald ranges are 5--19 for level I, 8--32 for II, 11--45
-for III, 14--58 for IV, and 17--64 for V. Treasure prices double before the
-64-emerald cap.
+Each Librarian book trade draws uniformly from 39 eligible enchantments,
+then draws uniformly from the selected enchantment's valid levels. This
+gives 116 enchantment-level combinations. Soul Speed, Swift Sneak, and Wind
+Burst are excluded. For enchantment level \code{L}, the pinned parameters produce
+the normal emerald price
+\code{2 + 3L + U}, where \code{U} is a discrete uniform integer from zero through
+\code{4 + 10L}. Treasure prices double before the 64-emerald cap. Expanded rows
+enumerate the resulting price support, and probabilities from every
+underlying price capped at 64 are combined. Consequently, treasure support
+is even below the cap and need not contain every integer inside its compact
+minimum--maximum range.
 
 Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use the pinned
-\code{enchant_with_levels} model. The updater analytically integrates enchanting
-power from 5 through 19, item enchantability, weights, conflicts, and
-additional-enchantment branches. Identical complete sets are combined
-without simulation or resampling.
+\code{enchant_with_levels} model. The source enchanting level is uniform from 5
+through 19. Mojang's base emerald cost is increased by that selected level,
+and the enchantment set is generated conditionally on the same value. The
+updater analytically integrates item enchantability, the two enchantability
+rolls, the triangular multiplier, weights, conflicts, and
+additional-enchantment branches. Identical complete sets at the same price
+are combined without simulation or resampling; the same set at another
+price remains a distinct expanded option.
 
 \code{"documented_model"} means exact probability under the documented model,
 rather than a guarantee about Bedrock engine constants that Mojang has not
 published.
+}
+
+\section{Pinned table details}{
+
+The Librarian master candle group contains three identical red-candle source
+entries and one yellow-candle entry. They are presented as two rows:
+red has probability \code{0.75}, yellow has probability \code{0.25}, and
+\code{num_trades} remains four to preserve the source selection pool.
+
+Bed colors use the white-to-black auxiliary-value order. Banner colors use
+Bedrock's black-to-white metadata order, so \code{minecraft:banner:0} is black
+and \code{minecraft:banner:15} is white.
+
+Mojang omits \code{num_to_select} from the pinned Fisherman master group. That
+group contains the pufferfish trade and one variant-specific boat trade;
+both are selected. The returned value is therefore \code{-1}, the trade-table
+select-all convention. No other omission is accepted by the data updater.
+
+The Farmer suspicious-stew trade follows the six auxiliary values authored
+in the pinned table. Expanded output assigns each effect probability \code{1/6},
+including Night Vision. This describes the source table rather than the
+known Bedrock runtime defect affecting that effect.
 }
 
 \section{Villager context}{
@@ -207,6 +250,7 @@ head(
   enchanted_armor[
     !is.na(enchanted_armor$gives_1_enchantments),
     c(
+      'wants_1_quantity_min',
       'gives_1_item',
       'gives_1_enchantments',
       'offer_probability'
@@ -215,14 +259,17 @@ head(
 )
 
 books <- villager_trades('librarian', expanded = TRUE)
-books[
-  grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
-  c(
-    'gives_1_enchantments',
-    'wants_1_quantity_min',
-    'wants_1_quantity_max'
-  )
-]
+head(
+  books[
+    grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
+    c(
+      'gives_1_enchantments',
+      'wants_1_quantity_min',
+      'wants_1_quantity_max',
+      'offer_probability'
+    )
+  ]
+)
 
 maps <- villager_trades(
   profession = 'cartographer',
@@ -242,4 +289,6 @@ maps[
 \href{https://learn.microsoft.com/en-us/minecraft/creator/reference/content/loottablereference/examples/loottabledefinitions/enchantingtables?view=minecraft-bedrock-stable}{Microsoft, "Loot Tables Documentation - Enchanting Tables"}
 
 \href{https://minecraft.wiki/w/Enchanting_table_mechanics?oldid=3681507}{Minecraft Wiki, "Enchanting table mechanics," revision 3681507}
+
+\href{https://minecraft.wiki/w/Banner#Metadata}{Minecraft Wiki, "Banner metadata"}
 }

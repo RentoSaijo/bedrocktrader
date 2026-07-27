@@ -22,9 +22,10 @@ numeric tier with its name and cumulative experience requirement.
 \section{Data}{
 
 \code{\link[=villager_trades]{villager_trades()}} follows Mojang's \code{tiers}, \code{groups}, \code{trades}, \code{wants},
-and \code{gives} terminology. Its compact rows describe base item alternatives;
-expanded rows separate modeled enchantments and other generated outcomes.
-Both forms include the marginal probability that the displayed row appears.
+and \code{gives} terminology. Compact rows may summarize generated details with
+quantity ranges. Expanded rows identify one exact item specification and
+price. Both forms report the probability of the outcome displayed by that
+row.
 }
 
 \section{Version and modeling boundary}{
