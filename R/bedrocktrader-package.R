@@ -12,13 +12,19 @@
 #' trade-table features. [villager_variants()] connects biome names with
 #' Mojang's `minecraft:mark_variant` values. [villager_tiers()] pairs each
 #' numeric tier with its name and cumulative experience requirement.
+#' [enchantments()] provides the pinned enchantment registry and Villager
+#' availability.
 #'
 #' @section Data:
 #' [villager_trades()] follows Mojang's `tiers`, `groups`, `trades`, `wants`,
-#' and `gives` terminology. Compact rows may summarize generated details with
-#' quantity ranges. Expanded rows identify one exact item specification and
-#' price. Both forms report the probability of the outcome displayed by that
-#' row.
+#' and `gives` terminology. Its trade, option, and offer views move from
+#' summarized source rows to exact item specifications and prices. Every view
+#' reports the probability represented by its rows.
+#'
+#' @section Analysis:
+#' [enchanted_book_probability()] calculates the chance that a fully unlocked
+#' Librarian has a qualifying book. [enchanted_item_probability()] evaluates
+#' complete enchantment sets on directly traded equipment.
 #'
 #' @section Version and modeling boundary:
 #' This package supports `1.26.30.5` only. Source-resolved rows come directly

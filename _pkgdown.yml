@@ -36,14 +36,22 @@ reference:
 
   - title: "Meta"
     desc: >
-      Inspect professions, variants, and tiers
+      Inspect professions, variants, tiers, and enchantments
     contents:
       - villager_professions
       - villager_variants
       - villager_tiers
+      - enchantments
 
   - title: "Data"
     desc: >
-      Inspect possible trade outcomes
+      Inspect possible trades, options, and offers
     contents:
       - villager_trades
+
+  - title: "Analysis"
+    desc: >
+      Calculate enchantment probabilities
+    contents:
+      - enchanted_book_probability
+      - enchanted_item_probability

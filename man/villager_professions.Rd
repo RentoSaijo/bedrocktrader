@@ -26,7 +26,7 @@ values, potion setting, map creation, or random dye.
 \description{
 Lists the 13 employable vanilla villager professions included in the
 Minecraft Bedrock \verb{1.26.30.5} data model. The feature flags offer a quick
-way to find tables that need contextual inputs or contain expanded source
+way to find tables that need contextual inputs or contain generated source
 instructions.
 }
 \details{

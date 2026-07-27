@@ -13,7 +13,8 @@ A base data frame with one row per enchantment:
 \item \code{display_name} (\code{character}) is the readable enchantment name.
 \item \code{max_level} (\code{integer}) is the highest valid level.
 \item \code{treasure} (\code{logical}) identifies treasure enchantments.
-\item \code{villager_attainable} (\code{logical}) indicates availability from villagers.
+\item \code{villager_attainable} (\code{logical}) indicates availability through the
+pinned Librarian trade model.
 \item \code{traded_items} (\code{character}) lists directly traded enchanted equipment,
 separated by commas. It is \code{NA} when none applies.
 }
@@ -22,6 +23,26 @@ separated by commas. It is \code{NA} when none applies.
 Lists the 42 enchantments registered in Minecraft Bedrock \verb{1.26.30.5} and
 identifies those available through the bundled villager model.
 }
+\details{
+The registry contains the 39 enchantments available from Librarians plus
+Soul Speed, Swift Sneak, and Wind Burst. The latter three remain visible for
+validation and return \code{FALSE} in \code{villager_attainable}.
+
+\code{traded_items} concerns equipment generated directly by Armorer, Fisherman,
+Fletcher, Toolsmith, or Weaponsmith trades. It does not list items that can
+receive a Librarian book later through an anvil.
+
+Values are bundled and verified against Mojang's pinned enchantment registry
+during package development. Calling the function performs no download.
+}
 \examples{
-enchantments()
+registry <- enchantments()
+head(registry)
+
+registry[!registry$villager_attainable, ]
+}
+\references{
+\href{https://learn.microsoft.com/en-us/minecraft/creator/commands/commands/enchant?view=minecraft-bedrock-stable}{Microsoft, "\verb{/enchant} Command"}
+
+\href{https://learn.microsoft.com/en-us/minecraft/creator/documents/introtoenchantments?view=minecraft-bedrock-stable}{Microsoft, "Introduction to Enchantments"}
 }

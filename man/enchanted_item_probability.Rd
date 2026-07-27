@@ -22,26 +22,92 @@ enchanted_item_probability(
 \item{profession}{Required for diamond axes; use \code{"toolsmith"} or
 \code{"weaponsmith"}. Other items infer their profession.}
 
-\item{max_emeralds}{Inclusive original emerald-price cutoff.}
+\item{max_emeralds}{Inclusive original emerald-price cutoff from 0 through
+64.}
 
-\item{include_higher_level}{Whether levels above each request also qualify.}
+\item{include_higher_level}{\code{FALSE} requires every requested level. \code{TRUE}
+treats each requested level as a minimum.}
 
-\item{match}{\code{"exact"} requires the complete requested set. \code{"contains"}
-permits additional enchantments.}
+\item{match}{\code{"exact"} requires the complete enchantment set to contain only
+the requested enchantments. \code{"contains"} permits additional enchantments.}
 }
 \value{
-One numeric probability.
+One numeric probability from 0 through 1.
 }
 \description{
 Calculates the probability that a fully unlocked villager offers one
-qualifying enchanted equipment item.
+qualifying enchanted equipment item in Minecraft Bedrock \verb{1.26.30.5}.
 }
+\section{Items and professions}{
+
+Short names are \code{helmet}, \code{chestplate}, \code{leggings}, \code{boots}, \code{sword}, \code{axe},
+\code{pickaxe}, \code{shovel}, \code{bow}, \code{crossbow}, and \code{fishing_rod}. Armor, swords,
+axes, pickaxes, and shovels refer to their diamond forms. Their corresponding
+namespaced item IDs are also accepted. Iron equipment is outside this
+analysis interface.
+
+Profession is inferred as Armorer, Fisherman, Fletcher, Toolsmith, or
+Weaponsmith. Diamond axes appear in two profession tables, so \code{profession}
+is required for that item. The Toolsmith trade is selected with probability
+\code{1/2}; the Weaponsmith trade is guaranteed. Profession aliases accepted by
+\code{\link[=villager_professions]{villager_professions()}} remain valid.
+}
+
+\section{Enchantment matching}{
+
+Input follows the atomic representation returned by \code{\link[=villager_trades]{villager_trades()}}, for
+example \verb{minecraft:efficiency=2,minecraft:unbreaking=1}. Whitespace and pair
+order do not matter, capitalization is normalized, and \verb{minecraft:} may be
+omitted. Display names are not accepted; \code{\link[=enchantments]{enchantments()}} lists canonical
+identifiers and valid levels.
+
+With \code{match = "exact"}, the modeled item must have exactly the requested
+enchantment identifiers. With \code{match = "contains"}, every requested
+enchantment must appear, but unrequested enchantments may also occur. When
+\code{include_higher_level = TRUE}, either rule accepts levels at or above each
+requested value.
+
+Recognized but impossible conditions return zero. This includes
+item-inapplicable enchantments and incompatible combinations such as Fortune
+with Silk Touch. Malformed pairs, unknown identifiers, repeated identifiers,
+and levels outside the registry produce errors.
+}
+
+\section{Probability and price}{
+
+The result includes source-trade selection and the complete documented
+\code{enchant_with_levels} distribution for the requested item. It sums the exact
+offers whose enchantment set and original emerald price meet the query.
+
+\code{max_emeralds} is evaluated before demand, curing, or other adjustments. Its
+default of \code{64} includes every modeled equipment price. It is a budget filter,
+not a prediction of the price after curing; price multipliers differ across
+equipment trades.
+
+The returned value is exact under the documented model described in
+\code{\link[=villager_trades]{villager_trades()}}, rather than a guarantee about undocumented Bedrock
+internals.
+}
+
 \examples{
 enchanted_item_probability('sword', 'sharpness=3')
+
+enchanted_item_probability(
+  item                 = 'pickaxe',
+  enchantments         = 'efficiency=2',
+  include_higher_level = TRUE,
+  match                = 'contains'
+)
+
 enchanted_item_probability(
   item         = 'axe',
   enchantments = 'efficiency=2,unbreaking=1',
   profession   = 'weaponsmith',
   match        = 'contains'
 )
+}
+\references{
+\href{https://learn.microsoft.com/en-us/minecraft/creator/reference/content/loottablereference/examples/loottabledefinitions/enchantingtables?view=minecraft-bedrock-stable}{Microsoft, "Loot Tables Documentation - Enchanting Tables"}
+
+\href{https://minecraft.wiki/w/Enchanting_table_mechanics?oldid=3681507}{Minecraft Wiki, "Enchanting table mechanics," revision 3681507}
 }

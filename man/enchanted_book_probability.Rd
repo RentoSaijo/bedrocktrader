@@ -12,20 +12,56 @@ enchanted_book_probability(
 }
 \arguments{
 \item{enchantment}{One \code{identifier=level} pair. The \verb{minecraft:} namespace
-is optional.}
+is optional. The default is the alphabetically first attainable
+enchantment.}
 
-\item{max_emeralds}{Inclusive original emerald-price cutoff.}
+\item{max_emeralds}{Inclusive original emerald-price cutoff from 0 through
+64.}
 
-\item{include_higher_level}{Whether levels above the request also qualify.}
+\item{include_higher_level}{\code{FALSE} requires the requested level. \code{TRUE}
+also counts higher valid levels of the same enchantment.}
 }
 \value{
-One numeric probability.
+One numeric probability from 0 through 1.
 }
 \description{
 Calculates the probability that a fully unlocked Librarian has at least one
-qualifying enchanted-book offer.
+qualifying enchanted-book offer in Minecraft Bedrock \verb{1.26.30.5}.
+}
+\details{
+A fully unlocked Bedrock Librarian has four independent opportunities to
+offer an enchanted book. The book candidate is selected with probability
+\code{1/2} at novice, apprentice, and journeyman tiers and \code{1/3} at expert. Within
+each selected book trade, the model chooses one of 39 enchantments uniformly,
+then chooses uniformly among that enchantment's valid levels and generates
+its emerald price.
+
+The function sums all qualifying level-and-price offers within each source
+trade, then calculates one minus the probability that none of the four book
+trades qualifies. A recognized enchantment that Villagers cannot offer,
+such as Soul Speed, returns zero. Unknown identifiers and invalid levels
+produce errors; use \code{\link[=enchantments]{enchantments()}} to inspect the registry.
+
+\code{max_emeralds} applies to the original modeled price before demand, curing,
+or other adjustments. The default \code{64} includes every book price. A cutoff
+of \code{26} is useful when screening for the commonly targeted low-price
+Librarian books, but the function does not simulate curing or promise a
+post-cure price.
+
+Probabilities for book identity, level, and price follow the documented
+model described in \code{\link[=villager_trades]{villager_trades()}}. They are exact under that model,
+rather than a guarantee about undocumented Bedrock internals.
 }
 \examples{
 enchanted_book_probability()
 enchanted_book_probability('mending=1', max_emeralds = 26)
+enchanted_book_probability(
+  'efficiency=2',
+  include_higher_level = TRUE
+)
+}
+\references{
+\href{https://learn.microsoft.com/en-us/minecraft/creator/documents/introtoenchantments?view=minecraft-bedrock-stable}{Microsoft, "Introduction to Enchantments"}
+
+\href{https://minecraft.wiki/w/Trading}{Minecraft Wiki, "Trading"}
 }

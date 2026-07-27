@@ -16,51 +16,53 @@ villager_trades(
 \code{\link[=villager_professions]{villager_professions()}}. The default is \code{"armorer"}; \code{"all"} is not a
 profession value.}
 
+\item{view}{Resolution of the returned rows. \code{"trade"} summarizes generated
+specifications and prices, \code{"option"} resolves item specifications while
+retaining price bounds, and \code{"offer"} resolves exact specifications and
+prices.}
+
 \item{variant}{One villager biome variant when the profession has
 variant-dependent trades. Use \code{\link[=villager_variants]{villager_variants()}} for canonical values
 and aliases.}
 
 \item{dimension}{One of \code{"overworld"}, \code{"nether"}, or \code{"end"} when the
 profession has dimension-dependent trades.}
-
-\item{expanded}{\code{FALSE} returns compact base item-choice combinations that
-may contain quantity ranges. \code{TRUE} returns exact modeled outcomes:
-populated quantity minima equal their corresponding maxima, and each row
-has the probability of its displayed items, specifications, and price.}
 }
 \value{
-A plain base data frame containing only atomic columns. Compact
-results contain 29 columns. Expanded results add \code{option_id} immediately
-after \code{trade_id}, for 30 columns.
+A plain base data frame containing only atomic columns. Trade results
+contain 29 columns. Option results add \code{option_id} after \code{trade_id}, for
+30 columns. Offer results add \code{offer_id} after \code{option_id}, for 31 columns.
 }
 \description{
 Returns the possible vanilla trades for one profession in Minecraft Bedrock
-\verb{1.26.30.5}, together with the probability represented by each compact or
-expanded row.
+\verb{1.26.30.5}, together with the probability represented at the requested
+trade, option, or offer resolution.
 }
-\section{Compact and expanded rows}{
+\section{Hierarchical views}{
 
-Minecraft trade tables follow \code{tier -> group -> trade}. Explicit Mojang
-item choices create separate base rows so each \code{wants} and \code{gives} field
-remains a single value.
+Minecraft trade tables follow \code{tier -> group -> trade}; the package extends
+that structure as \code{trade_id -> option_id -> offer_id}. Explicit Mojang item
+choices remain separate rows so every \code{wants} and \code{gives} field stays
+atomic.
 
-With \code{expanded = FALSE}, generated details remain collapsed into their base
-row. For example, a Librarian enchanted-book row describes the full emerald
-range without naming one enchantment or price. Its probability is the chance
-that the base item combination appears, marginal over every function
-outcome. The pinned tables contain 281 compact rows across all professions.
+\code{view = "trade"} returns 281 base item-choice combinations from 182 authored
+source entries across the pinned tables. Generated details remain summarized,
+so a Librarian book row covers every modeled enchantment, level, and price.
+A \code{trade_id} can repeat when Mojang supplies explicit item choices.
 
-With \code{expanded = TRUE}, each reconstructable function outcome and exact
-price receives its own row and \code{option_id}. Repeated \code{trade_id} values remain
-alternatives from one source trade; they are not additional candidates in a
-group. The pinned tables contain 30,592 expanded rows. Apart from the
-unresolved color of \code{random_dye}, every populated quantity minimum equals
-its maximum.
+\code{view = "option"} returns 2,787 concrete item specifications. For example,
+one enchanted-equipment option names its complete enchantment set while its
+emerald columns span every price that can produce that set. The probability
+is marginal over those prices.
 
-Fixed potion and exploration-map functions resolve to one value in either
-form because they do not create alternative outcomes. \code{random_dye} cannot
-be reconstructed faithfully from the pinned sources and remains one partial
-expanded row.
+\code{view = "offer"} returns 30,592 exact configurations. Each populated
+quantity minimum equals its maximum, and \code{offer_probability} covers the
+displayed items, specification, and price jointly. Offers are grouped by
+option and sorted by price.
+
+Fixed potion and exploration-map instructions resolve in every view because
+they do not create alternatives. \code{random_dye} remains one partial row
+because its color distribution is not established by the pinned sources.
 }
 
 \section{Identity and selection columns}{
@@ -76,9 +78,12 @@ repeated identical entries still count because they affect selection
 probability.
 \item \code{num_to_select} (\code{integer}) is Mojang's number of trades selected from the
 group. \code{-1} means every applicable trade is selected.
-\item \code{trade_id} (\code{character}) identifies one source trade.
-\item \code{option_id} (\code{character}) uniquely identifies an expanded row and is
-present only when \code{expanded = TRUE}.
+\item \code{trade_id} (\code{character}) identifies one source trade. Explicit item-choice
+rows share this identifier.
+\item \code{option_id} (\code{character}) identifies one concrete item specification. It
+appears in option and offer views and repeats across an option's prices.
+\item \code{offer_id} (\code{character}) uniquely identifies an exact configuration. It
+appears only in the offer view.
 }
 
 The identifiers are stable within the pinned package release and do not
@@ -101,10 +106,11 @@ Every \verb{wants_2_*} field is typed \code{NA} for a one-item payment. An omitt
 quantity becomes one, while an omitted price multiplier on an existing item
 becomes Mojang's documented default of \code{0.05}.
 
-Compact Librarian and enchanted-equipment rows span every modeled emerald
-price. In expanded output, the emerald minimum and maximum are equal and
-identify the exact modeled price attached to that row. These values precede
-demand, curing, and Hero of the Village adjustments.
+Trade rows span every modeled price when a function changes the emerald
+cost. Option rows provide the bounds for one item specification; those bounds
+do not promise that every interior integer is attainable. Offer rows have
+equal minima and maxima and therefore identify exact modeled prices. All
+returned values precede demand, curing, and Hero of the Village adjustments.
 }
 
 \section{Gives columns}{
@@ -120,7 +126,7 @@ stew effect, potion identifier, or exploration-map destination. Each is
 \item \code{gives_1_enchantments} (\code{character}) records a complete enchantment set as
 sorted \code{minecraft:id=level} pairs separated by commas. For example,
 \verb{minecraft:sharpness=2,minecraft:unbreaking=1} describes one sword carrying
-both enchantments. It is \code{NA} on compact generated rows and ordinary
+both enchantments. It is \code{NA} on trade-view generated rows and ordinary
 items.
 \item \code{gives_1_treasure} (\code{logical}) indicates whether the set contains a
 treasure enchantment. It is \code{NA} when no single treasure status applies.
@@ -151,15 +157,15 @@ appears among the villager's offers. A group selecting \code{k} of \code{n} appl
 source entries gives an ordinary source trade probability \code{k / n};
 select-all groups give every source trade probability one. Identical source
 entries are treated as repeated ways to obtain the same trade. Explicit
-choices and expanded function outcomes then contribute their conditional
+choices and generated outcomes then contribute their conditional
 probabilities.
 
 Rows do not generally sum to one. A tier can contain several groups and can
-therefore add several offers. A compact row's probability is marginal over
-all details it collapses. An expanded row instead gives the joint probability
-of its exact displayed items, specifications, and price. Summing expanded
-probabilities over one base item-choice combination recovers its compact
-probability.
+therefore add several offers. A trade row is marginal over its generated
+item specifications and prices. An option row is marginal over prices for
+one specification. An offer row gives the joint probability of one
+specification and exact price. Summing offers recovers their option
+probability; summing options recovers the corresponding trade-view row.
 
 \code{probability_status} (\code{character}) describes the calculation:
 \itemize{
@@ -180,11 +186,11 @@ gives 116 enchantment-level combinations. Soul Speed, Swift Sneak, and Wind
 Burst are excluded. For enchantment level \code{L}, the pinned parameters produce
 the normal emerald price
 \code{2 + 3L + U}, where \code{U} is a discrete uniform integer from zero through
-\code{4 + 10L}. Treasure prices double before the 64-emerald cap. Expanded rows
+\code{4 + 10L}. Treasure prices double before the 64-emerald cap. Offer rows
 enumerate the resulting price support, and probabilities from every
 underlying price capped at 64 are combined. Consequently, treasure support
-is even below the cap and need not contain every integer inside its compact
-minimum--maximum range.
+is even below the cap and need not contain every integer inside its trade or
+option minimum--maximum range.
 
 Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use the pinned
 \code{enchant_with_levels} model. The source enchanting level is uniform from 5
@@ -193,8 +199,8 @@ and the enchantment set is generated conditionally on the same value. The
 updater analytically integrates item enchantability, the two enchantability
 rolls, the triangular multiplier, weights, conflicts, and
 additional-enchantment branches. Identical complete sets at the same price
-are combined without simulation or resampling; the same set at another
-price remains a distinct expanded option.
+are combined without simulation or resampling. The same set at another
+price shares its \code{option_id} and receives a distinct \code{offer_id}.
 
 \code{"documented_model"} means exact probability under the documented model,
 rather than a guarantee about Bedrock engine constants that Mojang has not
@@ -218,8 +224,8 @@ both are selected. The returned value is therefore \code{-1}, the trade-table
 select-all convention. No other omission is accepted by the data updater.
 
 The Farmer suspicious-stew trade follows the six auxiliary values authored
-in the pinned table. Expanded output assigns each effect probability \code{1/6},
-including Night Vision. This describes the source table rather than the
+in the pinned table. Option and offer output assign each effect probability
+\code{1/6}, including Night Vision. This describes the source table rather than the
 known Bedrock runtime defect affecting that effect.
 }
 
@@ -245,12 +251,13 @@ head(
   ]
 )
 
-enchanted_armor <- villager_trades(expanded = TRUE)
+armor_options <- villager_trades(view = 'option')
 head(
-  enchanted_armor[
-    !is.na(enchanted_armor$gives_1_enchantments),
+  armor_options[
+    !is.na(armor_options$gives_1_enchantments),
     c(
       'wants_1_quantity_min',
+      'wants_1_quantity_max',
       'gives_1_item',
       'gives_1_enchantments',
       'offer_probability'
@@ -258,14 +265,17 @@ head(
   ]
 )
 
-books <- villager_trades('librarian', expanded = TRUE)
+book_offers <- villager_trades('librarian', view = 'offer')
 head(
-  books[
-    grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
+  book_offers[
+    grepl(
+      'minecraft:mending=',
+      book_offers$gives_1_enchantments,
+      fixed = TRUE
+    ),
     c(
       'gives_1_enchantments',
       'wants_1_quantity_min',
-      'wants_1_quantity_max',
       'offer_probability'
     )
   ]

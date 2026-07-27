@@ -17,15 +17,23 @@ without downloading files or reading \code{GITHUB_PAT}.
 trade-table features. \code{\link[=villager_variants]{villager_variants()}} connects biome names with
 Mojang's \code{minecraft:mark_variant} values. \code{\link[=villager_tiers]{villager_tiers()}} pairs each
 numeric tier with its name and cumulative experience requirement.
+\code{\link[=enchantments]{enchantments()}} provides the pinned enchantment registry and Villager
+availability.
 }
 
 \section{Data}{
 
 \code{\link[=villager_trades]{villager_trades()}} follows Mojang's \code{tiers}, \code{groups}, \code{trades}, \code{wants},
-and \code{gives} terminology. Compact rows may summarize generated details with
-quantity ranges. Expanded rows identify one exact item specification and
-price. Both forms report the probability of the outcome displayed by that
-row.
+and \code{gives} terminology. Its trade, option, and offer views move from
+summarized source rows to exact item specifications and prices. Every view
+reports the probability represented by its rows.
+}
+
+\section{Analysis}{
+
+\code{\link[=enchanted_book_probability]{enchanted_book_probability()}} calculates the chance that a fully unlocked
+Librarian has a qualifying book. \code{\link[=enchanted_item_probability]{enchanted_item_probability()}} evaluates
+complete enchantment sets on directly traded equipment.
 }
 
 \section{Version and modeling boundary}{

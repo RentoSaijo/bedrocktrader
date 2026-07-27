@@ -258,7 +258,8 @@
   levels      <- as.integer(vapply(parts, function(part) {
     part[[2L]]
   }, character(1)))
-  setNames(levels, identifiers)
+  names(levels) <- identifiers
+  levels
 }
 
 # Match one modeled enchantment set.
@@ -269,7 +270,8 @@
   match
 ) {
   modeled <- .parse_modeled_enchantments(value)
-  requested <- setNames(query$level, query$enchantment)
+  requested <- query$level
+  names(requested) <- query$enchantment
   if (identical(match, 'exact') && !setequal(names(modeled), names(requested))) {
     return(FALSE)
   }
@@ -288,19 +290,55 @@
 #' Calculate Enchanted Book Probability
 #'
 #' Calculates the probability that a fully unlocked Librarian has at least one
-#' qualifying enchanted-book offer.
+#' qualifying enchanted-book offer in Minecraft Bedrock `1.26.30.5`.
 #'
 #' @param enchantment One `identifier=level` pair. The `minecraft:` namespace
-#'   is optional.
-#' @param max_emeralds Inclusive original emerald-price cutoff.
-#' @param include_higher_level Whether levels above the request also qualify.
+#'   is optional. The default is the alphabetically first attainable
+#'   enchantment.
+#' @param max_emeralds Inclusive original emerald-price cutoff from 0 through
+#'   64.
+#' @param include_higher_level `FALSE` requires the requested level. `TRUE`
+#'   also counts higher valid levels of the same enchantment.
 #'
-#' @return One numeric probability.
+#' @return One numeric probability from 0 through 1.
+#'
+#' @details
+#' A fully unlocked Bedrock Librarian has four independent opportunities to
+#' offer an enchanted book. The book candidate is selected with probability
+#' `1/2` at novice, apprentice, and journeyman tiers and `1/3` at expert. Within
+#' each selected book trade, the model chooses one of 39 enchantments uniformly,
+#' then chooses uniformly among that enchantment's valid levels and generates
+#' its emerald price.
+#'
+#' The function sums all qualifying level-and-price offers within each source
+#' trade, then calculates one minus the probability that none of the four book
+#' trades qualifies. A recognized enchantment that Villagers cannot offer,
+#' such as Soul Speed, returns zero. Unknown identifiers and invalid levels
+#' produce errors; use [enchantments()] to inspect the registry.
+#'
+#' `max_emeralds` applies to the original modeled price before demand, curing,
+#' or other adjustments. The default `64` includes every book price. A cutoff
+#' of `26` is useful when screening for the commonly targeted low-price
+#' Librarian books, but the function does not simulate curing or promise a
+#' post-cure price.
+#'
+#' Probabilities for book identity, level, and price follow the documented
+#' model described in [villager_trades()]. They are exact under that model,
+#' rather than a guarantee about undocumented Bedrock internals.
+#'
+#' @references
+#' [Microsoft, "Introduction to Enchantments"](https://learn.microsoft.com/en-us/minecraft/creator/documents/introtoenchantments?view=minecraft-bedrock-stable)
+#'
+#' [Minecraft Wiki, "Trading"](https://minecraft.wiki/w/Trading)
 #' @export
 #'
 #' @examples
 #' enchanted_book_probability()
 #' enchanted_book_probability('mending=1', max_emeralds = 26)
+#' enchanted_book_probability(
+#'   'efficiency=2',
+#'   include_higher_level = TRUE
+#' )
 enchanted_book_probability <- function(
   enchantment = 'minecraft:aqua_affinity=1',
   max_emeralds = 64,
@@ -335,10 +373,8 @@ enchanted_book_probability <- function(
   qualifying <- enchantment_ids == requested_id &
     level_matches &
     rows$wants_1_quantity_min <= max_emeralds
-  trade_probabilities <- setNames(
-    numeric(length(book_trade_ids)),
-    book_trade_ids
-  )
+  trade_probabilities <- numeric(length(book_trade_ids))
+  names(trade_probabilities) <- book_trade_ids
   if (any(qualifying)) {
     matching_probabilities <- tapply(
       rows$.offer_probability[qualifying],
@@ -354,23 +390,83 @@ enchanted_book_probability <- function(
 #' Calculate Enchanted Item Probability
 #'
 #' Calculates the probability that a fully unlocked villager offers one
-#' qualifying enchanted equipment item.
+#' qualifying enchanted equipment item in Minecraft Bedrock `1.26.30.5`.
 #'
 #' @param item One supported short item name or canonical Minecraft item ID.
 #' @param enchantments Comma-separated `identifier=level` pairs. The
 #'   `minecraft:` namespace is optional.
 #' @param profession Required for diamond axes; use `"toolsmith"` or
 #'   `"weaponsmith"`. Other items infer their profession.
-#' @param max_emeralds Inclusive original emerald-price cutoff.
-#' @param include_higher_level Whether levels above each request also qualify.
-#' @param match `"exact"` requires the complete requested set. `"contains"`
-#'   permits additional enchantments.
+#' @param max_emeralds Inclusive original emerald-price cutoff from 0 through
+#'   64.
+#' @param include_higher_level `FALSE` requires every requested level. `TRUE`
+#'   treats each requested level as a minimum.
+#' @param match `"exact"` requires the complete enchantment set to contain only
+#'   the requested enchantments. `"contains"` permits additional enchantments.
 #'
-#' @return One numeric probability.
+#' @return One numeric probability from 0 through 1.
+#'
+#' @section Items and professions:
+#' Short names are `helmet`, `chestplate`, `leggings`, `boots`, `sword`, `axe`,
+#' `pickaxe`, `shovel`, `bow`, `crossbow`, and `fishing_rod`. Armor, swords,
+#' axes, pickaxes, and shovels refer to their diamond forms. Their corresponding
+#' namespaced item IDs are also accepted. Iron equipment is outside this
+#' analysis interface.
+#'
+#' Profession is inferred as Armorer, Fisherman, Fletcher, Toolsmith, or
+#' Weaponsmith. Diamond axes appear in two profession tables, so `profession`
+#' is required for that item. The Toolsmith trade is selected with probability
+#' `1/2`; the Weaponsmith trade is guaranteed. Profession aliases accepted by
+#' [villager_professions()] remain valid.
+#'
+#' @section Enchantment matching:
+#' Input follows the atomic representation returned by [villager_trades()], for
+#' example `minecraft:efficiency=2,minecraft:unbreaking=1`. Whitespace and pair
+#' order do not matter, capitalization is normalized, and `minecraft:` may be
+#' omitted. Display names are not accepted; [enchantments()] lists canonical
+#' identifiers and valid levels.
+#'
+#' With `match = "exact"`, the modeled item must have exactly the requested
+#' enchantment identifiers. With `match = "contains"`, every requested
+#' enchantment must appear, but unrequested enchantments may also occur. When
+#' `include_higher_level = TRUE`, either rule accepts levels at or above each
+#' requested value.
+#'
+#' Recognized but impossible conditions return zero. This includes
+#' item-inapplicable enchantments and incompatible combinations such as Fortune
+#' with Silk Touch. Malformed pairs, unknown identifiers, repeated identifiers,
+#' and levels outside the registry produce errors.
+#'
+#' @section Probability and price:
+#' The result includes source-trade selection and the complete documented
+#' `enchant_with_levels` distribution for the requested item. It sums the exact
+#' offers whose enchantment set and original emerald price meet the query.
+#'
+#' `max_emeralds` is evaluated before demand, curing, or other adjustments. Its
+#' default of `64` includes every modeled equipment price. It is a budget filter,
+#' not a prediction of the price after curing; price multipliers differ across
+#' equipment trades.
+#'
+#' The returned value is exact under the documented model described in
+#' [villager_trades()], rather than a guarantee about undocumented Bedrock
+#' internals.
+#'
+#' @references
+#' [Microsoft, "Loot Tables Documentation - Enchanting Tables"](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/loottablereference/examples/loottabledefinitions/enchantingtables?view=minecraft-bedrock-stable)
+#'
+#' [Minecraft Wiki, "Enchanting table mechanics," revision 3681507](https://minecraft.wiki/w/Enchanting_table_mechanics?oldid=3681507)
 #' @export
 #'
 #' @examples
 #' enchanted_item_probability('sword', 'sharpness=3')
+#'
+#' enchanted_item_probability(
+#'   item                 = 'pickaxe',
+#'   enchantments         = 'efficiency=2',
+#'   include_higher_level = TRUE,
+#'   match                = 'contains'
+#' )
+#'
 #' enchanted_item_probability(
 #'   item         = 'axe',
 #'   enchantments = 'efficiency=2,unbreaking=1',
