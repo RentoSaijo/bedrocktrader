@@ -1,15 +1,15 @@
 # Retrieve Villager Trades
 
 Returns the possible vanilla trades for one profession in Minecraft
-Bedrock `1.26.30.5`, together with the probability represented by each
-compact or expanded row.
+Bedrock `1.26.30.5`, together with the probability represented at the
+requested trade, option, or offer resolution.
 
 ## Usage
 
 ``` r
 villager_trades(
   profession = "armorer",
-  expanded = FALSE,
+  view = c("trade", "option", "offer"),
   variant = NULL,
   dimension = NULL
 )
@@ -23,12 +23,12 @@ villager_trades(
   [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md).
   The default is `"armorer"`; `"all"` is not a profession value.
 
-- expanded:
+- view:
 
-  `FALSE` returns compact base item-choice combinations that may contain
-  quantity ranges. `TRUE` returns exact modeled outcomes: populated
-  quantity minima equal their corresponding maxima, and each row has the
-  probability of its displayed items, specifications, and price.
+  Resolution of the returned rows. `"trade"` summarizes generated
+  specifications and prices, `"option"` resolves item specifications
+  while retaining price bounds, and `"offer"` resolves exact
+  specifications and prices.
 
 - variant:
 
@@ -44,34 +44,38 @@ villager_trades(
 
 ## Value
 
-A plain base data frame containing only atomic columns. Compact results
-contain 29 columns. Expanded results add `option_id` immediately after
-`trade_id`, for 30 columns.
+A plain base data frame containing only atomic columns. Trade results
+contain 29 columns. Option results add `option_id` after `trade_id`, for
+30 columns. Offer results add `offer_id` after `option_id`, for 31
+columns.
 
-## Compact and expanded rows
+## Hierarchical views
 
-Minecraft trade tables follow `tier -> group -> trade`. Explicit Mojang
-item choices create separate base rows so each `wants` and `gives` field
-remains a single value.
+Minecraft trade tables follow `tier -> group -> trade`; the package
+extends that structure as `trade_id -> option_id -> offer_id`. Explicit
+Mojang item choices remain separate rows so every `wants` and `gives`
+field stays atomic.
 
-With `expanded = FALSE`, generated details remain collapsed into their
-base row. For example, a Librarian enchanted-book row describes the full
-emerald range without naming one enchantment or price. Its probability
-is the chance that the base item combination appears, marginal over
-every function outcome. The pinned tables contain 281 compact rows
-across all professions.
+`view = "trade"` returns 281 base item-choice combinations from 182
+authored source entries across the pinned tables. Generated details
+remain summarized, so a Librarian book row covers every modeled
+enchantment, level, and price. A `trade_id` can repeat when Mojang
+supplies explicit item choices.
 
-With `expanded = TRUE`, each reconstructable function outcome and exact
-price receives its own row and `option_id`. Repeated `trade_id` values
-remain alternatives from one source trade; they are not additional
-candidates in a group. The pinned tables contain 30,592 expanded rows.
-Apart from the unresolved color of `random_dye`, every populated
-quantity minimum equals its maximum.
+`view = "option"` returns 2,787 concrete item specifications. For
+example, one enchanted-equipment option names its complete enchantment
+set while its emerald columns span every price that can produce that
+set. The probability is marginal over those prices.
 
-Fixed potion and exploration-map functions resolve to one value in
-either form because they do not create alternative outcomes.
-`random_dye` cannot be reconstructed faithfully from the pinned sources
-and remains one partial expanded row.
+`view = "offer"` returns 30,592 exact configurations. Each populated
+quantity minimum equals its maximum, and `offer_probability` covers the
+displayed items, specification, and price jointly. Offers are grouped by
+option and sorted by price.
+
+Fixed potion and exploration-map instructions resolve in every view
+because they do not create alternatives. `random_dye` remains one
+partial row because its color distribution is not established by the
+pinned sources.
 
 ## Identity and selection columns
 
@@ -91,10 +95,15 @@ and remains one partial expanded row.
 - `num_to_select` (`integer`) is Mojang's number of trades selected from
   the group. `-1` means every applicable trade is selected.
 
-- `trade_id` (`character`) identifies one source trade.
+- `trade_id` (`character`) identifies one source trade. Explicit
+  item-choice rows share this identifier.
 
-- `option_id` (`character`) uniquely identifies an expanded row and is
-  present only when `expanded = TRUE`.
+- `option_id` (`character`) identifies one concrete item specification.
+  It appears in option and offer views and repeats across an option's
+  prices.
+
+- `offer_id` (`character`) uniquely identifies an exact configuration.
+  It appears only in the offer view.
 
 The identifiers are stable within the pinned package release and do not
 appear in Mojang's source files.
@@ -117,10 +126,12 @@ Every `wants_2_*` field is typed `NA` for a one-item payment. An omitted
 quantity becomes one, while an omitted price multiplier on an existing
 item becomes Mojang's documented default of `0.05`.
 
-Compact Librarian and enchanted-equipment rows span every modeled
-emerald price. In expanded output, the emerald minimum and maximum are
-equal and identify the exact modeled price attached to that row. These
-values precede demand, curing, and Hero of the Village adjustments.
+Trade rows span every modeled price when a function changes the emerald
+cost. Option rows provide the bounds for one item specification; those
+bounds do not promise that every interior integer is attainable. Offer
+rows have equal minima and maxima and therefore identify exact modeled
+prices. All returned values precede demand, curing, and Hero of the
+Village adjustments.
 
 ## Gives columns
 
@@ -139,8 +150,8 @@ values precede demand, curing, and Hero of the Village adjustments.
 - `gives_1_enchantments` (`character`) records a complete enchantment
   set as sorted `minecraft:id=level` pairs separated by commas. For
   example, `minecraft:sharpness=2,minecraft:unbreaking=1` describes one
-  sword carrying both enchantments. It is `NA` on compact generated rows
-  and ordinary items.
+  sword carrying both enchantments. It is `NA` on trade-view generated
+  rows and ordinary items.
 
 - `gives_1_treasure` (`logical`) indicates whether the set contains a
   treasure enchantment. It is `NA` when no single treasure status
@@ -170,15 +181,16 @@ row appears among the villager's offers. A group selecting `k` of `n`
 applicable source entries gives an ordinary source trade probability
 `k / n`; select-all groups give every source trade probability one.
 Identical source entries are treated as repeated ways to obtain the same
-trade. Explicit choices and expanded function outcomes then contribute
-their conditional probabilities.
+trade. Explicit choices and generated outcomes then contribute their
+conditional probabilities.
 
 Rows do not generally sum to one. A tier can contain several groups and
-can therefore add several offers. A compact row's probability is
-marginal over all details it collapses. An expanded row instead gives
-the joint probability of its exact displayed items, specifications, and
-price. Summing expanded probabilities over one base item-choice
-combination recovers its compact probability.
+can therefore add several offers. A trade row is marginal over its
+generated item specifications and prices. An option row is marginal over
+prices for one specification. An offer row gives the joint probability
+of one specification and exact price. Summing offers recovers their
+option probability; summing options recovers the corresponding
+trade-view row.
 
 `probability_status` (`character`) describes the calculation:
 
@@ -199,11 +211,11 @@ gives 116 enchantment-level combinations. Soul Speed, Swift Sneak, and
 Wind Burst are excluded. For enchantment level `L`, the pinned
 parameters produce the normal emerald price `2 + 3L + U`, where `U` is a
 discrete uniform integer from zero through `4 + 10L`. Treasure prices
-double before the 64-emerald cap. Expanded rows enumerate the resulting
+double before the 64-emerald cap. Offer rows enumerate the resulting
 price support, and probabilities from every underlying price capped at
 64 are combined. Consequently, treasure support is even below the cap
-and need not contain every integer inside its compact minimum–maximum
-range.
+and need not contain every integer inside its trade or option
+minimum–maximum range.
 
 Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use the
 pinned `enchant_with_levels` model. The source enchanting level is
@@ -213,8 +225,8 @@ on the same value. The updater analytically integrates item
 enchantability, the two enchantability rolls, the triangular multiplier,
 weights, conflicts, and additional-enchantment branches. Identical
 complete sets at the same price are combined without simulation or
-resampling; the same set at another price remains a distinct expanded
-option.
+resampling. The same set at another price shares its `option_id` and
+receives a distinct `offer_id`.
 
 `"documented_model"` means exact probability under the documented model,
 rather than a guarantee about Bedrock engine constants that Mojang has
@@ -238,7 +250,7 @@ trade-table select-all convention. No other omission is accepted by the
 data updater.
 
 The Farmer suspicious-stew trade follows the six auxiliary values
-authored in the pinned table. Expanded output assigns each effect
+authored in the pinned table. Option and offer output assign each effect
 probability `1/6`, including Night Vision. This describes the source
 table rather than the known Bedrock runtime defect affecting that
 effect.
@@ -291,66 +303,63 @@ head(
 #> 5    1    minecraft:emerald minecraft:iron_chestplate              0.25
 #> 6    2 minecraft:iron_ingot         minecraft:emerald              1.00
 
-enchanted_armor <- villager_trades(expanded = TRUE)
+armor_options <- villager_trades(view = 'option')
 head(
-  enchanted_armor[
-    !is.na(enchanted_armor$gives_1_enchantments),
+  armor_options[
+    !is.na(armor_options$gives_1_enchantments),
     c(
       'wants_1_quantity_min',
+      'wants_1_quantity_max',
       'gives_1_item',
       'gives_1_enchantments',
       'offer_probability'
     )
   ]
 )
-#>    wants_1_quantity_min               gives_1_item
-#> 15                   19 minecraft:diamond_leggings
-#> 16                   19 minecraft:diamond_leggings
-#> 17                   19 minecraft:diamond_leggings
-#> 18                   19 minecraft:diamond_leggings
-#> 19                   19 minecraft:diamond_leggings
-#> 20                   19 minecraft:diamond_leggings
+#>    wants_1_quantity_min wants_1_quantity_max               gives_1_item
+#> 15                   19                   27 minecraft:diamond_leggings
+#> 16                   19                   27 minecraft:diamond_leggings
+#> 17                   19                   27 minecraft:diamond_leggings
+#> 18                   19                   27 minecraft:diamond_leggings
+#> 19                   20                   33 minecraft:diamond_leggings
+#> 20                   20                   33 minecraft:diamond_leggings
 #>                                                      gives_1_enchantments
 #> 15                                           minecraft:blast_protection=1
 #> 16                        minecraft:blast_protection=1,minecraft:thorns=1
 #> 17 minecraft:blast_protection=1,minecraft:thorns=1,minecraft:unbreaking=1
 #> 18                    minecraft:blast_protection=1,minecraft:unbreaking=1
-#> 19                                            minecraft:fire_protection=1
-#> 20                         minecraft:fire_protection=1,minecraft:thorns=1
+#> 19                                           minecraft:blast_protection=2
+#> 20                        minecraft:blast_protection=2,minecraft:thorns=1
 #>    offer_probability
-#> 15      2.419088e-03
-#> 16      1.246141e-05
-#> 17      1.061701e-05
-#> 18      6.556624e-04
-#> 19      6.028045e-04
-#> 20      3.115352e-05
+#> 15      0.0105131839
+#> 16      0.0003051833
+#> 17      0.0002780594
+#> 18      0.0030375988
+#> 19      0.0122614313
+#> 20      0.0010950188
 
-books <- villager_trades('librarian', expanded = TRUE)
+book_offers <- villager_trades('librarian', view = 'offer')
 head(
-  books[
-    grepl('minecraft:mending=', books$gives_1_enchantments, fixed = TRUE),
+  book_offers[
+    grepl(
+      'minecraft:mending=',
+      book_offers$gives_1_enchantments,
+      fixed = TRUE
+    ),
     c(
       'gives_1_enchantments',
       'wants_1_quantity_min',
-      'wants_1_quantity_max',
       'offer_probability'
     )
   ]
 )
-#>      gives_1_enchantments wants_1_quantity_min wants_1_quantity_max
-#> 1875  minecraft:mending=1                   10                   10
-#> 1876  minecraft:mending=1                   12                   12
-#> 1877  minecraft:mending=1                   14                   14
-#> 1878  minecraft:mending=1                   16                   16
-#> 1879  minecraft:mending=1                   18                   18
-#> 1880  minecraft:mending=1                   20                   20
-#>      offer_probability
-#> 1875      0.0008547009
-#> 1876      0.0008547009
-#> 1877      0.0008547009
-#> 1878      0.0008547009
-#> 1879      0.0008547009
-#> 1880      0.0008547009
+#>      gives_1_enchantments wants_1_quantity_min offer_probability
+#> 1875  minecraft:mending=1                   10      0.0008547009
+#> 1876  minecraft:mending=1                   12      0.0008547009
+#> 1877  minecraft:mending=1                   14      0.0008547009
+#> 1878  minecraft:mending=1                   16      0.0008547009
+#> 1879  minecraft:mending=1                   18      0.0008547009
+#> 1880  minecraft:mending=1                   20      0.0008547009
 
 maps <- villager_trades(
   profession = 'cartographer',

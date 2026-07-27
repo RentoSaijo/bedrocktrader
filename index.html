@@ -69,39 +69,29 @@
 <div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>Compact rows keep generated details together and may report a quantity range:</p>
+<p>Choose the resolution that matches the question:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rentosaijo.github.io/bedrocktrader/">bedrocktrader</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">armor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">armor</span><span class="op">[</span></span>
-<span>  <span class="va">armor</span><span class="op">$</span><span class="va">gives_1_item</span> <span class="op">==</span> <span class="st">'minecraft:diamond_helmet'</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">'wants_1_quantity_min'</span>,</span>
-<span>    <span class="st">'wants_1_quantity_max'</span>,</span>
-<span>    <span class="st">'gives_1_item'</span>,</span>
-<span>    <span class="st">'offer_probability'</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">]</span></span></code></pre></div>
-<p>Expanded rows describe one exact outcome and price:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enchanted_armor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span>expanded <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">helmet_options</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/villager_trades.html">villager_trades</a></span><span class="op">(</span>view <span class="op">=</span> <span class="st">'option'</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span>
-<span>  <span class="va">enchanted_armor</span><span class="op">[</span></span>
-<span>    <span class="va">enchanted_armor</span><span class="op">$</span><span class="va">gives_1_item</span> <span class="op">==</span> <span class="st">'minecraft:diamond_helmet'</span>,</span>
+<span>  <span class="va">helmet_options</span><span class="op">[</span></span>
+<span>    <span class="va">helmet_options</span><span class="op">$</span><span class="va">gives_1_item</span> <span class="op">==</span> <span class="st">'minecraft:diamond_helmet'</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>      <span class="st">'wants_1_quantity_min'</span>,</span>
 <span>      <span class="st">'gives_1_enchantments'</span>,</span>
+<span>      <span class="st">'wants_1_quantity_min'</span>,</span>
+<span>      <span class="st">'wants_1_quantity_max'</span>,</span>
 <span>      <span class="st">'offer_probability'</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">]</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/enchanted_book_probability.html">enchanted_book_probability</a></span><span class="op">(</span><span class="st">'mending=1'</span>, max_emeralds <span class="op">=</span> <span class="fl">26</span><span class="op">)</span></span></code></pre></div>
 <p>Minecraft organizes these possibilities as:</p>
-<pre class="text"><code><span><span class="va">tier</span> <span class="op">-&gt;</span> <span class="va">group</span> <span class="op">-&gt;</span> <span class="va">trade</span> <span class="op">-&gt;</span> <span class="va">option</span></span></code></pre>
-<p>A group selects one or more trades. Explicit item choices form separate base rows. Compact probabilities are marginal over collapsed outcomes, whereas an expanded option’s probability covers its exact items, specifications, and price.</p>
-<p>Use <code><a href="reference/villager_professions.html">villager_professions()</a></code>, <code><a href="reference/villager_variants.html">villager_variants()</a></code>, and <code><a href="reference/villager_tiers.html">villager_tiers()</a></code> to inspect accepted metadata. The <a href="reference/villager_trades.html"><code>villager_trades()</code> reference</a> explains every column, contextual inputs, probabilities, and modeling limits.</p>
+<pre class="text"><code><span><span class="va">tier</span> <span class="op">-&gt;</span> <span class="va">group</span> <span class="op">-&gt;</span> <span class="va">trade</span> <span class="op">-&gt;</span> <span class="va">option</span> <span class="op">-&gt;</span> <span class="va">offer</span></span></code></pre>
+<p>The trade view summarizes generated details and prices. The option view names one concrete item specification while retaining price bounds. The offer view separates every exact specification and price.</p>
+<p>Use <code><a href="reference/villager_professions.html">villager_professions()</a></code>, <code><a href="reference/villager_variants.html">villager_variants()</a></code>, <code><a href="reference/villager_tiers.html">villager_tiers()</a></code>, and <code><a href="reference/enchantments.html">enchantments()</a></code> to inspect accepted metadata. The <a href="reference/villager_trades.html"><code>villager_trades()</code> reference</a> explains every column and view. Detailed help for <a href="reference/enchanted_book_probability.html"><code>enchanted_book_probability()</code></a> and <a href="reference/enchanted_item_probability.html"><code>enchanted_item_probability()</code></a> covers the analysis queries.</p>
 </div>
 <div class="section level2">
 <h2 id="source-and-license">Source and license<a class="anchor" aria-label="anchor" href="#source-and-license"></a>

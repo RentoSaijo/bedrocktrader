@@ -16,64 +16,52 @@ pak::pak('RentoSaijo/bedrocktrader')
 
 ## Quick start
 
-Compact rows keep generated details together and may report a quantity
-range:
+Choose the resolution that matches the question:
 
 ``` r
 
 library(bedrocktrader)
 
-armor <- villager_trades()
-
-armor[
-  armor$gives_1_item == 'minecraft:diamond_helmet',
-  c(
-    'wants_1_quantity_min',
-    'wants_1_quantity_max',
-    'gives_1_item',
-    'offer_probability'
-  )
-]
-```
-
-Expanded rows describe one exact outcome and price:
-
-``` r
-
-enchanted_armor <- villager_trades(expanded = TRUE)
+helmet_options <- villager_trades(view = 'option')
 
 head(
-  enchanted_armor[
-    enchanted_armor$gives_1_item == 'minecraft:diamond_helmet',
+  helmet_options[
+    helmet_options$gives_1_item == 'minecraft:diamond_helmet',
     c(
-      'wants_1_quantity_min',
       'gives_1_enchantments',
+      'wants_1_quantity_min',
+      'wants_1_quantity_max',
       'offer_probability'
     )
   ]
 )
+
+enchanted_book_probability('mending=1', max_emeralds = 26)
 ```
 
 Minecraft organizes these possibilities as:
 
 ``` text
-tier -> group -> trade -> option
+tier -> group -> trade -> option -> offer
 ```
 
-A group selects one or more trades. Explicit item choices form separate
-base rows. Compact probabilities are marginal over collapsed outcomes,
-whereas an expanded option’s probability covers its exact items,
-specifications, and price.
+The trade view summarizes generated details and prices. The option view
+names one concrete item specification while retaining price bounds. The
+offer view separates every exact specification and price.
 
 Use
 [`villager_professions()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_professions.md),
 [`villager_variants()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_variants.md),
+[`villager_tiers()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_tiers.md),
 and
-[`villager_tiers()`](https://rentosaijo.github.io/bedrocktrader/reference/villager_tiers.md)
+[`enchantments()`](https://rentosaijo.github.io/bedrocktrader/reference/enchantments.md)
 to inspect accepted metadata. The [`villager_trades()`
 reference](https://rentosaijo.github.io/bedrocktrader/reference/villager_trades.md)
-explains every column, contextual inputs, probabilities, and modeling
-limits.
+explains every column and view. Detailed help for
+[`enchanted_book_probability()`](https://rentosaijo.github.io/bedrocktrader/reference/enchanted_book_probability.md)
+and
+[`enchanted_item_probability()`](https://rentosaijo.github.io/bedrocktrader/reference/enchanted_item_probability.md)
+covers the analysis queries.
 
 ## Source and license
 
