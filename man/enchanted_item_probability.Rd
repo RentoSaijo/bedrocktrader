@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{enchanted_item_probability}
 \alias{enchanted_item_probability}
-\title{Calculate Enchanted Item Probability}
+\title{Calculate enchanted item probability}
 \usage{
 enchanted_item_probability(
   item,
@@ -36,7 +36,8 @@ One numeric probability from 0 through 1.
 }
 \description{
 Calculates the probability that a fully unlocked villager offers one
-qualifying enchanted equipment item in Minecraft Bedrock \verb{1.26.30.5}.
+qualifying enchanted equipment item in Minecraft Bedrock Edition
+\verb{1.26.30.5}.
 }
 \section{Items and professions}{
 
@@ -46,10 +47,10 @@ axes, pickaxes, and shovels refer to their diamond forms. Their corresponding
 namespaced item IDs are also accepted. Iron equipment is outside this
 analysis interface.
 
-Profession is inferred as Armorer, Fisherman, Fletcher, Toolsmith, or
-Weaponsmith. Diamond axes appear in two profession tables, so \code{profession}
-is required for that item. The Toolsmith trade is selected with probability
-\code{1/2}; the Weaponsmith trade is guaranteed. Profession aliases accepted by
+Profession is inferred as armorer, fisherman, fletcher, toolsmith, or
+weaponsmith. Diamond axes appear in two profession tables, so \code{profession}
+is required for that item. The toolsmith trade is selected with probability
+\code{1/2}; the weaponsmith trade is guaranteed. Profession aliases accepted by
 \code{\link[=villager_professions]{villager_professions()}} remain valid.
 }
 

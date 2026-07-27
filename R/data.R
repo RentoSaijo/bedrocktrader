@@ -31,14 +31,13 @@
 
 # Public Functions --------------------------------------------------------------
 
-#' List Supported Villager Professions
+#' List supported villager professions
 #'
 #' Lists the 13 employable vanilla villager professions included in the
-#' Minecraft Bedrock `1.26.30.5` data model. The feature flags offer a quick
-#' way to find tables that need contextual inputs or contain generated source
-#' instructions.
+#' Minecraft Bedrock Edition `1.26.30.5` data model. The feature flags identify
+#' tables that need contextual inputs or contain generated source instructions.
 #'
-#' @return A base data frame with one row per profession:
+#' @returns A base data frame with one row per profession:
 #'
 #' - `profession` (`character`) is the canonical value accepted by
 #'   [villager_trades()].
@@ -80,12 +79,12 @@ villager_professions <- function() {
   result
 }
 
-#' List Villager Variants
+#' List villager variants
 #'
 #' Lists vanilla villager biome variants and their
-#' `minecraft:mark_variant` values for Minecraft Bedrock `1.26.30.5`.
+#' `minecraft:mark_variant` values for Minecraft Bedrock Edition `1.26.30.5`.
 #'
-#' @return A base data frame with seven rows:
+#' @returns A base data frame with seven rows:
 #'
 #' - `variant` (`character`) is the canonical package identifier.
 #' - `mark_variant` (`integer`) is Mojang's
@@ -114,12 +113,12 @@ villager_variants <- function() {
   result
 }
 
-#' List Villager Tiers
+#' List villager tiers
 #'
 #' Lists the five villager trading tiers and the cumulative experience a
-#' villager needs to unlock each tier in Minecraft Bedrock `1.26.30.5`.
+#' villager needs to unlock each tier in Minecraft Bedrock Edition `1.26.30.5`.
 #'
-#' @return A base data frame with five rows:
+#' @returns A base data frame with five rows:
 #'
 #' - `tier` (`integer`) is the numeric tier used by [villager_trades()].
 #' - `tier_name` (`character`) is the corresponding in-game rank.
@@ -139,30 +138,31 @@ villager_tiers <- function() {
   result
 }
 
-#' List Enchantments
+#' List enchantments
 #'
-#' Lists the 42 enchantments registered in Minecraft Bedrock `1.26.30.5` and
-#' identifies those available through the bundled villager model.
+#' Lists the 42 enchantments registered in Minecraft Bedrock Edition
+#' `1.26.30.5` and identifies those available through the bundled villager
+#' model.
 #'
-#' @return A base data frame with one row per enchantment:
+#' @returns A base data frame with one row per enchantment:
 #'
 #' - `enchantment` (`character`) is the namespaced identifier.
 #' - `display_name` (`character`) is the readable enchantment name.
 #' - `max_level` (`integer`) is the highest valid level.
 #' - `treasure` (`logical`) identifies treasure enchantments.
 #' - `villager_attainable` (`logical`) indicates availability through the
-#'   pinned Librarian trade model.
+#'   pinned librarian trade model.
 #' - `traded_items` (`character`) lists directly traded enchanted equipment,
 #'   separated by commas. It is `NA` when none applies.
 #'
 #' @details
-#' The registry contains the 39 enchantments available from Librarians plus
+#' The registry contains the 39 enchantments available from librarians plus
 #' Soul Speed, Swift Sneak, and Wind Burst. The latter three remain visible for
 #' validation and return `FALSE` in `villager_attainable`.
 #'
-#' `traded_items` concerns equipment generated directly by Armorer, Fisherman,
-#' Fletcher, Toolsmith, or Weaponsmith trades. It does not list items that can
-#' receive a Librarian book later through an anvil.
+#' `traded_items` concerns equipment generated directly by armorer, fisherman,
+#' fletcher, toolsmith, or weaponsmith trades. It does not list items that can
+#' receive a librarian book later through an anvil.
 #'
 #' Values are bundled and verified against Mojang's pinned enchantment registry
 #' during package development. Calling the function performs no download.
@@ -184,11 +184,11 @@ enchantments <- function() {
   result
 }
 
-#' Retrieve Villager Trades
+#' Retrieve villager trades
 #'
 #' Returns the possible vanilla trades for one profession in Minecraft Bedrock
-#' `1.26.30.5`, together with the probability represented at the requested
-#' trade, option, or offer resolution.
+#' Edition `1.26.30.5`, together with the probability represented at the
+#' requested trade, option, or offer resolution.
 #'
 #' @param profession One canonical profession or alias listed by
 #'   [villager_professions()]. The default is `"armorer"`; `"all"` is not a
@@ -203,7 +203,7 @@ enchantments <- function() {
 #' @param dimension One of `"overworld"`, `"nether"`, or `"end"` when the
 #'   profession has dimension-dependent trades.
 #'
-#' @return A plain base data frame containing only atomic columns. Trade results
+#' @returns A plain base data frame containing only atomic columns. Trade results
 #'   contain 29 columns. Option results add `option_id` after `trade_id`, for
 #'   30 columns. Offer results add `offer_id` after `option_id`, for 31 columns.
 #'
@@ -215,7 +215,7 @@ enchantments <- function() {
 #'
 #' `view = "trade"` returns 281 base item-choice combinations from 182 authored
 #' source entries across the pinned tables. Generated details remain summarized,
-#' so a Librarian book row covers every modeled enchantment, level, and price.
+#' so a librarian book row covers every modeled enchantment, level, and price.
 #' A `trade_id` can repeat when Mojang supplies explicit item choices.
 #'
 #' `view = "option"` returns 2,787 concrete item specifications. For example,
@@ -325,13 +325,13 @@ enchantments <- function() {
 #'
 #' - `"exact"` covers source-table selection, explicit choices, legacy
 #'   data-value outcomes, fixed potions, and maps.
-#' - `"documented_model"` covers Librarian books and complete enchanted
+#' - `"documented_model"` covers librarian books and complete enchanted
 #'   equipment sets.
 #' - `"partial"` marks `random_dye`, whose exact leather-color distribution is
 #'   not established by the pinned sources.
 #'
 #' @section Enchantment models:
-#' Each Librarian book trade draws uniformly from 39 eligible enchantments,
+#' Each librarian book trade draws uniformly from 39 eligible enchantments,
 #' then draws uniformly from the selected enchantment's valid levels. This
 #' gives 116 enchantment-level combinations. Soul Speed, Swift Sneak, and Wind
 #' Burst are excluded. For enchantment level `L`, the pinned parameters produce
@@ -343,7 +343,7 @@ enchantments <- function() {
 #' is even below the cap and need not contain every integer inside its trade or
 #' option minimum--maximum range.
 #'
-#' Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use the pinned
+#' Armorers, fishermen, fletchers, toolsmiths, and weaponsmiths use the pinned
 #' `enchant_with_levels` model. The source enchanting level is uniform from 5
 #' through 19. Mojang's base emerald cost is increased by that selected level,
 #' and the enchantment set is generated conditionally on the same value. The
@@ -358,7 +358,7 @@ enchantments <- function() {
 #' published.
 #'
 #' @section Pinned table details:
-#' The Librarian master candle group contains three identical red-candle source
+#' The librarian master candle group contains three identical red-candle source
 #' entries and one yellow-candle entry. They are presented as two rows:
 #' red has probability `0.75`, yellow has probability `0.25`, and
 #' `num_trades` remains four to preserve the source selection pool.
@@ -367,19 +367,19 @@ enchantments <- function() {
 #' Bedrock's black-to-white metadata order, so `minecraft:banner:0` is black
 #' and `minecraft:banner:15` is white.
 #'
-#' Mojang omits `num_to_select` from the pinned Fisherman master group. That
+#' Mojang omits `num_to_select` from the pinned fisherman master group. That
 #' group contains the pufferfish trade and one variant-specific boat trade;
 #' both are selected. The returned value is therefore `-1`, the trade-table
 #' select-all convention. No other omission is accepted by the data updater.
 #'
-#' The Farmer suspicious-stew trade follows the six auxiliary values authored
+#' The farmer suspicious-stew trade follows the six auxiliary values authored
 #' in the pinned table. Option and offer output assign each effect probability
 #' `1/6`, including Night Vision. This describes the source table rather than the
 #' known Bedrock runtime defect affecting that effect.
 #'
 #' @section Villager context:
 #' Filters are applied before group sizes and probabilities are calculated.
-#' Fisherman requires `variant`; Cartographer requires both `variant` and
+#' Fisherman requires `variant`; cartographer requires both `variant` and
 #' `dimension`. Other professions need neither. The function stops when
 #' required context is missing rather than assuming Plains or the Overworld.
 #'

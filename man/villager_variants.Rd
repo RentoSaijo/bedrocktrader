@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{villager_variants}
 \alias{villager_variants}
-\title{List Villager Variants}
+\title{List villager variants}
 \usage{
 villager_variants()
 }
@@ -19,7 +19,7 @@ commas. It is \code{NA} when no aliases exist.
 }
 \description{
 Lists vanilla villager biome variants and their
-\code{minecraft:mark_variant} values for Minecraft Bedrock \verb{1.26.30.5}.
+\code{minecraft:mark_variant} values for Minecraft Bedrock Edition \verb{1.26.30.5}.
 }
 \details{
 The canonical cold-biome identifier is \code{snow}, matching the pinned entity

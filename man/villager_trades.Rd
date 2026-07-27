@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{villager_trades}
 \alias{villager_trades}
-\title{Retrieve Villager Trades}
+\title{Retrieve villager trades}
 \usage{
 villager_trades(
   profession = "armorer",
@@ -35,8 +35,8 @@ contain 29 columns. Option results add \code{option_id} after \code{trade_id}, f
 }
 \description{
 Returns the possible vanilla trades for one profession in Minecraft Bedrock
-\verb{1.26.30.5}, together with the probability represented at the requested
-trade, option, or offer resolution.
+Edition \verb{1.26.30.5}, together with the probability represented at the
+requested trade, option, or offer resolution.
 }
 \section{Hierarchical views}{
 
@@ -47,7 +47,7 @@ atomic.
 
 \code{view = "trade"} returns 281 base item-choice combinations from 182 authored
 source entries across the pinned tables. Generated details remain summarized,
-so a Librarian book row covers every modeled enchantment, level, and price.
+so a librarian book row covers every modeled enchantment, level, and price.
 A \code{trade_id} can repeat when Mojang supplies explicit item choices.
 
 \code{view = "option"} returns 2,787 concrete item specifications. For example,
@@ -171,7 +171,7 @@ probability; summing options recovers the corresponding trade-view row.
 \itemize{
 \item \code{"exact"} covers source-table selection, explicit choices, legacy
 data-value outcomes, fixed potions, and maps.
-\item \code{"documented_model"} covers Librarian books and complete enchanted
+\item \code{"documented_model"} covers librarian books and complete enchanted
 equipment sets.
 \item \code{"partial"} marks \code{random_dye}, whose exact leather-color distribution is
 not established by the pinned sources.
@@ -180,7 +180,7 @@ not established by the pinned sources.
 
 \section{Enchantment models}{
 
-Each Librarian book trade draws uniformly from 39 eligible enchantments,
+Each librarian book trade draws uniformly from 39 eligible enchantments,
 then draws uniformly from the selected enchantment's valid levels. This
 gives 116 enchantment-level combinations. Soul Speed, Swift Sneak, and Wind
 Burst are excluded. For enchantment level \code{L}, the pinned parameters produce
@@ -192,7 +192,7 @@ underlying price capped at 64 are combined. Consequently, treasure support
 is even below the cap and need not contain every integer inside its trade or
 option minimum--maximum range.
 
-Armorers, Fishermen, Fletchers, Toolsmiths, and Weaponsmiths use the pinned
+Armorers, fishermen, fletchers, toolsmiths, and weaponsmiths use the pinned
 \code{enchant_with_levels} model. The source enchanting level is uniform from 5
 through 19. Mojang's base emerald cost is increased by that selected level,
 and the enchantment set is generated conditionally on the same value. The
@@ -209,7 +209,7 @@ published.
 
 \section{Pinned table details}{
 
-The Librarian master candle group contains three identical red-candle source
+The librarian master candle group contains three identical red-candle source
 entries and one yellow-candle entry. They are presented as two rows:
 red has probability \code{0.75}, yellow has probability \code{0.25}, and
 \code{num_trades} remains four to preserve the source selection pool.
@@ -218,12 +218,12 @@ Bed colors use the white-to-black auxiliary-value order. Banner colors use
 Bedrock's black-to-white metadata order, so \code{minecraft:banner:0} is black
 and \code{minecraft:banner:15} is white.
 
-Mojang omits \code{num_to_select} from the pinned Fisherman master group. That
+Mojang omits \code{num_to_select} from the pinned fisherman master group. That
 group contains the pufferfish trade and one variant-specific boat trade;
 both are selected. The returned value is therefore \code{-1}, the trade-table
 select-all convention. No other omission is accepted by the data updater.
 
-The Farmer suspicious-stew trade follows the six auxiliary values authored
+The farmer suspicious-stew trade follows the six auxiliary values authored
 in the pinned table. Option and offer output assign each effect probability
 \code{1/6}, including Night Vision. This describes the source table rather than the
 known Bedrock runtime defect affecting that effect.
@@ -232,7 +232,7 @@ known Bedrock runtime defect affecting that effect.
 \section{Villager context}{
 
 Filters are applied before group sizes and probabilities are calculated.
-Fisherman requires \code{variant}; Cartographer requires both \code{variant} and
+Fisherman requires \code{variant}; cartographer requires both \code{variant} and
 \code{dimension}. Other professions need neither. The function stops when
 required context is missing rather than assuming Plains or the Overworld.
 }

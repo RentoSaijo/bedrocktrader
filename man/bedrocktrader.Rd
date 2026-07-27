@@ -4,7 +4,7 @@
 \name{bedrocktrader}
 \alias{bedrocktrader}
 \alias{bedrocktrader-package}
-\title{bedrocktrader: Minecraft Bedrock Villager Trade Data}
+\title{bedrocktrader: Minecraft Bedrock Edition villager trade data}
 \description{
 \code{bedrocktrader} provides normalized vanilla villager trades for Minecraft
 Bedrock Edition \verb{1.26.30.5}. The data and modeled outcomes are bundled with
@@ -17,7 +17,7 @@ without downloading files or reading \code{GITHUB_PAT}.
 trade-table features. \code{\link[=villager_variants]{villager_variants()}} connects biome names with
 Mojang's \code{minecraft:mark_variant} values. \code{\link[=villager_tiers]{villager_tiers()}} pairs each
 numeric tier with its name and cumulative experience requirement.
-\code{\link[=enchantments]{enchantments()}} provides the pinned enchantment registry and Villager
+\code{\link[=enchantments]{enchantments()}} provides the pinned enchantment registry and villager
 availability.
 }
 
@@ -32,7 +32,7 @@ reports the probability represented by its rows.
 \section{Analysis}{
 
 \code{\link[=enchanted_book_probability]{enchanted_book_probability()}} calculates the chance that a fully unlocked
-Librarian has a qualifying book. \code{\link[=enchanted_item_probability]{enchanted_item_probability()}} evaluates
+librarian has a qualifying book. \code{\link[=enchanted_item_probability]{enchanted_item_probability()}} evaluates
 complete enchantment sets on directly traded equipment.
 }
 

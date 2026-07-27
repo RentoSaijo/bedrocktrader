@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{villager_tiers}
 \alias{villager_tiers}
-\title{List Villager Tiers}
+\title{List villager tiers}
 \usage{
 villager_tiers()
 }
@@ -17,7 +17,7 @@ villager needs to unlock the tier. The novice tier is always available.
 }
 \description{
 Lists the five villager trading tiers and the cumulative experience a
-villager needs to unlock each tier in Minecraft Bedrock \verb{1.26.30.5}.
+villager needs to unlock each tier in Minecraft Bedrock Edition \verb{1.26.30.5}.
 }
 \details{
 The bundled vanilla profession tables use the same tier names and

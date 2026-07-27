@@ -287,10 +287,10 @@
 
 # Public Functions --------------------------------------------------------------
 
-#' Calculate Enchanted Book Probability
+#' Calculate enchanted book probability
 #'
-#' Calculates the probability that a fully unlocked Librarian has at least one
-#' qualifying enchanted-book offer in Minecraft Bedrock `1.26.30.5`.
+#' Calculates the probability that a fully unlocked librarian has at least one
+#' qualifying enchanted-book offer in Minecraft Bedrock Edition `1.26.30.5`.
 #'
 #' @param enchantment One `identifier=level` pair. The `minecraft:` namespace
 #'   is optional. The default is the alphabetically first attainable
@@ -300,10 +300,10 @@
 #' @param include_higher_level `FALSE` requires the requested level. `TRUE`
 #'   also counts higher valid levels of the same enchantment.
 #'
-#' @return One numeric probability from 0 through 1.
+#' @returns One numeric probability from 0 through 1.
 #'
 #' @details
-#' A fully unlocked Bedrock Librarian has four independent opportunities to
+#' A fully unlocked Bedrock librarian has four independent opportunities to
 #' offer an enchanted book. The book candidate is selected with probability
 #' `1/2` at novice, apprentice, and journeyman tiers and `1/3` at expert. Within
 #' each selected book trade, the model chooses one of 39 enchantments uniformly,
@@ -312,14 +312,14 @@
 #'
 #' The function sums all qualifying level-and-price offers within each source
 #' trade, then calculates one minus the probability that none of the four book
-#' trades qualifies. A recognized enchantment that Villagers cannot offer,
+#' trades qualifies. A recognized enchantment that villagers cannot offer,
 #' such as Soul Speed, returns zero. Unknown identifiers and invalid levels
 #' produce errors; use [enchantments()] to inspect the registry.
 #'
 #' `max_emeralds` applies to the original modeled price before demand, curing,
 #' or other adjustments. The default `64` includes every book price. A cutoff
 #' of `26` is useful when screening for the commonly targeted low-price
-#' Librarian books, but the function does not simulate curing or promise a
+#' librarian books, but the function does not simulate curing or promise a
 #' post-cure price.
 #'
 #' Probabilities for book identity, level, and price follow the documented
@@ -387,10 +387,11 @@ enchanted_book_probability <- function(
   as.numeric(1 - prod(1 - trade_probabilities))
 }
 
-#' Calculate Enchanted Item Probability
+#' Calculate enchanted item probability
 #'
 #' Calculates the probability that a fully unlocked villager offers one
-#' qualifying enchanted equipment item in Minecraft Bedrock `1.26.30.5`.
+#' qualifying enchanted equipment item in Minecraft Bedrock Edition
+#' `1.26.30.5`.
 #'
 #' @param item One supported short item name or canonical Minecraft item ID.
 #' @param enchantments Comma-separated `identifier=level` pairs. The
@@ -404,7 +405,7 @@ enchanted_book_probability <- function(
 #' @param match `"exact"` requires the complete enchantment set to contain only
 #'   the requested enchantments. `"contains"` permits additional enchantments.
 #'
-#' @return One numeric probability from 0 through 1.
+#' @returns One numeric probability from 0 through 1.
 #'
 #' @section Items and professions:
 #' Short names are `helmet`, `chestplate`, `leggings`, `boots`, `sword`, `axe`,
@@ -413,10 +414,10 @@ enchanted_book_probability <- function(
 #' namespaced item IDs are also accepted. Iron equipment is outside this
 #' analysis interface.
 #'
-#' Profession is inferred as Armorer, Fisherman, Fletcher, Toolsmith, or
-#' Weaponsmith. Diamond axes appear in two profession tables, so `profession`
-#' is required for that item. The Toolsmith trade is selected with probability
-#' `1/2`; the Weaponsmith trade is guaranteed. Profession aliases accepted by
+#' Profession is inferred as armorer, fisherman, fletcher, toolsmith, or
+#' weaponsmith. Diamond axes appear in two profession tables, so `profession`
+#' is required for that item. The toolsmith trade is selected with probability
+#' `1/2`; the weaponsmith trade is guaranteed. Profession aliases accepted by
 #' [villager_professions()] remain valid.
 #'
 #' @section Enchantment matching:

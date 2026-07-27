@@ -1,6 +1,6 @@
 # Package Documentation ---------------------------------------------------------
 
-#' bedrocktrader: Minecraft Bedrock Villager Trade Data
+#' bedrocktrader: Minecraft Bedrock Edition villager trade data
 #'
 #' `bedrocktrader` provides normalized vanilla villager trades for Minecraft
 #' Bedrock Edition `1.26.30.5`. The data and modeled outcomes are bundled with
@@ -12,7 +12,7 @@
 #' trade-table features. [villager_variants()] connects biome names with
 #' Mojang's `minecraft:mark_variant` values. [villager_tiers()] pairs each
 #' numeric tier with its name and cumulative experience requirement.
-#' [enchantments()] provides the pinned enchantment registry and Villager
+#' [enchantments()] provides the pinned enchantment registry and villager
 #' availability.
 #'
 #' @section Data:
@@ -23,7 +23,7 @@
 #'
 #' @section Analysis:
 #' [enchanted_book_probability()] calculates the chance that a fully unlocked
-#' Librarian has a qualifying book. [enchanted_item_probability()] evaluates
+#' librarian has a qualifying book. [enchanted_item_probability()] evaluates
 #' complete enchantment sets on directly traded equipment.
 #'
 #' @section Version and modeling boundary:

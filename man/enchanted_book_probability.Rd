@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{enchanted_book_probability}
 \alias{enchanted_book_probability}
-\title{Calculate Enchanted Book Probability}
+\title{Calculate enchanted book probability}
 \usage{
 enchanted_book_probability(
   enchantment = "minecraft:aqua_affinity=1",
@@ -25,11 +25,11 @@ also counts higher valid levels of the same enchantment.}
 One numeric probability from 0 through 1.
 }
 \description{
-Calculates the probability that a fully unlocked Librarian has at least one
-qualifying enchanted-book offer in Minecraft Bedrock \verb{1.26.30.5}.
+Calculates the probability that a fully unlocked librarian has at least one
+qualifying enchanted-book offer in Minecraft Bedrock Edition \verb{1.26.30.5}.
 }
 \details{
-A fully unlocked Bedrock Librarian has four independent opportunities to
+A fully unlocked Bedrock librarian has four independent opportunities to
 offer an enchanted book. The book candidate is selected with probability
 \code{1/2} at novice, apprentice, and journeyman tiers and \code{1/3} at expert. Within
 each selected book trade, the model chooses one of 39 enchantments uniformly,
@@ -38,14 +38,14 @@ its emerald price.
 
 The function sums all qualifying level-and-price offers within each source
 trade, then calculates one minus the probability that none of the four book
-trades qualifies. A recognized enchantment that Villagers cannot offer,
+trades qualifies. A recognized enchantment that villagers cannot offer,
 such as Soul Speed, returns zero. Unknown identifiers and invalid levels
 produce errors; use \code{\link[=enchantments]{enchantments()}} to inspect the registry.
 
 \code{max_emeralds} applies to the original modeled price before demand, curing,
 or other adjustments. The default \code{64} includes every book price. A cutoff
 of \code{26} is useful when screening for the commonly targeted low-price
-Librarian books, but the function does not simulate curing or promise a
+librarian books, but the function does not simulate curing or promise a
 post-cure price.
 
 Probabilities for book identity, level, and price follow the documented

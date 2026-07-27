@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{enchantments}
 \alias{enchantments}
-\title{List Enchantments}
+\title{List enchantments}
 \usage{
 enchantments()
 }
@@ -14,23 +14,24 @@ A base data frame with one row per enchantment:
 \item \code{max_level} (\code{integer}) is the highest valid level.
 \item \code{treasure} (\code{logical}) identifies treasure enchantments.
 \item \code{villager_attainable} (\code{logical}) indicates availability through the
-pinned Librarian trade model.
+pinned librarian trade model.
 \item \code{traded_items} (\code{character}) lists directly traded enchanted equipment,
 separated by commas. It is \code{NA} when none applies.
 }
 }
 \description{
-Lists the 42 enchantments registered in Minecraft Bedrock \verb{1.26.30.5} and
-identifies those available through the bundled villager model.
+Lists the 42 enchantments registered in Minecraft Bedrock Edition
+\verb{1.26.30.5} and identifies those available through the bundled villager
+model.
 }
 \details{
-The registry contains the 39 enchantments available from Librarians plus
+The registry contains the 39 enchantments available from librarians plus
 Soul Speed, Swift Sneak, and Wind Burst. The latter three remain visible for
 validation and return \code{FALSE} in \code{villager_attainable}.
 
-\code{traded_items} concerns equipment generated directly by Armorer, Fisherman,
-Fletcher, Toolsmith, or Weaponsmith trades. It does not list items that can
-receive a Librarian book later through an anvil.
+\code{traded_items} concerns equipment generated directly by armorer, fisherman,
+fletcher, toolsmith, or weaponsmith trades. It does not list items that can
+receive a librarian book later through an anvil.
 
 Values are bundled and verified against Mojang's pinned enchantment registry
 during package development. Calling the function performs no download.

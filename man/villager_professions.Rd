@@ -2,7 +2,7 @@
 % Please edit documentation in R/data.R
 \name{villager_professions}
 \alias{villager_professions}
-\title{List Supported Villager Professions}
+\title{List supported villager professions}
 \usage{
 villager_professions()
 }
@@ -25,9 +25,8 @@ values, potion setting, map creation, or random dye.
 }
 \description{
 Lists the 13 employable vanilla villager professions included in the
-Minecraft Bedrock \verb{1.26.30.5} data model. The feature flags offer a quick
-way to find tables that need contextual inputs or contain generated source
-instructions.
+Minecraft Bedrock Edition \verb{1.26.30.5} data model. The feature flags identify
+tables that need contextual inputs or contain generated source instructions.
 }
 \details{
 Inputs are case-insensitive. \code{mason} and \code{stonemason} resolve to
